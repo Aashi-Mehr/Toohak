@@ -3,7 +3,7 @@
 // other.js
 //
 // Authors:
-// Zhejun Gu (z351573)
+// Zhejun Gu (z5351573)
 //
 // Edited: 21/09/2023
 //
