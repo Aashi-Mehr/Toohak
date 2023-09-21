@@ -7,3 +7,13 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
         authUserId: 1,
     }
 }
+
+// Function : adminUserLogin
+// Input    : email, password
+// Output   : authUserId
+
+function adminAuthLogin(email, password) {
+    return {
+        authUserId: 1,
+    }
+}
