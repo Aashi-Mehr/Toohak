@@ -3,10 +3,11 @@ let data = {
     users:
     [
         {
-            user_id: 1,
-            name_first: 'Hello',
-            name_last: 'World',
+            authUserId: 1,
+            nameFirst: 'Hello',
+            nameLast: 'World',
             email: 'Hello_World@1531.com',
+            password: '123456789...',
             successful_log_time: '15',
             failed_password_num: '2',
         },
@@ -16,7 +17,7 @@ let data = {
     quizzes: 
     [
         {
-            quiz_id: 1,
+            quizId: 1,
             quiz_name: 'My Quiz',
             quiz_discription: 'This is my quiz',
             time_created: 202309211910,
