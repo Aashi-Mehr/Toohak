@@ -28,3 +28,18 @@ function adminQuizCreate( authUserId, name, description ) {
 function adminQuizRemove( authUserId, quizId ) {
     return { };
 }
+
+// Function : adminQuizList
+// Input    : authUserId
+// Output   : quizzes : [{quizId: 1, name: 'My Quiz',}]
+
+function adminQuizList( authUserId ) {
+    return {
+        quizzes: [
+            {
+              quizId: 1,
+              name: 'My Quiz',
+            }
+        ]
+    }
+}
