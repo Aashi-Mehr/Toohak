@@ -12,7 +12,7 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
 // Input    : email, password
 // Output   : authUserId
 
-function adminUserLogin(email, password) {
+function adminAuthLogin(email, password) {
     return {
         authUserId: 1,
     }
