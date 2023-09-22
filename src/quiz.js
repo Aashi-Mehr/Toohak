@@ -58,3 +58,18 @@ function adminQuizRemove( authUserId, quizId ) {
 function adminQuizNameUpdate( authUserId, quizId, name ) {
     return { };
 }
+
+/*  adminQuizDescriptionUpdate
+    Update the description of the relevant quiz.
+
+    Parameters:
+        authUserId:
+        quizId:
+        description:
+    
+    Returns:
+        { }: Rempty Object
+ */
+function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
+    return { };
+}
