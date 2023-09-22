@@ -44,10 +44,29 @@ function adminQuizRemove( authUserId, quizId ) {
     return { };
 }
 
+/*  adminQuizInfo
+    Get all of the relevant information about the current quiz.
+
+    Parameters:
+        authUserId:
+        quizId:
+    
+    Returns:
+        Quiz Object
+ */
+function adminQuizInfo( authUserId, quizId ) {
+    return {
+        quizId: 1,
+        name: 'My Quiz',
+        timeCreated: 1683125870,
+        timeLastEdited: 1683125871,
+        description: 'This is my quiz',
+    };
+}
+
 /*  adminQuizNameUpdate
     Update the name of the relevant quiz.
 
-<<<<<<< src/quiz.js
     Parameters:
         authUserId:
         quizId:
