@@ -47,6 +47,7 @@ function adminQuizRemove( authUserId, quizId ) {
 /*  adminQuizNameUpdate
     Update the name of the relevant quiz.
 
+<<<<<<< src/quiz.js
     Parameters:
         authUserId:
         quizId:
