@@ -20,10 +20,14 @@ test('Test Invalid User IDs', () => {
 
 test('Test Valid User IDs', () => {
     // DEPENDENCY on adminAuthRegister
-    let authUserId1 = adminAuthRegister("first.last1@gmail.com", "Val1dPassword1", "first1", "last1").authUserId;
-    let authUserId2 = adminAuthRegister("first.last2@gmail.com", "Val1dPassword2", "first2", "last2").authUserId;
-    let authUserId3 = adminAuthRegister("first.last3@gmail.com", "Val1dPassword3", "first3", "last3").authUserId;
-    let authUserId4 = adminAuthRegister("first.last4@gmail.com", "Val1dPassword4", "first4", "last4").authUserId;
+    let authUserId1 = adminAuthRegister("first.last1@gmail.com",
+                      "Val1dPassword1", "first1", "last1").authUserId;
+    let authUserId2 = adminAuthRegister("first.last2@gmail.com",
+                      "Val1dPassword2", "first2", "last2").authUserId;
+    let authUserId3 = adminAuthRegister("first.last3@gmail.com",
+                      "Val1dPassword3", "first3", "last3").authUserId;
+    let authUserId4 = adminAuthRegister("first.last4@gmail.com",
+                      "Val1dPassword4", "first4", "last4").authUserId;
     
     let result = adminUserDetails(authUserId1);
     expect(result).toMatchObject({ user:
