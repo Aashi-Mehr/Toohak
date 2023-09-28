@@ -2,7 +2,7 @@
 // Input : email, password, nameFirst, nameLast
 // Output : authUserId
 
-function adminAuthRegister(email, password, nameFirst, nameLast) {
+export function adminAuthRegister(email, password, nameFirst, nameLast) {
     return { 
         authUserId: 1,
     }
@@ -12,7 +12,7 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
 // Input    : email, password
 // Output   : authUserId
 
-function adminAuthLogin(email, password) {
+export function adminAuthLogin(email, password) {
     return {
         authUserId: 1,
     }
@@ -23,7 +23,7 @@ function adminAuthLogin(email, password) {
 // Output   : user {userId: 1, name: 'Hayden Smith', 
 //            email: 'hayden.smith@unsw.edu.au', numSuccessfulLogins: 3}
 
-function adminUserDetails(authUserId) {
+export function adminUserDetails(authUserId) {
     return { 
         user:
         {
