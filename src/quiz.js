@@ -55,13 +55,21 @@ function adminQuizRemove( authUserId, quizId ) {
         Quiz Object
  */
 function adminQuizInfo( authUserId, quizId ) {
-    return {
-        quizId: 1,
-        name: 'My Quiz',
-        timeCreated: 1683125870,
-        timeLastEdited: 1683125871,
-        description: 'This is my quiz',
-    };
+    let quizzes = getData();
+
+    for (quiz of quizzes) {
+        if (quiz.quizId === quizId && quiz.quizAuthorId === authUserId) {
+            return {
+                quizId: quiz.quizId,
+                name: quiz.name,
+                timeCreated: quiz.time_created,
+                timeLastEdited:quiz.time_last_edit,
+                description: quiz.description
+            }
+        }
+    }
+
+    return { error: "No such quiz" }
 }
 
 /*  adminQuizNameUpdate
