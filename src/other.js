@@ -2,15 +2,21 @@
 //
 // other.js
 //
-// Authors:
+// authors:
 // Zhejun Gu (z5351573)
 //
-// Edited: 21/09/2023
+// edit: 
+// 28/09/2023
 //
 
 // clear (parameters: void(); return: empty{})
 // Reset state of the application back to the start
+import { getData, setData } from './dataStore.js';
+
 function clear() {
-    return {}
+    setData({
+        users: [],
+    });
 }
  
+export { clear };
