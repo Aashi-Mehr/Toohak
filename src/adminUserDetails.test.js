@@ -1,6 +1,10 @@
 import { adminUserDetails } from './auth.js';
 import { adminAuthRegister } from './auth.js';
 
+beforeEach(() => {
+  clear();
+});
+
 test('Test Invalid User IDs', () => {
     // authUserId is not an integer
     let result = adminUserDetails("12345");
