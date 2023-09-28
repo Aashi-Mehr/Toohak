@@ -1,4 +1,5 @@
 import { adminUserDetails } from './auth.js';
+import { adminAuthRegister } from './auth.js';
 
 test('Test Invalid User IDs', () => {
     // authUserId is not an integer
