@@ -1,3 +1,18 @@
+// Function : adminQuizList
+// Input    : authUserId
+// Output   : quizzes : [{quizId: 1, name: 'My Quiz',}]
+
+function adminQuizList( authUserId ) {
+    return {
+        quizzes: [
+            {
+              quizId: 1,
+              name: 'My Quiz',
+            }
+        ]
+    }
+}
+
 /*  adminQuizCreate
     Given basic details about a new quiz, create one for the logged in user.
 
@@ -29,17 +44,52 @@ function adminQuizRemove( authUserId, quizId ) {
     return { };
 }
 
-// Function : adminQuizList
-// Input    : authUserId
-// Output   : quizzes : [{quizId: 1, name: 'My Quiz',}]
+/*  adminQuizInfo
+    Get all of the relevant information about the current quiz.
 
-function adminQuizList( authUserId ) {
+    Parameters:
+        authUserId:
+        quizId:
+    
+    Returns:
+        Quiz Object
+ */
+function adminQuizInfo( authUserId, quizId ) {
     return {
-        quizzes: [
-            {
-              quizId: 1,
-              name: 'My Quiz',
-            }
-        ]
-    }
+        quizId: 1,
+        name: 'My Quiz',
+        timeCreated: 1683125870,
+        timeLastEdited: 1683125871,
+        description: 'This is my quiz',
+    };
+}
+
+/*  adminQuizNameUpdate
+    Update the name of the relevant quiz.
+
+    Parameters:
+        authUserId:
+        quizId:
+        name:
+    
+    Returns:
+        { }: Rempty Object
+ */
+function adminQuizNameUpdate( authUserId, quizId, name ) {
+    return { };
+}
+
+/*  adminQuizDescriptionUpdate
+    Update the description of the relevant quiz.
+
+    Parameters:
+        authUserId:
+        quizId:
+        description:
+    
+    Returns:
+        { }: Rempty Object
+ */
+function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
+    return { };
 }
