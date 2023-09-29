@@ -94,4 +94,5 @@ function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
     return { };
 }
 
-export { adminQuizList, adminQuizInfo };
+// last edit: 29/09/2023 by Zhejun Gu
+export { adminQuizList, adminQuizInfo, adminQuizCreate };
