@@ -93,3 +93,6 @@ function adminQuizNameUpdate( authUserId, quizId, name ) {
 function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
     return { };
 }
+
+// last edit: 29/09/2023 by Zhejun Gu
+export { adminQuizList, adminQuizInfo, adminQuizCreate };
