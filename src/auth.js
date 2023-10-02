@@ -103,7 +103,7 @@ export function adminUserDetails(authUserId) {
         return { "error": "No user with authUserId"`${authUserId}` };
     }
 
-    // No further errors accur, return the user detail
+    // No further errors occur, return the user detail
     return { 
         user:
         {
