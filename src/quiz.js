@@ -65,11 +65,11 @@ function adminQuizInfo( authUserId, quizId ) {
                 timeCreated: quiz.time_created,
                 timeLastEdited:quiz.time_last_edit,
                 description: quiz.description
-            }
+            };
         }
     }
 
-    return { error: "No such quiz" }
+    return { error: "No such quiz" };
 }
 
 /*  adminQuizNameUpdate
