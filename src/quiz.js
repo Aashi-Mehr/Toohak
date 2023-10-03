@@ -1,18 +1,30 @@
 import { getData } from './dataStore.js';
 
-// Function : adminQuizList
-// Input    : authUserId
-// Output   : quizzes : [{quizId: 1, name: 'My Quiz',}]
+/*  adminQuizList
+    Provide a list of all quizzes that are owned by the currently logged in user.
+
+    Parameters:
+        authUserId:
+
+    Output:
+        quizzes: { quizId: , name: }
+ */
 
 function adminQuizList( authUserId ) {
-    return {
-        quizzes: [
-            {
-              quizId: 1,
-              name: 'My Quiz',
-            }
-        ]
+    let allQuizzes = getData().quizzes;
+    let userQuizzes = [];
+
+    for (let quiz of allQuizzes) {
+        if (quiz.authId === authUserId) {
+            userQuizzes.push({
+                quizId: quiz.quizId,
+                name: quiz.name
+            });
+        }
     }
+
+    if (userQuizzes.length < 1) return { error: "Invalid user ID" };
+    else return { quizzes: userQuizzes };
 }
 
 /*  adminQuizCreate
@@ -60,7 +72,7 @@ function adminQuizInfo( authUserId, quizId ) {
     let quizzes = getData().quizzes;
 
     for (let quiz of quizzes) {
-        if (quiz.quizId === quizId && quiz.quizAuthorId === authUserId) {
+        if (quiz.quizId === quizId && quiz.authId === authUserId) {
             return {
                 quizId: quiz.quizId,
                 name: quiz.name,
