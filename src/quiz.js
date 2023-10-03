@@ -1,3 +1,5 @@
+import { getData } from './dataStore.js';
+
 // Function : adminQuizList
 // Input    : authUserId
 // Output   : quizzes : [{quizId: 1, name: 'My Quiz',}]
@@ -55,9 +57,9 @@ function adminQuizRemove( authUserId, quizId ) {
         Quiz Object
  */
 function adminQuizInfo( authUserId, quizId ) {
-    let quizzes = getData();
+    let quizzes = getData().quizzes;
 
-    for (quiz of quizzes) {
+    for (let quiz of quizzes) {
         if (quiz.quizId === quizId && quiz.quizAuthorId === authUserId) {
             return {
                 quizId: quiz.quizId,
