@@ -90,7 +90,7 @@ function adminQuizNameUpdate( authUserId, quizId, name ) {
     Returns:
         { }: Rempty Object
  */
-function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
+export function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
     return { };
 }
 
