@@ -6,6 +6,7 @@ let data = {
             authUserId: 1,
             nameFirst: 'Hello',
             nameLast: 'World',
+            name: 'Hello World',
             email: 'Hello_World@1531.com',
             password: '123456789...',
             successful_log_time: '15',
@@ -30,3 +31,5 @@ let data = {
 ```
 
 [Optional] short description: 
+// Edit: 02/10/2023 by Zhejun Gu
+// Add extra element 'name' in users array
