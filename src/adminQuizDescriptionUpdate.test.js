@@ -54,7 +54,7 @@ test('Description is more than 100 characters in length (note: empty strings are
     let longDescription = "";
  
     for (let i = 0; i <= 100; i++) {
-        longDescription += 'a'; // You can replace 'a' with any character you want.
+        longDescription += 'a'; 
     }
     const result =  adminQuizDescriptionUpdate(authUserId1, quizId, longDescription);
 
