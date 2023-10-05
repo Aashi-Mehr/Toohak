@@ -178,4 +178,4 @@ export function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
 }
 
 // last edit: 29/09/2023 by Zhejun Gu
-export { adminQuizList, adminQuizInfo, adminQuizCreate };
+export { adminQuizList, adminQuizInfo, adminQuizCreate, adminQuizRemove, adminQuizNameUpdate };
