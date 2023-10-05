@@ -4,7 +4,7 @@
 // Zhejun Gu (z5351573)
 //
 // edit:
-// 29/09/2023
+// 05/10/2023
 //
 
 import { adminQuizInfo } from './quiz.js';
@@ -47,7 +47,7 @@ test('Test valid format User Id but not exist in data base', () =>{
 
     // Correct format UserId but never is the Id being registered
     let result = adminQuizInfo(4, 1);
-    expect(data.has(result)).toBe(false);
+    expect(result).toMatchObject({ error: expect.any(String) });
 });
 
 test('Test Valid User and Quiz Ids', () => {
