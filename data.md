@@ -19,8 +19,9 @@ let data = {
     [
         {
             quizId: 1,
-            quiz_name: 'My Quiz',
-            quiz_discription: 'This is my quiz',
+            authId: 1,
+            name: 'My Quiz',
+            description: 'This is my quiz',
             time_created: 202309211910,
             time_last_edit: 202309211912,
         },
