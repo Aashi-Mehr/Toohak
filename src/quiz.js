@@ -1,4 +1,4 @@
-import { getData } from './dataStore.js';
+import { getData,setData } from './dataStore.js';
 
 /*  adminQuizList
     Provide a list of all quizzes that are owned by the currently logged in user.
@@ -54,9 +54,33 @@ function adminQuizCreate( authUserId, name, description ) {
     Returns:
         { }: Empty List
  */
-function adminQuizRemove( authUserId, quizId ) {
-    return { };
+function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a positive integer
+    if (!Number.isInteger(authUserId) || authUserId <= 0) {
+        return {error: 'AuthUserId is not a valid user'};
+    }
+    if (!Number.isInteger(quizId) || quizId <= 0) {
+        return {error: 'QuizId is not a valid Quiz'};
+    }
+
+    const data = getData();
+    const user = data.users.find((user) => user.id === authUserId);
+
+    if (! user) {
+        return {error: 'AuthUserId is not a valid user'};
+    }
+
+    let quizzes = data.quizzes;
+    for (let i = 0; i < quizzes.length; i++) {
+        if (quizzes[i].id === quizId && quizzes[i].ownerId === authUserId) {
+            quizzes.splice(i, 1);
+            setData(data);
+            return {};
+        }
+    }
+    return {error: 'Quiz ID does not refer to a valid quiz or Quiz ID does not refer to a quiz that this user owns'};
 }
+
+
 
 /*  adminQuizInfo
     Get all of the relevant information about the current quiz.
