@@ -100,7 +100,7 @@ export function adminUserDetails(authUserId) {
         }
     }
     if (userFound === undefined) {
-        return { error: "No user with authUserId"`${authUserId}` };
+        return { error: "No user with authUserId: "`${authUserId}` };
     }
 
     // No further errors occur, return the user detail
