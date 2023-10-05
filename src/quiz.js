@@ -122,7 +122,44 @@ function adminQuizInfo( authUserId, quizId ) {
         { }: Rempty Object
  */
 function adminQuizNameUpdate( authUserId, quizId, name ) {
-    return { };
+    if (!Number.isInteger(authUserId) || authUserId <= 0) {
+        return {error: 'AuthUserId is not a valid user'};
+    }
+    if (!Number.isInteger(quizId) || quizId <= 0) {
+        return {error: 'QuizId is not a valid Quiz'};
+    }
+
+    const data = getData();
+    const user = data.users.find((user) => user.id === authUserId);
+
+    if (! user) {
+        return {error: 'AuthUserId is not a valid user'};
+    }
+
+      // Check if the name contains invalid characters (only alphanumeric and spaces allowed)
+    if (!/^[a-zA-Z0-9\s]+$/.test(name)) {
+        return { error: 'Name contains invalid characters.' };
+    }
+
+    // Check if the name length is within the specified limits
+    if (name.length < 3 || name.length > 30) {
+        return { error: 'Name must be between 3 and 30 characters long' };
+    }
+
+    let quizzes = data.quizzes;
+    for (let i = 0; i < quizzes.length; i++) {
+        if (quizzes[i].id === quizId && quizzes[i].ownerId === authUserId && quizzes[i].name === name) {
+            return { error: 'Name has exist' };
+        }
+    }
+    for (let i = 0; i < quizzes.length; i++) {
+        if (quizzes[i].id === quizId && quizzes[i].ownerId === authUserId) {
+            quizzes[i].name = name;
+            setData(data);
+            return {};
+        }
+    }
+    return {error: 'Quiz ID does not refer to a valid quiz or Quiz ID does not refer to a quiz that this user owns'};
 }
 
 /*  adminQuizDescriptionUpdate
