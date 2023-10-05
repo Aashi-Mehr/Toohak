@@ -1,16 +1,30 @@
-// Function : adminQuizList
-// Input    : authUserId
-// Output   : quizzes : [{quizId: 1, name: 'My Quiz',}]
+import { getData } from './dataStore.js';
+
+/*  adminQuizList
+    Provide a list of all quizzes that are owned by the currently logged in user.
+
+    Parameters:
+        authUserId:
+
+    Output:
+        quizzes: { quizId: , name: }
+ */
 
 function adminQuizList( authUserId ) {
-    return {
-        quizzes: [
-            {
-              quizId: 1,
-              name: 'My Quiz',
-            }
-        ]
+    let allQuizzes = getData().quizzes;
+    let userQuizzes = [];
+
+    for (let quiz of allQuizzes) {
+        if (quiz.authId === authUserId) {
+            userQuizzes.push({
+                quizId: quiz.quizId,
+                name: quiz.name
+            });
+        }
     }
+
+    if (userQuizzes.length < 1) return { error: "Invalid user ID" };
+    else return { quizzes: userQuizzes };
 }
 
 /*  adminQuizCreate
@@ -55,13 +69,21 @@ function adminQuizRemove( authUserId, quizId ) {
         Quiz Object
  */
 function adminQuizInfo( authUserId, quizId ) {
-    return {
-        quizId: 1,
-        name: 'My Quiz',
-        timeCreated: 1683125870,
-        timeLastEdited: 1683125871,
-        description: 'This is my quiz',
-    };
+    let quizzes = getData().quizzes;
+
+    for (let quiz of quizzes) {
+        if (quiz.quizId === quizId && quiz.authId === authUserId) {
+            return {
+                quizId: quiz.quizId,
+                name: quiz.name,
+                timeCreated: quiz.time_created,
+                timeLastEdited:quiz.time_last_edit,
+                description: quiz.description
+            };
+        }
+    }
+
+    return { error: "No such quiz" };
 }
 
 /*  adminQuizNameUpdate
