@@ -1,7 +1,9 @@
+// Import adminQuizCreate function from quiz.js
 import { adminQuizCreate } from './quiz.js';
+// Import adminAuthRegister from auth.js
 import { adminAuthRegister } from './auth.js';
 
-
+// Test : Invalid AuthUserId Format
 test('Test Invalid AuthUserId Format', () => {
     // authUserId contains characters
     let result = adminQuizCreate('abc', 'Quiz', 'quizDescription');
@@ -21,6 +23,7 @@ test('Test Invalid AuthUserId Format', () => {
 
 });
 
+// Test : Non-Existing AuthUserId
 test('Test Non-existing AuthUserId', () => {
     // Register user by id 1
     adminAuthRegister('first.last1@gmail.com', 'Val1dPassword1', 'first1', 'last1');
@@ -30,6 +33,7 @@ test('Test Non-existing AuthUserId', () => {
     expect(result).toMatchObject({ error: expect.any(String) });
 });
 
+// Test : Name With Invalid Characters
 test('Test Name With Invalid Characters', () => {
     // Name contains spaces, but also special characters
     let result = adminQuizCreate("1, Qu1# COMP, quizDescription");
@@ -49,6 +53,7 @@ test('Test Name With Invalid Characters', () => {
 
 });
 
+// Test : Name Length
 test('Test Name Length', () => {
     // Name is less than 3 characters long
     let result = adminQuizCreate("1, Qu, quizDescription");
@@ -76,6 +81,7 @@ test('Test Name Length', () => {
 
 });
 
+// Test : Quiz Name Is Already Used
 test('Test Quiz Name Is Already Used', () => {
     let quizName1 = adminQuizCreate('1', 'COMP Quiz', 'This quiz is about COMP1531').name;
     let quizDescription1 = adminQuizCreate('1', 'Quiz Comp', 'This quiz is about COMP1531').description;
@@ -85,12 +91,14 @@ test('Test Quiz Name Is Already Used', () => {
     expect(result).toMatchObject({ error: expect.any(String) });
 });
 
+// Test : Description Length
 test('Test Description Length', () => {
     // Description is more than 100 characters
     let result = adminQuizCreate('1', 'COMP Quiz ', 'This might be the longest quiz description ever been tested. This quiz is the most amazing quiz ever been made.');
     expect(result).toMatchObject({ error: expect.any(String) }); 
 });
 
+// Test : Valid AuthUserId, Name and Description
 test('Test Valid AuthUserId, name and description', () => {
     let result = adminQuizCreate('1', 'COMP Quiz', 'COMP1531 Iteration 1 Quiz.');
     expect(result).toMatchObject({ quizId: expect.any(number)});
