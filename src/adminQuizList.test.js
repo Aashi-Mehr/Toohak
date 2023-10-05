@@ -4,12 +4,13 @@
 // Zhejun Gu (z5351573)
 //
 // edit:
-// 29/09/2023
+// 05/10/2023
 //
 
 import { adminQuizList } from './quiz.js';
 import { adminQuizCreate } from './quiz.js';
 import { adminAuthRegister } from './auth.js';
+import { adminQuizInfo } from './quiz.js';
 import { clear } from './other.js';
 
 test('Test Invalid User Ids', () => {
@@ -26,19 +27,23 @@ test('Test Invalid User Ids', () => {
     expect(result).toMatchObject({ error: expect.any(String) });
 });
 
-test('Test valid format User Id but not exist in data base', () =>{
+test('Test valid format User Id but not exist in data base', () => {
     clear();
     // Register user with id: 1
     adminAuthRegister("first.last2@gmail.com", "efgh5678", "first2", "last2");
 
     // Correct format UserId but never is the Id being registered
     let result = adminQuizInfo(4, 1);
-    expect(data.has(result)).toBe(false);
+    expect(result).toMatchObject({ error: expect.any(String) });
 });
 
 test('Test Valid User Ids', () => {
     clear();
-    let result = adminQuizList(1);
+    
+    adminAuthRegister('1531_user1@1531.com', 'C123321c', 'first', 'last');
+    adminQuizCreate(1, 'first last', '');
+
+    let result = adminQuizList(2);
     expect(result).toMatchObject({
         quizzes: [
             {
