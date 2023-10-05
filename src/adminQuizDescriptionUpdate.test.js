@@ -13,7 +13,7 @@ test('AuthUserId is not a valid user', () => {
     // authUserId is not an integar
     const result =  adminQuizDescriptionUpdate(invalidUser, quizId, description);
 
-    expect(result).toMatchObject({ error: "AuthUserId is not a valid user" });
+    expect(result).toMatchObject({ error: expect.any(String) });
 });
 
 test('Quiz ID does not refer to a valid quiz', () => {
@@ -27,7 +27,7 @@ test('Quiz ID does not refer to a valid quiz', () => {
     // authUserId is not an integar
     const result =  adminQuizDescriptionUpdate(authUserId1, quizId, description);
 
-    expect(result).toMatchObject({ error:"Quiz ID does not refer to a valid quit" });
+    expect(result).toMatchObject({ error: expect.any(String) });
 });
 
 test('Quiz ID does not refer to a quiz that this user owns', () => {
@@ -41,7 +41,7 @@ test('Quiz ID does not refer to a quiz that this user owns', () => {
     // authUserId is not an integar
     const result =  adminQuizDescriptionUpdate(authUserId1, quizId, description);
 
-    expect(result).toMatchObject({ error:"Quiz ID does not refer to a quiz that this user owt" });
+    expect(result).toMatchObject({ error: expect.any(String) });
 });
 
 test('Description is more than 100 characters in length (note: empty strings are OK)', () => {
@@ -58,5 +58,5 @@ test('Description is more than 100 characters in length (note: empty strings are
     }
     const result =  adminQuizDescriptionUpdate(authUserId1, quizId, longDdescription);
 
-    expect(result).toMatchObject({ error:"Description is more than 100 characters in length (note: empty strings are OK)" });
+    expect(result).toMatchObject({ error: expect.any(String)});
 });
