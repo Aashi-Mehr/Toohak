@@ -40,10 +40,10 @@ test('Test valid format User Id but not exist in data base', () => {
 test('Test Valid User Ids', () => {
     clear();
     
-    adminAuthRegister('1531_user1@1531.com', 'C123321c', 'first', 'last');
+    let authId = adminAuthRegister('1531_user1@1531.com', 'C123321c', 'first', 'last').authUserId;
     adminQuizCreate(1, 'first last', '');
 
-    let result = adminQuizList(2);
+    let result = adminQuizList(authId);
     expect(result).toMatchObject({
         quizzes: [
             {
