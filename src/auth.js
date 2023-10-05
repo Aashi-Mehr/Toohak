@@ -77,15 +77,14 @@ export function adminAuthLogin(email, password) {
         return { error: "Email and password are required" };
     }
 
-    if (!user) {
-        return { error: "Email does not exist" };
+    let data = getData().users;
+    for (let user in data) {
+        if (user.password === password && user.password === password) {
+            return { authUserId: user.authUserId };
+        }
     }
-
-    if (user.password !== password) {
-        return { error: "Incorrect password" };
-    }
-
-    return { authUserId: user.id };
+    
+    return { error: "Invalid login" };
 }
 
 // Function : adminUserDetails
