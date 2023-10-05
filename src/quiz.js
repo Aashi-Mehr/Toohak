@@ -24,14 +24,24 @@ function adminQuizList( authUserId ) {
     Returns:
         quizId:
  */
-function adminQuizCreate( authUserId, name, description ) {
-    return {
-        quizId: 2
-    };
+function adminQuizCreate(authUserId, name, description) {
+    if (!authUserId || typeof authUserId !== 'string' || authUserId.length < 1) {
+        return { error: 'Invalid AuthUserId Format' };
+    }
+          
+    if (!name || typeof name !== 'string' || name.length < 3 || name.length > 30) {
+        return { error: 'Invalid Name Format' };
+    }
+         
+    if (!description || typeof description !== 'string' || description.length > 100) {
+        return { error: 'Invalid Description Format' };
+    }
+          
+    return { quizId: 1 }; 
 }
 
 /*  adminQuizRemove
-    Given a particular quiz, permanently remove the quiz.
+    Given a particular quiz, permanently remove the quiz
 
     Parameters:
         authUserId:

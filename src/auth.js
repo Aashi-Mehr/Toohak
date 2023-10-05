@@ -73,14 +73,24 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
 // Output   : authUserId
 
 export function adminAuthLogin(email, password) {
-    return {
-        authUserId: 1,
+    if (!email || !password) {
+        return { error: "Email and password are required" };
     }
+
+    if (!user) {
+        return { error: "Email does not exist" };
+    }
+
+    if (user.password !== password) {
+        return { error: "Incorrect password" };
+    }
+
+    return { authUserId: user.id };
 }
 
 // Function : adminUserDetails
 // Input    : authUserId
-// Output   : user {userId: 1, name: 'Hayden Smith', 
+// Output   : user {userId: 1, name: 'Hayden Smith',
 //            email: 'hayden.smith@unsw.edu.au', numSuccessfulLogins: 3}
 // Edit     : 02/10/2023 by Zhejun Gu 
 
