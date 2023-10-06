@@ -71,7 +71,7 @@ function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a posit
 
     let quizzes = data.quizzes;
     for (let i = 0; i < quizzes.length; i++) {
-        if (quizzes[i].id === quizId && quizzes[i].ownerId === authUserId) {
+        if (quizzes[i].id === quizId && quizzes[i].authId === authUserId) {
             quizzes.splice(i, 1);
             setData(data);
             return {};
@@ -148,7 +148,7 @@ function adminQuizNameUpdate( authUserId, quizId, name ) {
 
     let quizzes = data.quizzes;
     for (let i = 0; i < quizzes.length; i++) {
-        if (quizzes[i].id === quizId && quizzes[i].ownerId === authUserId && quizzes[i].name === name) {
+        if (quizzes[i].id === quizId && quizzes[i].authId === authUserId && quizzes[i].name === name) {
             return { error: 'Name has exist' };
         }
     }
