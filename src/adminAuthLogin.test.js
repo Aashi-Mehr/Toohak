@@ -1,5 +1,6 @@
 import { adminAuthLogin } from './auth.js';
-import { adminAuthRegister } from './auth/js';
+import { adminAuthRegister } from './auth.js';
+import { clear } from './other.js';
 
 beforeEach(() => {
     clear();
@@ -11,7 +12,7 @@ test('Test Non-Existing Emails', () => {
     expect(result).toMatchObject({ error: expect.any(String) });
 
     // Email is empty
-    let result = adminAuthLogin('', 'Val1dPassword');
+    result = adminAuthLogin('', 'Val1dPassword');
     expect(result).toMatchObject({ error: expect.any(String) });
 
 });
@@ -28,17 +29,17 @@ test('Test Incorrect Password', () => {
     let result = adminAuthLogin('first.last1@gmail.com', 'Val1dPasswoord');
     expect(result).toMatchObject({ error: id1 });
 
-    let result = adminAuthLogin('first.last2@gmail.com', "Val1dPasswoord");
+    result = adminAuthLogin('first.last2@gmail.com', "Val1dPasswoord");
     expect(result).toMatchObject({ error: id2 });
 
-    let result = adminAuthLogin('first.last3@gmail.com', "Val1dPasswoord");
+    result = adminAuthLogin('first.last3@gmail.com', "Val1dPasswoord");
     expect(result).toMatchObject({ error: id3 });
 
-    let result = adminAuthLogin('first.last4@gmail.com', "Val1dPasswoord");
+    result = adminAuthLogin('first.last4@gmail.com', "Val1dPasswoord");
     expect(result).toMatchObject({ error: id4 });
 
     // Password is empty
-    let result = adminAuthLogin('first.last4@gmail.com', '');
+    result = adminAuthLogin('first.last4@gmail.com', '');
     expect(result).toMatchObject({ error: expect.any(String) });
 
 });
@@ -53,13 +54,13 @@ test('Test Valid Email And Password', () => {
     let result = adminAuthLogin('first.last1@gmail.com', 'Val1dPassword1');
     expect(result).toMatchObject({ authUserId: id1 });
 
-    let result = adminAuthLogin('first.last2@gmail.com', 'Val1dPassword2');
+    result = adminAuthLogin('first.last2@gmail.com', 'Val1dPassword2');
     expect(result).toMatchObject({ authUserId: id2 });
 
-    let result = adminAuthLogin('first.last3@gmail.com', 'Val1dPassword3');
+    result = adminAuthLogin('first.last3@gmail.com', 'Val1dPassword3');
     expect(result).toMatchObject({ authUserId: id3 });
 
-    let result = adminAuthLogin('first.last4@gmail.com', 'Val1dPassword4');
+    result = adminAuthLogin('first.last4@gmail.com', 'Val1dPassword4');
     expect(result).toMatchObject({ authUserId: id4 });
 
 });

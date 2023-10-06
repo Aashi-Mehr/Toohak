@@ -28,7 +28,7 @@ test('Clear User', () => {
 test('Clear quizzes', () => {
 
     // Register user with id: 1
-    let authUserId = adminAuthRegister("first.last1@gmail.com", "Val1dPassword1", "first1", "last1");
+    let authUserId1 = adminAuthRegister("first.last1@gmail.com", "Val1dPassword1", "first1", "last1");
     let result = adminUserDetails(authUserId1);
     expect(result).toMatchObject({
         quizId: 1,

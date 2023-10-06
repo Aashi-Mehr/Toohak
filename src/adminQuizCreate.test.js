@@ -1,7 +1,7 @@
-// Import adminQuizCreate function from quiz.js
-import { adminQuizCreate } from './quiz.js';
-// Import adminAuthRegister from auth.js
+// Import functions
+import { adminQuizCreate, adminQuizInfo } from './quiz.js';
 import { adminAuthRegister } from './auth.js';
+import { clear } from './other.js';
 
 // Test : Invalid AuthUserId Format
 test('Test Invalid AuthUserId Format', () => {
@@ -10,15 +10,15 @@ test('Test Invalid AuthUserId Format', () => {
     expect(result).toMatchObject({ error: expect.any(String) });
 
     // authUserId contains characters and numbers
-    let result = adminQuizCreate('abc123', 'Quiz', 'quizDescription');
+    result = adminQuizCreate('abc123', 'Quiz', 'quizDescription');
     expect(result).toMatchObject({ error: expect.any(String) });
 
     // authUserId contains out of range number
-    let result = adminQuizCreate('-1', 'Quiz', 'quizDescription');
+    result = adminQuizCreate('-1', 'Quiz', 'quizDescription');
     expect(result).toMatchObject({ error: expect.any(String) });
 
     // authUserId is empty
-    let result = adminQuizCreate('', 'Quiz', 'quizDescription');
+    result = adminQuizCreate('', 'Quiz', 'quizDescription');
     expect(result).toMatchObject({ error: expect.any(String) });
 
 });
@@ -40,15 +40,15 @@ test('Test Name With Invalid Characters', () => {
     expect(result).toMatchObject({ error: expect.any(String) });
 
     // Name does not contain spaces
-    let result = adminQuizCreate("1, QuizCOMP, quizDescription");
+    result = adminQuizCreate("1, QuizCOMP, quizDescription");
     expect(result).toMatchObject({ error: expect.any(String) });
 
     // Name contains spaces, but also number
-    let result = adminQuizCreate("1, Qu1z COMP1511, quizDescription");
+    result = adminQuizCreate("1, Qu1z COMP1511, quizDescription");
     expect(result).toMatchObject({ error: expect.any(String) });
 
     // Name does not contain spaces, but contains numbers and special characters
-    let result = adminQuizCreate("1, Qu1zC0MP1511, quizDescription");
+    result = adminQuizCreate("1, Qu1zC0MP1511, quizDescription");
     expect(result).toMatchObject({ error: expect.any(String) });
 
 });
@@ -60,23 +60,23 @@ test('Test Name Length', () => {
     expect(result).toMatchObject({ error: expect.any(String) });
 
     // Name is empty
-    let result = adminQuizCreate("1, '', quizDescription");
+    result = adminQuizCreate("1, '', quizDescription");
     expect(result).toMatchObject({ error: expect.any(String) });
 
     // Name is more than 30 characters long
-    let result = adminQuizCreate("1, Quizzzzzzzzzzzzzzzz COMPPPPPPPPPPPPP, quizDescription");
+    result = adminQuizCreate("1, Quizzzzzzzzzzzzzzzz COMPPPPPPPPPPPPP, quizDescription");
     expect(result).toMatchObject({ error: expect.any(String) });
 
     // Name is more than 30 characters long and contains special characters
-    let result = adminQuizCreate("1, Quizzzzzzzzzzzzzzzz C@MPPPPPPPPPPPPP, quizDescription");
+    result = adminQuizCreate("1, Quizzzzzzzzzzzzzzzz C@MPPPPPPPPPPPPP, quizDescription");
     expect(result).toMatchObject({ error: expect.any(String) });
 
     // Name is more than 30 characters long and contains numbers
-    let result = adminQuizCreate("1, Qu1zzzzzzzzzzzzzzzz COMPPPPPPPPPPPPP, quizDescription");
+    result = adminQuizCreate("1, Qu1zzzzzzzzzzzzzzzz COMPPPPPPPPPPPPP, quizDescription");
     expect(result).toMatchObject({ error: expect.any(String) });
 
     // Name is more than 30 characters long, contains numbers and special character
-    let result = adminQuizCreate("1, Qu1zzzzzzzzzzzzzzzz C@MPPPPPPPPPPPPP, quizDescription");
+    result = adminQuizCreate("1, Qu1zzzzzzzzzzzzzzzz C@MPPPPPPPPPPPPP, quizDescription");
     expect(result).toMatchObject({ error: expect.any(String) });
 
 });
@@ -101,5 +101,5 @@ test('Test Description Length', () => {
 // Test : Valid AuthUserId, Name and Description
 test('Test Valid AuthUserId, name and description', () => {
     let result = adminQuizCreate('1', 'COMP Quiz', 'COMP1531 Iteration 1 Quiz.');
-    expect(result).toMatchObject({ quizId: expect.any(number)});
+    expect(result).toMatchObject({ quizId: expect.any(Number)});
 });
