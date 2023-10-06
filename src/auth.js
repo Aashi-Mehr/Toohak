@@ -59,14 +59,14 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
 
     let timestamp = new Date().valueOf();
     let randomId = Math.floor(Math.random() * 1000000) + 1;
-    let authUserId = timestamp*randomId;
+    let authUserId = timestamp * randomId;
 
     // If no error, push the new user and return the authUserId
     data.users.push({
         authUserId: authUserId,
         nameFirst: nameFirst,
         nameLast: nameLast,
-        name: `${nameFirst} ${nameFirst}`,
+        name: `${nameFirst} ${nameLast}`,
         email: email,
         password: password,
         successful_log_time: 0,
@@ -114,7 +114,6 @@ export function adminUserDetails(authUserId) {
     }
     for (const user of data.users) {
         if (user.authUserId === authUserId) {
-            ifFind = true;
             userFound = user;
         }
     }
@@ -126,11 +125,11 @@ export function adminUserDetails(authUserId) {
     return { 
         user:
         {
-            userId: `${authUserId}`,
-            name: `${userFound.name}`,
-            email: `${userFound.email}`,
-            numSuccessfulLogins: `${userFound.successful_log_time}`,
-            numFailedPasswordsSinceLastLogin: `${userFound.failed_password_num}`,
+            userId: authUserId ,
+            name: userFound.name ,
+            email: userFound.email ,
+            numSuccessfulLogins: userFound.successful_log_time ,
+            numFailedPasswordsSinceLastLogin: userFound.failed_password_num ,
         }
     }
 }

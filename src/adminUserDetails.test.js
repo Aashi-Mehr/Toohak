@@ -22,19 +22,19 @@ test('Test Invalid User IDs', () => {
 test('Test Valid User IDs', () => {
     // DEPENDENCY on adminAuthRegister
     let authUserId1 = adminAuthRegister("first.last1@gmail.com",
-                      "Val1dPassword1", "first1", "last1").authUserId;
+                      "Val1dPassword1", 'first', 'last').authUserId;
     let authUserId2 = adminAuthRegister("first.last2@gmail.com",
-                      "Val1dPassword2", "first2", "last2").authUserId;
+                      "Val1dPassword2", 'first', 'last').authUserId;
     let authUserId3 = adminAuthRegister("first.last3@gmail.com",
-                      "Val1dPassword3", "first3", "last3").authUserId;
+                      "Val1dPassword3", 'first', 'last').authUserId;
     let authUserId4 = adminAuthRegister("first.last4@gmail.com",
-                      "Val1dPassword4", "first4", "last4").authUserId;
+                      "Val1dPassword4", 'first', 'last').authUserId;
     
     let result = adminUserDetails(authUserId1);
     expect(result).toMatchObject({ user:
         {
           userId: authUserId1,
-          name: "first1 last1",
+          name: "first last",
           email: "first.last1@gmail.com",
           numSuccessfulLogins: 0,
           numFailedPasswordsSinceLastLogin: 0,
@@ -45,7 +45,7 @@ test('Test Valid User IDs', () => {
     expect(result).toMatchObject({ user:
         {
           userId: authUserId2,
-          name: "first2 last2",
+          name: "first last",
           email: "first.last2@gmail.com",
           numSuccessfulLogins: 0,
           numFailedPasswordsSinceLastLogin: 0,
@@ -56,7 +56,7 @@ test('Test Valid User IDs', () => {
     expect(result).toMatchObject({ user:
         {
           userId: authUserId3,
-          name: "first3 last3",
+          name: "first last",
           email: "first.last3@gmail.com",
           numSuccessfulLogins: 0,
           numFailedPasswordsSinceLastLogin: 0,
@@ -67,7 +67,7 @@ test('Test Valid User IDs', () => {
     expect(result).toMatchObject({ user:
         {
           userId: authUserId4,
-          name: "first4 last4",
+          name: "first last",
           email: "first.last4@gmail.com",
           numSuccessfulLogins: 0,
           numFailedPasswordsSinceLastLogin: 0,
