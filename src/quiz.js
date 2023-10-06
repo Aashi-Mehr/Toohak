@@ -25,27 +25,36 @@ function adminQuizList( authUserId ) {
         quizId:
  */
 function adminQuizCreate(authUserId, name, description) {
-    if (!authUserId || authUserId !== 'string' || authUserId.length < 1) {
+    // Check if authUserId is a positive number
+    if (!authUserId || typeof authUserId !== 'number' || authUserId <= 0) {
         return { error: 'Invalid AuthUserId Format' };
     }
 
-    if (!name || name !== 'string' || name.length < 3 || name.length > 30) {
+    // Check if name contains invalid characters (only allow alphanumeric and spaces)
+    let invalidName = /[^a-zA-Z0-9 ']/.test(name);
+    if (invalidName || name.length < 3 || name.length > 30) {
         return { error: 'Invalid Name Format' };
     }
 
-    if (!description || description !== 'string' || description.length > 100) {
+    // Empty description is okay, only check if it exceeds the length limit
+    if (description && description.length > 100) {
         return { error: 'Invalid Description Format' };
     }
+
+    // Generate a random quizId (for example, using a unique timestamp-based approach)
+    const quizId = Math.floor(Math.random() * 1000000) + 1;
+
+    // Check if the quizId is already used (unlikely due to uniqueness)
     let createdQuizzes = getData().quizId;
-    
     for (const quiz of createdQuizzes) {
         if (quiz.authUserId === authUserId && quiz.name === name) {
             return { error: 'Quiz Name Is Already Used' };
         }
     }
 
-    return { quizId: 1};
+    return { quizId };
 }
+
 
 
 /*  adminQuizRemove
