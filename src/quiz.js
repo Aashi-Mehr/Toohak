@@ -25,20 +25,28 @@ function adminQuizList( authUserId ) {
         quizId:
  */
 function adminQuizCreate(authUserId, name, description) {
-    if (!authUserId || typeof authUserId !== 'string' || authUserId.length < 1) {
+    if (!authUserId || authUserId !== 'string' || authUserId.length < 1) {
         return { error: 'Invalid AuthUserId Format' };
     }
-          
-    if (!name || typeof name !== 'string' || name.length < 3 || name.length > 30) {
+
+    if (!name || name !== 'string' || name.length < 3 || name.length > 30) {
         return { error: 'Invalid Name Format' };
     }
-         
-    if (!description || typeof description !== 'string' || description.length > 100) {
+
+    if (!description || description !== 'string' || description.length > 100) {
         return { error: 'Invalid Description Format' };
     }
-          
-    return { quizId: 1 }; 
+    let createdQuizzes = getData().quizId;
+    
+    for (const quiz of createdQuizzes) {
+        if (quiz.authUserId === authUserId && quiz.name === name) {
+            return { error: 'Quiz Name Is Already Used' };
+        }
+    }
+
+    return { quizId: 1};
 }
+
 
 /*  adminQuizRemove
     Given a particular quiz, permanently remove the quiz
