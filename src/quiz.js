@@ -34,11 +34,14 @@ function adminQuizCreate(authUserId, name, description) {
         return { error: 'Invalid Name Format' };
     }
 
-    if (description && description.length > 100) {
+    if (description.length > 100) {
         return { error: 'Invalid Description Format' };
     }
 
-    const quizId = Math.floor(Math.random() * 1000000) + 1;
+    const timestamp = new Date().valueOf(); 
+    const randomId = Math.floor(Math.random() * 1000000) + 1;
+
+    const quizId = `${timestamp}${randomId}`;
 
     let createdQuizzes = getData().quizId;
     for (const quiz of createdQuizzes) {
@@ -49,8 +52,6 @@ function adminQuizCreate(authUserId, name, description) {
 
     return { quizId };
 }
-
-
 
 /*  adminQuizRemove
     Given a particular quiz, permanently remove the quiz

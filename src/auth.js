@@ -73,7 +73,7 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
 // Output   : authUserId
 
 export function adminAuthLogin(email, password) {
-    if (!email || !password) {
+    if (user.email === email && user.password === password) {
         return { error: "Email and password are required" };
     }
 
