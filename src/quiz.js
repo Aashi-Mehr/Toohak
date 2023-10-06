@@ -38,14 +38,37 @@ function adminQuizList( authUserId ) {
     Returns:
         quizId:
  */
-function adminQuizCreate( authUserId, name, description ) {
-    return {
-        quizId: 2
-    };
+function adminQuizCreate(authUserId, name, description) {
+    if (!authUserId || typeof authUserId !== 'number' || authUserId <= 0) {
+        return { error: 'Invalid AuthUserId Format' };
+    }
+
+    let invalidName = /[^a-zA-Z0-9 ']/.test(name);
+    if (invalidName || name.length < 3 || name.length > 30) {
+        return { error: 'Invalid Name Format' };
+    }
+
+    if (description.length > 100) {
+        return { error: 'Invalid Description Format' };
+    }
+
+    const timestamp = new Date().valueOf(); 
+    const randomId = Math.floor(Math.random() * 1000000) + 1;
+
+    const quizId = `${timestamp}${randomId}`;
+
+    let createdQuizzes = getData().quizId;
+    for (const quiz of createdQuizzes) {
+        if (quiz.authUserId === authUserId && quiz.name === name) {
+            return { error: 'Quiz Name Is Already Used' };
+        }
+    }
+
+    return { quizId };
 }
 
 /*  adminQuizRemove
-    Given a particular quiz, permanently remove the quiz.
+    Given a particular quiz, permanently remove the quiz
 
     Parameters:
         authUserId:

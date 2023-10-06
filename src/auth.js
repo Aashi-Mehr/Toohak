@@ -86,20 +86,23 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
         authUserId:
  */
 export function adminAuthLogin(email, password) {
-    let users = getData().users;
+    if (user.email === email && user.password === password) {
+        return { error: "Email and password are required" };
+    }
 
-    for (let user of users) {
-        if (user.email === email && user.password === password) {
+    let data = getData().users;
+    for (let user in data) {
+        if (user.password === password && user.password === password) {
             return { authUserId: user.authUserId };
         }
     }
-
-    return { error: "Email or password is incorrect " };
+    
+    return { error: "Invalid login" };
 }
 
 // Function : adminUserDetails
 // Input    : authUserId
-// Output   : user {userId: 1, name: 'Hayden Smith', 
+// Output   : user {userId: 1, name: 'Hayden Smith',
 //            email: 'hayden.smith@unsw.edu.au', numSuccessfulLogins: 3}
 // Edit     : 05/10/2023 by Zhejun Gu 
 
