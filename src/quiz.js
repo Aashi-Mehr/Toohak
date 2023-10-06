@@ -1,4 +1,4 @@
-import { getData,setData } from './dataStore.js';
+import { getData } from './dataStore.js';
 
 /*  adminQuizList
     Provide a list of all quizzes that are owned by the currently logged in user.
@@ -38,43 +38,47 @@ function adminQuizList( authUserId ) {
     Returns:
         quizId:
  */
-function adminQuizCreate( authUserId, name, description ) {
-    // Error Checking
-    if (description.length > 100) return { error: 'Invalid Description' };
-
+function adminQuizCreate(authUserId, name, description) {
+    // Error checking
     let invalidName = /[^a-zA-Z0-9 ']/.test(name);
     if (invalidName || name.length < 3 || name.length > 30) {
         return { error: 'Invalid Name Format' };
     }
 
-    let exists = false;
-    let users = getData().users;
-    for (let user of users) {
-        if (user.authUserId === authUserId) exists = true;
+    if (description.length > 100) {
+        return { error: 'Invalid Description Format' };
     }
 
-    if (!exists) return { error: 'AuthUserId doesn\'t exist' };
+    let exists = false;
+    let users = getData().users
+    for (let user of users) {
+        if (user.authUserId === authUserId) {
+            exists = true;
+        }
+    }
 
-    let quizzes = getData().quizzes;
-    for (let quiz of quizzes) {
+    if (!exists) return { error: 'Invalid authUserId' };
+
+    let createdQuizzes = getData().quizzes;
+    for (const quiz of createdQuizzes) {
         if (quiz.authId === authUserId && quiz.name === name) {
             return { error: 'Quiz Name Is Already Used' };
         }
     }
 
-    // Adding data to dataStore and returning quizId
-    const timestamp = new Date().valueOf();
+    // Returning and altering data
+    const timestamp = new Date().valueOf(); 
     const randomId = Math.floor(Math.random() * 1000000) + 1;
     const quizId = timestamp * randomId;
 
-    quizzes.push({
+    createdQuizzes.push({
         quizId: quizId,
         authId: authUserId,
         name: name,
         description: description,
         time_created: timestamp,
         time_last_edit: timestamp,
-    });
+    })
 
     return { quizId: quizId };
 }
@@ -108,7 +112,6 @@ function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a posit
     for (let i = 0; i < quizzes.length; i++) {
         if (quizzes[i].quizId === quizId && quizzes[i].authId === authUserId) {
             quizzes.splice(i, 1);
-            setData(data);
             return { };
         }
     }
@@ -190,8 +193,7 @@ function adminQuizNameUpdate( authUserId, quizId, name ) {
     for (let i = 0; i < quizzes.length; i++) {
         if (quizzes[i].quizId === quizId && quizzes[i].authId === authUserId) {
             quizzes[i].name = name;
-            setData(data);
-            return {};
+            return { };
         }
     }
     return {error: 'Quiz ID does not refer to a valid quiz or Quiz ID does not refer to a quiz that this user owns'};
