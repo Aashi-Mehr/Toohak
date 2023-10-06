@@ -25,26 +25,21 @@ function adminQuizList( authUserId ) {
         quizId:
  */
 function adminQuizCreate(authUserId, name, description) {
-    // Check if authUserId is a positive number
     if (!authUserId || typeof authUserId !== 'number' || authUserId <= 0) {
         return { error: 'Invalid AuthUserId Format' };
     }
 
-    // Check if name contains invalid characters (only allow alphanumeric and spaces)
     let invalidName = /[^a-zA-Z0-9 ']/.test(name);
     if (invalidName || name.length < 3 || name.length > 30) {
         return { error: 'Invalid Name Format' };
     }
 
-    // Empty description is okay, only check if it exceeds the length limit
     if (description && description.length > 100) {
         return { error: 'Invalid Description Format' };
     }
 
-    // Generate a random quizId (for example, using a unique timestamp-based approach)
     const quizId = Math.floor(Math.random() * 1000000) + 1;
 
-    // Check if the quizId is already used (unlikely due to uniqueness)
     let createdQuizzes = getData().quizId;
     for (const quiz of createdQuizzes) {
         if (quiz.authUserId === authUserId && quiz.name === name) {
