@@ -24,11 +24,11 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
 
     // Test invalid email
     for (const user of data.users) {
-        if (user.data === email) {
+        if (user.email === email) {
             return { error: "Email already used" };
         }
     }
-    if (validator.isEmail('emial') === false) {
+    if (validator.isEmail(email) === false) {
         return { error: "Email format does not meet requirement" };
     }
 
@@ -57,15 +57,23 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
         return { error: "nameLast is too short or too long" };
     }
 
+    let timestamp = new Date().valueOf();
+    let randomId = Math.floor(Math.random() * 1000000) + 1;
+    let authUserId = timestamp*randomId;
+
     // If no error, push the new user and return the authUserId
     data.users.push({
+        authUserId: authUserId,
+        nameFirst: nameFirst,
+        nameLast: nameLast,
+        name: `${nameFirst} ${nameFirst}`,
         email: email,
         password: password,
-        name: `${nameFirst} ${nameFirst}`,
+        successful_log_time: 0,
+        failed_password_num: 0,
     });
-    return { 
-        authUserId: data.users.length,
-    };
+
+    return { authUserId: authUserId };
 }
 
 // Function : adminUserLogin
