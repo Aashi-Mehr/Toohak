@@ -39,9 +39,47 @@ function adminQuizList( authUserId ) {
         quizId:
  */
 function adminQuizCreate( authUserId, name, description ) {
-    return {
-        quizId: 2
-    };
+    // Error Checking
+    if (description.length > 100) return { error: 'Invalid Description' };
+
+    let invalidName = /[^a-zA-Z0-9 ']/.test(name);
+    if (invalidName || name.length < 3 || name.length > 30) {
+        return { error: 'Invalid Name Format' };
+    }
+
+    let exists = false;
+    let users = getData().users;
+    for (let user of users) {
+        if (user.authUserId === authUserId) exists = true;
+    }
+
+    if (!exists) return { error: 'AuthUserId doesn\'t exist' };
+
+    // 
+    const timestamp = new Date().valueOf();
+    const randomId = Math.floor(Math.random() * 1000000) + 1;
+    const quizId = timestamp * randomId;
+
+    let quizzes = getData().quizzes;
+
+    for (let quiz of quizzes) {
+        console.log("THERE ARE QUIZZES IN QUIZZES");
+        if (quiz.authId === authUserId && quiz.name === name) {
+            console.log("THERE IS A QUIZ THAT EXISTS!");
+            return { error: 'Quiz Name Is Already Used' };
+        }
+    }
+
+    quizzes.push({
+        quizId: quizId,
+        authId: authUserId,
+        name: name,
+        description: description,
+        time_created: timestamp,
+        time_last_edit: timestamp,
+    });
+
+    return { quizId: quizId };
 }
 
 /*  adminQuizRemove
