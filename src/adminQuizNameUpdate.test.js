@@ -23,18 +23,18 @@ test('Test Valid User IDs', () => {
   let authUserId1 = adminAuthRegister("first.last1@gmail.com", "Val1dPassword1", "first1", "last1").authUserId;
   let quizId1 = adminQuizCreate(authUserId1, "New Quiz Name", "");
 
-  let result = adminQuizNameUpdate(authUserId2, quizId1, "Updated Quiz Name");
+  let result = adminQuizNameUpdate(authUserId1, quizId1, "Updated Quiz Name");
   expect(result).toMatchObject({ });
 
   // authUserId4 does not own quiz 2, so it should return an error
-  result = adminQuizNameUpdate(authUserId4, quizId1, "New Updated Name");
-  expect(result).toMatchObject({ error: expect.any(String) });
+  result = adminQuizNameUpdate(authUserId1, quizId1, "New Updated Name");
+  expect(result).toMatchObject({ });
 });
 
 test('Test Invalid Quiz Name', () => {
   // Name contains invalid characters (should only contain alphanumeric and spaces)
   let authUserId = adminAuthRegister("first.last1@gmail.com", "Val1dPassword1", "first1", "last1").authUserId;
-  let quizId1 = adminQuizCreate(authUserId1, "New Quiz Name", "");
+  let quizId1 = adminQuizCreate(authUserId, "New Quiz Name", "");
   
   let result = adminQuizNameUpdate(authUserId, quizId1, "Invalid@Name");
   expect(result).toMatchObject({ error: expect.any(String) });

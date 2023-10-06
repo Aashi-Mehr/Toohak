@@ -71,10 +71,10 @@ function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a posit
 
     let quizzes = data.quizzes;
     for (let i = 0; i < quizzes.length; i++) {
-        if (quizzes[i].id === quizId && quizzes[i].authId === authUserId) {
+        if (quizzes[i].quizId === quizId && quizzes[i].authId === authUserId) {
             quizzes.splice(i, 1);
             setData(data);
-            return {};
+            return { };
         }
     }
     return {error: 'Quiz ID does not refer to a valid quiz or Quiz ID does not refer to a quiz that this user owns'};
@@ -148,12 +148,12 @@ function adminQuizNameUpdate( authUserId, quizId, name ) {
 
     let quizzes = data.quizzes;
     for (let i = 0; i < quizzes.length; i++) {
-        if (quizzes[i].id === quizId && quizzes[i].authId === authUserId && quizzes[i].name === name) {
+        if (quizzes[i].quizId === quizId && quizzes[i].authId === authUserId && quizzes[i].name === name) {
             return { error: 'Name has exist' };
         }
     }
     for (let i = 0; i < quizzes.length; i++) {
-        if (quizzes[i].id === quizId && quizzes[i].ownerId === authUserId) {
+        if (quizzes[i].quizId === quizId && quizzes[i].authId === authUserId) {
             quizzes[i].name = name;
             setData(data);
             return {};
