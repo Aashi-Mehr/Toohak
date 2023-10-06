@@ -11,7 +11,7 @@ test('AuthUserId is not a valid user', () => {
     const description = 'New description';
 
     // authUserId is not an integar
-    const result =  adminQuizDescriptionUpdate(invalidUser, quizId, description);
+    const result = adminQuizDescriptionUpdate(invalidUser, quizId, description);
 
     expect(result).toMatchObject({ error: expect.any(String) });
 });
@@ -51,12 +51,12 @@ test('Description is more than 100 characters in length (note: empty strings are
  
     let quizId = adminQuizCreate(1, "first last", "fist_test").quizId;
 
-    let longDdescription = "";
+    let longDescription = "";
  
     for (let i = 0; i <= 100; i++) {
-        longDdescription += 'a'; // You can replace 'a' with any character you want.
+        longDescription += 'a'; 
     }
-    const result =  adminQuizDescriptionUpdate(authUserId1, quizId, longDdescription);
+    const result =  adminQuizDescriptionUpdate(authUserId1, quizId, longDescription);
 
     expect(result).toMatchObject({ error: expect.any(String)});
 });

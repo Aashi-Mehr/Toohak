@@ -53,11 +53,12 @@ test('Test valid format User Id but not exist in data base', () =>{
 test('Test Valid User and Quiz Ids', () => {
     clear();
 
-    let result = adminQuizInfo(1, a);
+    let authId = adminAuthRegister('1531_user1@1531.com', 'C123321c', 'first', 'last').authUserId;
+    let qzId = adminQuizCreate(authId, 'first last', '').quizId;
 
-    expect(result).toMatchObject({
-        quizId: 1,
-        name: expect.any(String),
+    expect(adminQuizInfo(authId, qzId)).toMatchObject({
+        quizId: qzId,
+        name: 'first last',
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
         description: expect.any(String),

@@ -41,14 +41,14 @@ test('Test Valid User Ids', () => {
     clear();
     
     let authId = adminAuthRegister('1531_user1@1531.com', 'C123321c', 'first', 'last').authUserId;
-    adminQuizCreate(1, 'first last', '');
+    let qzId = adminQuizCreate(1, 'first last', '').quizId;
 
     let result = adminQuizList(authId);
     expect(result).toMatchObject({
         quizzes: [
             {
-                quizId: expect.any(Number),
-                name: expect.any(String), 
+                quizId: qzId,
+                name: 'first last', 
             }
         ]
     });

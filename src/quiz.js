@@ -1,4 +1,4 @@
-import { getData } from './dataStore.js';
+import { getData,setData } from './dataStore.js';
 
 /*  adminQuizList
     Provide a list of all quizzes that are owned by the currently logged in user.
@@ -54,9 +54,33 @@ function adminQuizCreate( authUserId, name, description ) {
     Returns:
         { }: Empty List
  */
-function adminQuizRemove( authUserId, quizId ) {
-    return { };
+function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a positive integer
+    if (!Number.isInteger(authUserId) || authUserId <= 0) {
+        return {error: 'AuthUserId is not a valid user'};
+    }
+    if (!Number.isInteger(quizId) || quizId <= 0) {
+        return {error: 'QuizId is not a valid Quiz'};
+    }
+
+    const data = getData();
+    const user = data.users.find((user) => user.id === authUserId);
+
+    if (! user) {
+        return {error: 'AuthUserId is not a valid user'};
+    }
+
+    let quizzes = data.quizzes;
+    for (let i = 0; i < quizzes.length; i++) {
+        if (quizzes[i].id === quizId && quizzes[i].ownerId === authUserId) {
+            quizzes.splice(i, 1);
+            setData(data);
+            return {};
+        }
+    }
+    return {error: 'Quiz ID does not refer to a valid quiz or Quiz ID does not refer to a quiz that this user owns'};
 }
+
+
 
 /*  adminQuizInfo
     Get all of the relevant information about the current quiz.
@@ -98,7 +122,44 @@ function adminQuizInfo( authUserId, quizId ) {
         { }: Rempty Object
  */
 function adminQuizNameUpdate( authUserId, quizId, name ) {
-    return { };
+    if (!Number.isInteger(authUserId) || authUserId <= 0) {
+        return {error: 'AuthUserId is not a valid user'};
+    }
+    if (!Number.isInteger(quizId) || quizId <= 0) {
+        return {error: 'QuizId is not a valid Quiz'};
+    }
+
+    const data = getData();
+    const user = data.users.find((user) => user.id === authUserId);
+
+    if (! user) {
+        return {error: 'AuthUserId is not a valid user'};
+    }
+
+      // Check if the name contains invalid characters (only alphanumeric and spaces allowed)
+    if (!/^[a-zA-Z0-9\s]+$/.test(name)) {
+        return { error: 'Name contains invalid characters.' };
+    }
+
+    // Check if the name length is within the specified limits
+    if (name.length < 3 || name.length > 30) {
+        return { error: 'Name must be between 3 and 30 characters long' };
+    }
+
+    let quizzes = data.quizzes;
+    for (let i = 0; i < quizzes.length; i++) {
+        if (quizzes[i].id === quizId && quizzes[i].ownerId === authUserId && quizzes[i].name === name) {
+            return { error: 'Name has exist' };
+        }
+    }
+    for (let i = 0; i < quizzes.length; i++) {
+        if (quizzes[i].id === quizId && quizzes[i].ownerId === authUserId) {
+            quizzes[i].name = name;
+            setData(data);
+            return {};
+        }
+    }
+    return {error: 'Quiz ID does not refer to a valid quiz or Quiz ID does not refer to a quiz that this user owns'};
 }
 
 /*  adminQuizDescriptionUpdate
@@ -131,4 +192,4 @@ function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
 }
 
 // last edit: 29/09/2023 by Zhejun Gu
-export { adminQuizList, adminQuizInfo, adminQuizCreate };
+export { adminQuizList, adminQuizInfo, adminQuizCreate, adminQuizRemove, adminQuizNameUpdate };
