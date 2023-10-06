@@ -1,4 +1,4 @@
-import { getData,setData } from './dataStore.js';
+import { getData } from './dataStore.js';
 
 /*  adminQuizList
     Provide a list of all quizzes that are owned by the currently logged in user.
@@ -11,11 +11,26 @@ import { getData,setData } from './dataStore.js';
  */
 
 function adminQuizList( authUserId ) {
+    // Checking if the user exists
+    let users = getData().users;
+    let exists = false;
+
+    for (let user in users) {
+        if (user.authUserId === authUserId) {
+            exists = true;
+        }
+    }
+
+    if (!exists) return { error: "Invalid user ID" };
+
+    // Gathering quizzes
     let allQuizzes = getData().quizzes;
     let userQuizzes = [];
 
+    // Looping through quizzes in dataStore
     for (let quiz of allQuizzes) {
         if (quiz.authId === authUserId) {
+            // If it belongs to the relevant user, it needs to be returned
             userQuizzes.push({
                 quizId: quiz.quizId,
                 name: quiz.name
@@ -23,8 +38,8 @@ function adminQuizList( authUserId ) {
         }
     }
 
-    if (userQuizzes.length < 1) return { error: "Invalid user ID" };
-    else return { quizzes: userQuizzes };
+    // Quizzes list 
+    return { quizzes: userQuizzes };
 }
 
 /*  adminQuizCreate
@@ -39,10 +54,7 @@ function adminQuizList( authUserId ) {
         quizId:
  */
 function adminQuizCreate(authUserId, name, description) {
-    if (!authUserId || typeof authUserId !== 'number' || authUserId <= 0) {
-        return { error: 'Invalid AuthUserId Format' };
-    }
-
+    // Error checking
     let invalidName = /[^a-zA-Z0-9 ']/.test(name);
     if (invalidName || name.length < 3 || name.length > 30) {
         return { error: 'Invalid Name Format' };
@@ -52,19 +64,38 @@ function adminQuizCreate(authUserId, name, description) {
         return { error: 'Invalid Description Format' };
     }
 
-    const timestamp = new Date().valueOf(); 
-    const randomId = Math.floor(Math.random() * 1000000) + 1;
+    let exists = false;
+    let users = getData().users
+    for (let user of users) {
+        if (user.authUserId === authUserId) {
+            exists = true;
+        }
+    }
 
-    const quizId = `${timestamp}${randomId}`;
+    if (!exists) return { error: 'Invalid authUserId' };
 
-    let createdQuizzes = getData().quizId;
+    let createdQuizzes = getData().quizzes;
     for (const quiz of createdQuizzes) {
-        if (quiz.authUserId === authUserId && quiz.name === name) {
+        if (quiz.authId === authUserId && quiz.name === name) {
             return { error: 'Quiz Name Is Already Used' };
         }
     }
 
-    return { quizId };
+    // Returning and altering data
+    const timestamp = new Date().valueOf(); 
+    const randomId = Math.floor(Math.random() * 1000000) + 1;
+    const quizId = timestamp * randomId;
+
+    createdQuizzes.push({
+        quizId: quizId,
+        authId: authUserId,
+        name: name,
+        description: description,
+        time_created: timestamp,
+        time_last_edit: timestamp,
+    })
+
+    return { quizId: quizId };
 }
 
 /*  adminQuizRemove
@@ -96,7 +127,6 @@ function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a posit
     for (let i = 0; i < quizzes.length; i++) {
         if (quizzes[i].quizId === quizId && quizzes[i].authId === authUserId) {
             quizzes.splice(i, 1);
-            setData(data);
             return { };
         }
     }
@@ -116,10 +146,12 @@ function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a posit
         Quiz Object
  */
 function adminQuizInfo( authUserId, quizId ) {
+    // Gathering all quizzes
     let quizzes = getData().quizzes;
 
     for (let quiz of quizzes) {
         if (quiz.quizId === quizId && quiz.authId === authUserId) {
+            // If it's the quiz that's being searched for, return it
             return {
                 quizId: quiz.quizId,
                 name: quiz.name,
@@ -130,6 +162,7 @@ function adminQuizInfo( authUserId, quizId ) {
         }
     }
 
+    // If it gets through without returning, then it doesn't exist
     return { error: "No such quiz" };
 }
 
@@ -178,8 +211,7 @@ function adminQuizNameUpdate( authUserId, quizId, name ) {
     for (let i = 0; i < quizzes.length; i++) {
         if (quizzes[i].quizId === quizId && quizzes[i].authId === authUserId) {
             quizzes[i].name = name;
-            setData(data);
-            return {};
+            return { };
         }
     }
     return {error: 'Quiz ID does not refer to a valid quiz or Quiz ID does not refer to a quiz that this user owns'};

@@ -86,18 +86,15 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
         authUserId:
  */
 export function adminAuthLogin(email, password) {
-    if (user.email === email && user.password === password) {
-        return { error: "Email and password are required" };
-    }
+    let users = getData().users;
 
-    let data = getData().users;
-    for (let user in data) {
-        if (user.password === password && user.password === password) {
+    for (let user of users) {
+        if (user.email === email && user.password === password) {
             return { authUserId: user.authUserId };
         }
     }
-    
-    return { error: "Invalid login" };
+
+    return { error: "Email or password is incorrect " };
 }
 
 // Function : adminUserDetails
