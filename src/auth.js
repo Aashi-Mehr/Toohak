@@ -68,14 +68,25 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
     };
 }
 
-// Function : adminUserLogin
-// Input    : email, password
-// Output   : authUserId
+/*  adminUserLogin
 
+    Parameters:
+        email:
+        password:
+    
+    Output:
+        authUserId:
+ */
 export function adminAuthLogin(email, password) {
-    return {
-        authUserId: 1,
+    let users = getData().users;
+
+    for (let user of users) {
+        if (user.email === email && user.password === password) {
+            return { authUserId: user.authUserId };
+        }
     }
+
+    return { error: "Email or password is incorrect " };
 }
 
 // Function : adminUserDetails
