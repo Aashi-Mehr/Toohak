@@ -1,5 +1,4 @@
-import { adminQuizDescriptionUpdate } from './quiz.js';
-import { adminQuizCreate } from './quiz.js';
+import { adminQuizCreate, adminQuizDescriptionUpdate } from './quiz.js';
 import { adminAuthRegister } from './auth.js';
 import { clear } from './other.js';
 
@@ -31,6 +30,8 @@ test('Quiz ID does not refer to a valid quiz', () => {
 });
 
 test('Quiz ID does not refer to a quiz that this user owns', () => {
+    const description = 'New description';
+    
     clear();
     // Register user with id: 1
     let authUserId1 = adminAuthRegister("first.last1@gmail.com", "abcd1234", "first", "last").authUserId;

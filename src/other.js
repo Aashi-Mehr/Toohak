@@ -23,6 +23,8 @@ function clear() {
     };
 
     setData(emptyData);
+    
+    return { };
 }
 
 export { clear };

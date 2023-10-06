@@ -1,4 +1,4 @@
-import { adminQuizRemove } from './quiz.js';
+import { adminQuizRemove, adminQuizCreate } from './quiz.js';
 import { adminAuthRegister } from './auth.js';
 import { clear } from './other.js';
 
@@ -23,30 +23,35 @@ test('Test Valid User IDs', () => {
   // DEPENDENCY on adminAuthRegister
   let authUserId1 = adminAuthRegister("first.last1@gmail.com", "Val1dPassword1", "first1", "last1").authUserId;
   let authUserId2 = adminAuthRegister("first.last2@gmail.com", "Val1dPassword2", "first2", "last2").authUserId;
-  let authUserId3 = adminAuthRegister("first.last3@gmail.com", "Val1dPassword3", "first3", "last3").authUserId;
-  let authUserId4 = adminAuthRegister("first.last4@gmail.com", "Val1dPassword4", "first4", "last4").authUserId;
   
-  let result = adminQuizRemove(authUserId1, 1);
-  expect(result).toMatchObject({ success: true });
+  let quizId1 = adminQuizCreate(authUserId1, "New Quiz Name1", "");
+  let quizId2 = adminQuizCreate(authUserId2, "New Quiz Name2", "");
 
-  result = adminQuizRemove(authUserId2, 2);
-  expect(result).toMatchObject({ success: true });
+  let result = adminQuizRemove(authUserId1, quizId1);
+  expect(result).toMatchObject({ });
 
-  // authUserId4 does not own quiz 2, so it should return an error
-  result = adminQuizRemove(authUserId4, 2);
+  result = adminQuizRemove(authUserId2, quizId2);
+  expect(result).toMatchObject({ });
+
+  quizId1 = adminQuizCreate(authUserId1, "New Quiz Name1", "");
+  quizId2 = adminQuizCreate(authUserId2, "New Quiz Name2", "");
+
+  // authUserId2 does not own quiz1, so it should return an error
+  result = adminQuizRemove(authUserId2, quizId1);
+  expect(result).toMatchObject({ error: expect.any(String) });
+
+  result = adminQuizRemove(authUserId1, quizId2);
   expect(result).toMatchObject({ error: expect.any(String) });
 });
 
-test('Test New Error Conditions', () => {
-  // authUserId is not a valid user
-  let result = adminQuizRemove("invalidUserId", 1);
-  expect(result).toMatchObject({ error: expect.any(String) });
+test('Test Invalid QuizIDs', () => {
+  let authUserId1 = adminAuthRegister("first.last1@gmail.com", "Val1dPassword1", "first1", "last1").authUserId;
+  let quizId1 = adminQuizCreate(authUserId1, "New Quiz Name1", "");
 
   // Quiz ID does not refer to a valid quiz
-  result = adminQuizRemove(authUserId1, "invalidQuizId");
+  let result = adminQuizRemove(authUserId1, "invalidQuizId");
   expect(result).toMatchObject({ error: expect.any(String) });
 
-  // Quiz ID does not refer to a quiz that this user owns
-  result = adminQuizRemove(authUserId1, 2);
+  result = adminQuizRemove(authUserId1, quizId1 + 1);
   expect(result).toMatchObject({ error: expect.any(String) });
 });
