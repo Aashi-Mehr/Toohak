@@ -11,11 +11,26 @@ import { getData } from './dataStore.js';
  */
 
 function adminQuizList( authUserId ) {
+    // Checking if the user exists
+    let users = getData().users;
+    let exists = false;
+
+    for (let user in users) {
+        if (user.authUserId === authUserId) {
+            exists = true;
+        }
+    }
+
+    if (!exists) return { error: "Invalid user ID" };
+
+    // Gathering quizzes
     let allQuizzes = getData().quizzes;
     let userQuizzes = [];
 
+    // Looping through quizzes in dataStore
     for (let quiz of allQuizzes) {
         if (quiz.authId === authUserId) {
+            // If it belongs to the relevant user, it needs to be returned
             userQuizzes.push({
                 quizId: quiz.quizId,
                 name: quiz.name
@@ -23,8 +38,8 @@ function adminQuizList( authUserId ) {
         }
     }
 
-    if (userQuizzes.length < 1) return { error: "Invalid user ID" };
-    else return { quizzes: userQuizzes };
+    // Quizzes list 
+    return { quizzes: userQuizzes };
 }
 
 /*  adminQuizCreate
@@ -131,10 +146,12 @@ function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a posit
         Quiz Object
  */
 function adminQuizInfo( authUserId, quizId ) {
+    // Gathering all quizzes
     let quizzes = getData().quizzes;
 
     for (let quiz of quizzes) {
         if (quiz.quizId === quizId && quiz.authId === authUserId) {
+            // If it's the quiz that's being searched for, return it
             return {
                 quizId: quiz.quizId,
                 name: quiz.name,
@@ -145,6 +162,7 @@ function adminQuizInfo( authUserId, quizId ) {
         }
     }
 
+    // If it gets through without returning, then it doesn't exist
     return { error: "No such quiz" };
 }
 
