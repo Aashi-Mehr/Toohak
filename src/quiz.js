@@ -55,20 +55,17 @@ function adminQuizCreate( authUserId, name, description ) {
 
     if (!exists) return { error: 'AuthUserId doesn\'t exist' };
 
-    // 
-    const timestamp = new Date().valueOf();
-    const randomId = Math.floor(Math.random() * 1000000) + 1;
-    const quizId = timestamp * randomId;
-
     let quizzes = getData().quizzes;
-
     for (let quiz of quizzes) {
-        console.log("THERE ARE QUIZZES IN QUIZZES");
         if (quiz.authId === authUserId && quiz.name === name) {
-            console.log("THERE IS A QUIZ THAT EXISTS!");
             return { error: 'Quiz Name Is Already Used' };
         }
     }
+
+    // Adding data to dataStore and returning quizId
+    const timestamp = new Date().valueOf();
+    const randomId = Math.floor(Math.random() * 1000000) + 1;
+    const quizId = timestamp * randomId;
 
     quizzes.push({
         quizId: quizId,
@@ -83,7 +80,7 @@ function adminQuizCreate( authUserId, name, description ) {
 }
 
 /*  adminQuizRemove
-    Given a particular quiz, permanently remove the quiz.
+    Given a particular quiz, permanently remove the quiz
 
     Parameters:
         authUserId:
