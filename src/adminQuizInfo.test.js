@@ -4,7 +4,7 @@
 // Zhejun Gu (z5351573)
 //
 // edit:
-// 29/09/2023
+// 05/10/2023
 //
 
 import { adminQuizInfo } from './quiz.js';
@@ -47,17 +47,18 @@ test('Test valid format User Id but not exist in data base', () =>{
 
     // Correct format UserId but never is the Id being registered
     let result = adminQuizInfo(4, 1);
-    expect(data.has(result)).toBe(false);
+    expect(result).toMatchObject({ error: expect.any(String) });
 });
 
 test('Test Valid User and Quiz Ids', () => {
     clear();
 
-    let result = adminQuizInfo(1, a);
+    let authId = adminAuthRegister('1531_user1@1531.com', 'C123321c', 'first', 'last').authUserId;
+    let qzId = adminQuizCreate(authId, 'first last', '').quizId;
 
-    expect(result).toMatchObject({
-        quizId: 1,
-        name: expect.any(String),
+    expect(adminQuizInfo(authId, qzId)).toMatchObject({
+        quizId: qzId,
+        name: 'first last',
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
         description: expect.any(String),
