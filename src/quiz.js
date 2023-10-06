@@ -173,8 +173,22 @@ function adminQuizNameUpdate( authUserId, quizId, name ) {
     Returns:
         { }: Rempty Object
  */
-export function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
-    return { };
+function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
+    // Getting quizz data from dataStore
+    let quizzesData = getData().quizzes;
+
+    // Looping through quizzesData to find the quiz with matching authUserId and quizId
+    for ( let quiz of quizzesData ) {
+        // Compare authUserId and quizId
+        if ( authUserId === quiz.authUserId && quizId === quiz.quizId) {
+            // Updating the initial quiz description with the new description
+            quiz.description = description;
+            // Exit when its done
+            return { };
+        }
+    }
+    // Exit with an error message if the quiz with inputted authId and quizId is not found
+    return {error: "Quiz with inputted authUserId and quizId id not found"};
 }
 
 // last edit: 29/09/2023 by Zhejun Gu
