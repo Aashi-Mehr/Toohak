@@ -15,12 +15,7 @@ function adminQuizList( authUserId ) {
     let users = getData().users;
     let exists = false;
 
-    for (let user in users) {
-        if (user.authUserId === authUserId) {
-            exists = true;
-        }
-    }
-
+    for (let user of users) if (user.authUserId === authUserId) exists = true;
     if (!exists) return { error: "Invalid user ID" };
 
     // Gathering quizzes
@@ -57,25 +52,21 @@ function adminQuizCreate(authUserId, name, description) {
     // Error checking
     let invalidName = /[^a-zA-Z0-9 ']/.test(name);
     if (invalidName || name.length < 3 || name.length > 30) {
-        return { error: 'Invalid Name Format' };
+        return { error: 'Invalid Name' };
     }
 
     if (description.length > 100) {
-        return { error: 'Invalid Description Format' };
+        return { error: 'Invalid Description' };
     }
 
+    let users = getData().users;
     let exists = false;
-    let users = getData().users
-    for (let user of users) {
-        if (user.authUserId === authUserId) {
-            exists = true;
-        }
-    }
 
-    if (!exists) return { error: 'Invalid authUserId' };
+    for (let user of users) if (user.authUserId === authUserId) exists = true;
+    if (!exists) return { error: "Invalid user ID" };
 
     let createdQuizzes = getData().quizzes;
-    for (const quiz of createdQuizzes) {
+    for (let quiz of createdQuizzes) {
         if (quiz.authId === authUserId && quiz.name === name) {
             return { error: 'Quiz Name Is Already Used' };
         }
@@ -84,7 +75,7 @@ function adminQuizCreate(authUserId, name, description) {
     // Returning and altering data
     const timestamp = new Date().valueOf(); 
     const randomId = Math.floor(Math.random() * 1000000) + 1;
-    const quizId = timestamp * randomId;
+    const quizId = timestamp * randomId % 100000000;
 
     createdQuizzes.push({
         quizId: quizId,
@@ -110,27 +101,27 @@ function adminQuizCreate(authUserId, name, description) {
  */
 function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a positive integer
     if (!Number.isInteger(authUserId) || authUserId <= 0) {
-        return {error: 'AuthUserId is not a valid user'};
+        return { error: 'AuthUserId is not a valid user' };
     }
     if (!Number.isInteger(quizId) || quizId <= 0) {
-        return {error: 'QuizId is not a valid Quiz'};
+        return { error: 'QuizId is not a valid Quiz' };
     }
 
-    const data = getData();
-    const user = data.users.find((user) => user.id === authUserId);
+    let users = getData().users;
+    let exists = false;
 
-    if (! user) {
-        return {error: 'AuthUserId is not a valid user'};
-    }
+    for (let user of users) if (user.authUserId === authUserId) exists = true;
+    if (!exists) return { error: "Invalid user ID" };
 
-    let quizzes = data.quizzes;
+    let quizzes = getData().quizzes;
     for (let i = 0; i < quizzes.length; i++) {
         if (quizzes[i].quizId === quizId && quizzes[i].authId === authUserId) {
             quizzes.splice(i, 1);
             return { };
         }
     }
-    return {error: 'Quiz ID does not refer to a valid quiz or Quiz ID does not refer to a quiz that this user owns'};
+
+    return { error: 'Quiz ID is invalid' };
 }
 
 
@@ -156,7 +147,7 @@ function adminQuizInfo( authUserId, quizId ) {
                 quizId: quiz.quizId,
                 name: quiz.name,
                 timeCreated: quiz.time_created,
-                timeLastEdited:quiz.time_last_edit,
+                timeLastEdited: quiz.time_last_edit,
                 description: quiz.description
             };
         }
@@ -179,20 +170,19 @@ function adminQuizInfo( authUserId, quizId ) {
  */
 function adminQuizNameUpdate( authUserId, quizId, name ) {
     if (!Number.isInteger(authUserId) || authUserId <= 0) {
-        return {error: 'AuthUserId is not a valid user'};
+        return { error: 'AuthUserId is not a valid user' };
     }
     if (!Number.isInteger(quizId) || quizId <= 0) {
-        return {error: 'QuizId is not a valid Quiz'};
+        return { error: 'QuizId is not a valid Quiz' };
     }
 
-    const data = getData();
-    const user = data.users.find((user) => user.id === authUserId);
+    let users = getData().users;
+    let exists = false;
 
-    if (! user) {
-        return {error: 'AuthUserId is not a valid user'};
-    }
+    for (let user of users) if (user.authUserId === authUserId) exists = true;
+    if (!exists) return { error: "Invalid user ID" };
 
-      // Check if the name contains invalid characters (only alphanumeric and spaces allowed)
+    // Check if the name contains invalid characters (only alphanumeric and spaces allowed)
     if (!/^[a-zA-Z0-9\s]+$/.test(name)) {
         return { error: 'Name contains invalid characters.' };
     }
@@ -202,19 +192,19 @@ function adminQuizNameUpdate( authUserId, quizId, name ) {
         return { error: 'Name must be between 3 and 30 characters long' };
     }
 
-    let quizzes = data.quizzes;
-    for (let i = 0; i < quizzes.length; i++) {
-        if (quizzes[i].quizId === quizId && quizzes[i].authId === authUserId && quizzes[i].name === name) {
-            return { error: 'Name has exist' };
-        }
-    }
+    let quizzes = getData().quizzes;
     for (let i = 0; i < quizzes.length; i++) {
         if (quizzes[i].quizId === quizId && quizzes[i].authId === authUserId) {
+            if (quizzes[i].name === name) {
+                return { error: 'Name hasn\'t been changed' };
+            }
+
             quizzes[i].name = name;
             return { };
         }
     }
-    return {error: 'Quiz ID does not refer to a valid quiz or Quiz ID does not refer to a quiz that this user owns'};
+
+    return { error: 'Quiz ID is invalid' };
 }
 
 /*  adminQuizDescriptionUpdate
@@ -243,7 +233,7 @@ function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
         }
     }
     // Exit with an error message if the quiz with inputted authId and quizId is not found
-    return {error: "Quiz with inputted authUserId and quizId id not found"};
+    return { error: "Quiz with inputted authUserId and quizId id not found" };
 }
 
 // last edit: 29/09/2023 by Zhejun Gu
