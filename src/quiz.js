@@ -15,12 +15,7 @@ function adminQuizList( authUserId ) {
     let users = getData().users;
     let exists = false;
 
-    for (let user in users) {
-        if (user.authUserId === authUserId) {
-            exists = true;
-        }
-    }
-
+    for (let user of users) if (user.authUserId === authUserId) exists = true;
     if (!exists) return { error: "Invalid user ID" };
 
     // Gathering quizzes
