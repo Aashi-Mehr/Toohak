@@ -24,8 +24,26 @@ let data = {
             description: 'This is my quiz',
             time_created: 202309211910,
             time_last_edit: 202309211912,
+            in_trash: true,
+            questions: [
+                {
+                    question: "Who is the Monarch of England?",
+                    duration: 4,
+                    points: 5,
+                    answer: "answer": "Prince Charles",
+                }
+            ]
         },
         // ...
+    ],
+
+    tokens:
+    [
+        {
+            sessionId: 12345,
+            authUserId: 123456,
+            is_valid: true,
+        }
     ],
 }
 ```
