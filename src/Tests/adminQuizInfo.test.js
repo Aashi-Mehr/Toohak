@@ -7,10 +7,10 @@
 // 05/10/2023
 //
 
-import { adminQuizInfo } from './quiz.js';
-import { adminQuizCreate } from './quiz.js';
-import { adminAuthRegister } from './auth.js';
-import { clear } from './other.js';
+import { adminQuizInfo } from '../quiz.js';
+import { adminQuizCreate } from '../quiz.js';
+import { adminAuthRegister } from '../auth.js';
+import { clear } from '../other.js';
 
 test('Test Invalid User Ids', () => {
     clear();

@@ -1,6 +1,6 @@
-import { adminQuizCreate, adminQuizDescriptionUpdate } from './quiz.js';
-import { adminAuthRegister } from './auth.js';
-import { clear } from './other.js';
+import { adminQuizCreate, adminQuizDescriptionUpdate } from '../quiz.js';
+import { adminAuthRegister } from '../auth.js';
+import { clear } from '../other.js';
 
 test('AuthUserId is not a valid user', () => {
     clear();

@@ -1,6 +1,6 @@
-import { adminAuthRegister, adminUserDetails } from './auth.js';
-import { adminQuizInfo, adminQuizCreate } from './quiz.js';
-import { clear } from './other.js';
+import { adminAuthRegister, adminUserDetails } from '../auth.js';
+import { adminQuizInfo, adminQuizCreate } from '../quiz.js';
+import { clear } from '../other.js';
 
 test('Clear Users', () => {
     // Register user
