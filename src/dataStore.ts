@@ -4,8 +4,6 @@
 // INTERFACES Other
 interface ErrorObject { error: string }
 
-interface Empty { }
-
 // INTERFACES Auth
 interface AuthUserId { authUserId: number }
 
@@ -88,7 +86,7 @@ let data: Datastore = {
 };
 
 // Use getData() to access the data
-function getData(): Datastore { return data };
+function getData(): Datastore { return data; }
 
 // Use setData(newData) to pass modified data
 function setData(newData: Datastore): null {
@@ -100,7 +98,6 @@ export {
   getData,
   setData,
   ErrorObject,
-  Empty,
   AuthUserId,
   User,
   Details,

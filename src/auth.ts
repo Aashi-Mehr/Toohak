@@ -19,7 +19,7 @@ import { UserAdd, Details, ErrorObject, getData } from './dataStore';
         Migrating to TypeScript
  */
 export function adminAuthRegister(email: string, password: string,
-                                  nameFirst: string, nameLast: string) {
+  nameFirst: string, nameLast: string) {
   const users = getData().users;
 
   // ERROR CHECKING
@@ -49,7 +49,7 @@ export function adminAuthRegister(email: string, password: string,
   if (!validator.isEmail(email)) return { error: 'Invalid Email' };
 
   // Email cannot be duplicated
-  for (let user of users) if (user.email === email) return { error: 'Used' };
+  for (const user of users) if (user.email === email) return { error: 'Used' };
 
   // ADDING TO DATA
   const timestamp = Math.floor(Date.now() / 1000);
@@ -115,8 +115,10 @@ export function adminAuthLogin(email: string, password: string) {
  */
 export function adminUserDetails(authUserId: number): Details | ErrorObject {
   let user: UserAdd;
-  for (let person of getData().users) if (person.authUserId === authUserId) {
-    user = person;
+  for (const person of getData().users) {
+    if (person.authUserId === authUserId) {
+      user = person;
+    }
   }
 
   if (user === undefined) return { error: 'Invalid authUserId' };
