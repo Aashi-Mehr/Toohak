@@ -1,7 +1,6 @@
 import { adminQuizNameUpdate, adminQuizCreate, adminQuizInfo } from '../quiz.js';
 import { adminAuthRegister } from '../auth.js';
 import { clear } from '../other.js';
-import exp from 'constants';
 
 beforeEach(() => {
   clear();
@@ -9,54 +8,54 @@ beforeEach(() => {
 
 test('Test Invalid User IDs', () => {
   // authUserId is not an integer
-  let result = adminQuizNameUpdate("12345", 1, "New Quiz Name");
+  let result = adminQuizNameUpdate('12345', 1, 'New Quiz Name');
   expect(result).toMatchObject({ error: expect.any(String) });
 
-  result = adminQuizNameUpdate("67890", 1, "New Quiz Name");
+  result = adminQuizNameUpdate('67890', 1, 'New Quiz Name');
   expect(result).toMatchObject({ error: expect.any(String) });
 
   // authUserId is out of the range of User IDs.
-  result = adminQuizNameUpdate(0, 1, "New Quiz Name");
+  result = adminQuizNameUpdate(0, 1, 'New Quiz Name');
   expect(result).toMatchObject({ error: expect.any(String) });
 });
 
 test('Test Valid User IDs', () => {
-  let authUserId1 = adminAuthRegister("first.last1@gmail.com", "Val1dPassword1",
-                                      "first", "last").authUserId;
-  let quizId1 = adminQuizCreate(authUserId1, "New Name", "").quizId;
+  const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'Val1dPassword1',
+    'first', 'last').authUserId;
+  const quizId1 = adminQuizCreate(authUserId1, 'New Name', '').quizId;
 
-  let result = adminQuizNameUpdate(authUserId1, quizId1, "Updated Name");
+  let result = adminQuizNameUpdate(authUserId1, quizId1, 'Updated Name');
   expect(result).toMatchObject({ });
 
   let quiz = adminQuizInfo(authUserId1, quizId1);
-  expect(quiz.name).toStrictEqual("Updated Name");
+  expect(quiz.name).toStrictEqual('Updated Name');
 
-  result = adminQuizNameUpdate(authUserId1, quizId1, "New Name");
+  result = adminQuizNameUpdate(authUserId1, quizId1, 'New Name');
   expect(result).toMatchObject({ });
 
   quiz = adminQuizInfo(authUserId1, quizId1);
-  expect(quiz.name).toStrictEqual("New Name");
+  expect(quiz.name).toStrictEqual('New Name');
 });
 
 test('Test Invalid Quiz Name', () => {
   // Name contains invalid characters (should only contain alphanumeric and spaces)
-  let authUserId = adminAuthRegister("first.last1@gmail.com", "Val1dPassword1",
-                                     "first", "last").authUserId;
-  let quizId1 = adminQuizCreate(authUserId, "New Quiz Name", "");
-  
-  let result = adminQuizNameUpdate(authUserId, quizId1, "Invalid@Name");
+  const authUserId = adminAuthRegister('first.last1@gmail.com', 'Val1dPassword1',
+    'first', 'last').authUserId;
+  const quizId1 = adminQuizCreate(authUserId, 'New Quiz Name', '');
+
+  let result = adminQuizNameUpdate(authUserId, quizId1, 'Invalid@Name');
   expect(result).toMatchObject({ error: expect.any(String) });
 
   // Name is less than 3 characters long
-  result = adminQuizNameUpdate(authUserId, quizId1, "A");
+  result = adminQuizNameUpdate(authUserId, quizId1, 'A');
   expect(result).toMatchObject({ error: expect.any(String) });
 
   // Name is more than 30 characters long
-  result = adminQuizNameUpdate(authUserId, quizId1, "Very Long Quiz Name With More Than 30 Characters");
+  result = adminQuizNameUpdate(authUserId, quizId1, 'Very Long Quiz Name With More Than 30 Characters');
   expect(result).toMatchObject({ error: expect.any(String) });
 
   // Name is already used by the current logged in user
-  adminQuizNameUpdate(authUserId, quizId1, "Existing Name");
-  result = adminQuizNameUpdate(authUserId, quizId1, "Existing Name");
+  adminQuizNameUpdate(authUserId, quizId1, 'Existing Name');
+  result = adminQuizNameUpdate(authUserId, quizId1, 'Existing Name');
   expect(result).toMatchObject({ error: expect.any(String) });
 });

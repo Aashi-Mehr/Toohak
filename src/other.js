@@ -6,7 +6,7 @@
 // Zhejun Gu (z5351573)
 // Alya Nur Najwa (z5445823)
 //
-// edit: 
+// edit:
 // 29/09/2023
 //
 // Iteration 1: Function Implementation
@@ -14,17 +14,17 @@
 //
 // clear (parameters: void(); return: empty{})
 // Reset state of the application back to the start
-import { getData, setData } from './dataStore.js';
+import { setData } from './dataStore.js';
 
 function clear() {
-    let emptyData = {
-        users: [],
-        quizzes: [],
-    };
+  const emptyData = {
+    users: [],
+    quizzes: [],
+  };
 
-    setData(emptyData);
-    
-    return { };
+  setData(emptyData);
+
+  return { };
 }
 
 export { clear };
