@@ -1,5 +1,5 @@
 // adminQuizList test function
-// 
+//
 // authors:
 // Zhejun Gu (z5351573)
 //
@@ -8,84 +8,84 @@
 //
 
 import {
-    adminQuizList,
-    adminQuizCreate,
-    adminQuizInfo,
-    adminQuizRemove
+  adminQuizList,
+  adminQuizCreate,
+  adminQuizInfo,
+  adminQuizRemove
 } from '../quiz.js';
 
 import { adminAuthRegister } from '../auth.js';
 import { clear } from '../other.js';
 
 beforeEach(() => {
-    clear();
+  clear();
 });
 
 test('Test Invalid User Ids', () => {
-    // Register user with id: 1
-    adminAuthRegister("first.last1@gmail.com", "abcd1234", "first", "last");
+  // Register user with id: 1
+  adminAuthRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last');
 
-    // authUserId is not an integar
-    let result = adminQuizList("12321");
-    expect(result).toMatchObject({ error: expect.any(String) });
+  // authUserId is not an integar
+  let result = adminQuizList('12321');
+  expect(result).toMatchObject({ error: expect.any(String) });
 
-    // authUserId is out of valid range
-    result = adminQuizList(-1);
-    expect(result).toMatchObject({ error: expect.any(String) });
+  // authUserId is out of valid range
+  result = adminQuizList(-1);
+  expect(result).toMatchObject({ error: expect.any(String) });
 });
 
 test('Test valid format User Id but not exist in data base', () => {
-    // Register user with id: 1
-    adminAuthRegister("first.last2@gmail.com", "efgh5678", "first2", "last2");
+  // Register user with id: 1
+  adminAuthRegister('first.last2@gmail.com', 'efgh5678', 'first2', 'last2');
 
-    // Correct format UserId but never is the Id being registered
-    let result = adminQuizInfo(4, 1);
-    expect(result).toMatchObject({ error: expect.any(String) });
+  // Correct format UserId but never is the Id being registered
+  const result = adminQuizInfo(4, 1);
+  expect(result).toMatchObject({ error: expect.any(String) });
 });
 
 test('VALID 1 Quiz', () => {
-    let authId = adminAuthRegister('1531_user1@gmail.com', 'C123321c', 'first',
-                                   'last').authUserId;
-    let qzId = adminQuizCreate(authId, 'first last', '').quizId;
+  const authId = adminAuthRegister('1531_user1@gmail.com', 'C123321c', 'first',
+    'last').authUserId;
+  const qzId = adminQuizCreate(authId, 'first last', '').quizId;
 
-    let result = adminQuizList(authId);
-    expect(result).toMatchObject({
-        quizzes: [
-            {
-                quizId: qzId,
-                name: 'first last', 
-            }
-        ]
-    });
+  const result = adminQuizList(authId);
+  expect(result).toMatchObject({
+    quizzes: [
+      {
+        quizId: qzId,
+        name: 'first last',
+      }
+    ]
+  });
 });
 
 test('VALID 2 Quizzes', () => {
-    let authId = adminAuthRegister('1531_user1@gmail.com', 'C123321c', 'first',
-                                   'last').authUserId;
-    let qzId1 = adminQuizCreate(authId, 'first last1', '').quizId;
-    let qzId2 = adminQuizCreate(authId, 'first last2', '').quizId;
+  const authId = adminAuthRegister('1531_user1@gmail.com', 'C123321c', 'first',
+    'last').authUserId;
+  const qzId1 = adminQuizCreate(authId, 'first last1', '').quizId;
+  const qzId2 = adminQuizCreate(authId, 'first last2', '').quizId;
 
-    let result = adminQuizList(authId);
-    expect(result).toMatchObject({
-        quizzes: [
-            {
-                quizId: qzId1,
-                name: 'first last1', 
-            },
-            {
-                quizId: qzId2,
-                name: 'first last2', 
-            }
-        ]
-    });
+  const result = adminQuizList(authId);
+  expect(result).toMatchObject({
+    quizzes: [
+      {
+        quizId: qzId1,
+        name: 'first last1',
+      },
+      {
+        quizId: qzId2,
+        name: 'first last2',
+      }
+    ]
+  });
 });
 
 test('VALID After Removal', () => {
-    let authId = adminAuthRegister('1531_user1@gmail.com', 'C123321c', 'first',
-                                   'last').authUserId;
-    let qzId = adminQuizCreate(authId, 'first last1', '').quizId;
-    adminQuizRemove(authId, qzId);
+  const authId = adminAuthRegister('1531_user1@gmail.com', 'C123321c', 'first',
+    'last').authUserId;
+  const qzId = adminQuizCreate(authId, 'first last1', '').quizId;
+  adminQuizRemove(authId, qzId);
 
-    let result = adminQuizList(authId);
-    expect(result).toMatchObject({ quizzes: [ ] });
+  const result = adminQuizList(authId);
+  expect(result).toMatchObject({ quizzes: [] });
 });

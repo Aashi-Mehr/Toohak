@@ -9,7 +9,23 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 
-import { adminAuthRegister } from './auth.js';
+import {
+  adminAuthRegister,
+  // Uncomment the functions that you need (Lint gives an error if it's not in a
+  // comment :/)
+  // adminAuthLogin,
+  adminUserDetails
+} from './auth.js';
+
+// import {
+// adminQuizList,
+// adminQuizInfo,
+// adminQuizCreate,
+// adminQuizRemove,
+// adminQuizNameUpdate,
+// adminQuizDescriptionUpdate
+// } from './quiz.js';
+
 import { clear } from './other.js';
 
 // Set up web app
@@ -36,9 +52,8 @@ const HOST: string = process.env.IP || 'localhost';
 app.get('/echo', (req: Request, res: Response) => {
   const data = req.query.echo as string;
   const ret = echo(data);
-  if ('error' in ret) {
-    res.status(400);
-  }
+
+  if ('error' in ret) res.status(400);
   return res.json(ret);
 });
 
@@ -46,6 +61,16 @@ app.get('/echo', (req: Request, res: Response) => {
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   const { email, password, nameFirst, nameLast } = req.body;
   const response = adminAuthRegister(email, password, nameFirst, nameLast);
+
+  if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+});
+
+// adminUserDetails
+app.get('/v1/admin/user/details', (req: Request, res: Response) => {
+  let { authUserId } = req.body;
+  authUserId = parseInt(authUserId);
+  const response = adminUserDetails(authUserId);
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
