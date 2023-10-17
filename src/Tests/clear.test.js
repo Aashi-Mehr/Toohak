@@ -1,4 +1,4 @@
-import { adminAuthRegister } from '../auth.js';
+import { adminAuthRegister } from '../auth';
 import { adminQuizCreate } from '../quiz.js';
 import { clear } from '../other.js';
 

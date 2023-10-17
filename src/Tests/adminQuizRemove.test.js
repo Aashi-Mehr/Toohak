@@ -1,5 +1,5 @@
 import { adminQuizRemove, adminQuizCreate, adminQuizList } from '../quiz.js';
-import { adminAuthRegister } from '../auth.js';
+import { adminAuthRegister } from '../auth';
 import { clear } from '../other.js';
 
 beforeEach(() => {

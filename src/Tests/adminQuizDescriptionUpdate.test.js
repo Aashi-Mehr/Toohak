@@ -1,5 +1,9 @@
-import { adminQuizCreate, adminQuizDescriptionUpdate, adminQuizInfo } from '../quiz.js';
-import { adminAuthRegister } from '../auth.js';
+import {
+  adminQuizCreate,
+  adminQuizDescriptionUpdate,
+  adminQuizInfo
+} from '../quiz.js';
+import { adminAuthRegister } from '../auth';
 import { clear } from '../other.js';
 
 const invalidUser = 10000;

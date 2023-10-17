@@ -1,5 +1,10 @@
-import { adminQuizNameUpdate, adminQuizCreate, adminQuizInfo } from '../quiz.js';
-import { adminAuthRegister } from '../auth.js';
+import {
+  adminQuizNameUpdate,
+  adminQuizCreate,
+  adminQuizInfo
+} from '../quiz.js';
+
+import { adminAuthRegister } from '../auth';
 import { clear } from '../other.js';
 
 beforeEach(() => {
