@@ -113,7 +113,6 @@ test('Test Description Length', () => {
 // Test : Valid AuthUserId, Name and Description
 test('Test Valid AuthUserId, name and description', () => {
     let authId = adminAuthRegister("validEmail@gmail.com", "Val1dPassword", "first", "last").authUserId;
-    console.log(authId);
     let result = adminQuizCreate(authId, 'COMP Quiz', 'COMP1531 Iteration 1 Quiz.');
     expect(result).toMatchObject({ quizId: expect.any(Number) });
 });

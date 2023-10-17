@@ -9,6 +9,9 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 
+import { adminAuthRegister } from './auth.js';
+import { clear } from './other.js';
+
 // Set up web app
 const app = express();
 // Use middleware that allows us to access the JSON body of requests
@@ -37,6 +40,22 @@ app.get('/echo', (req: Request, res: Response) => {
     res.status(400);
   }
   return res.json(ret);
+});
+
+// adminAuthRegister
+app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
+  const { email, password, nameFirst, nameLast } = req.body;
+  const response = adminAuthRegister(email, password, nameFirst, nameLast);
+
+  if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+});
+
+// clear
+app.delete('/v1/clear', (req: Request, res: Response) => {
+  const response = clear();
+
+  res.json(response);
 });
 
 // ====================================================================

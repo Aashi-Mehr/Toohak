@@ -1,4 +1,4 @@
-import { adminUserDetails } from '../auth.js';
+import { adminAuthLogin, adminUserDetails } from '../auth.js';
 import { adminAuthRegister } from '../auth.js';
 import { clear } from '../other.js';
 
@@ -73,4 +73,58 @@ test('Test Valid User IDs', () => {
           numFailedPasswordsSinceLastLogin: 0,
         }
     });
+});
+
+test('Test Multiple Logins', () => {
+  // DEPENDENCY on adminAuthRegister
+  let authUserId = adminAuthRegister("first.last1@gmail.com",
+                    "Val1dPassword1", 'first', 'last').authUserId;
+
+  adminAuthLogin("first.last1@gmail.com", "Val1dPassword1");
+  let result = adminUserDetails(authUserId);
+  expect(result).toMatchObject({ user:
+      {
+        userId: authUserId,
+        name: "first last",
+        email: "first.last1@gmail.com",
+        numSuccessfulLogins: 1,
+        numFailedPasswordsSinceLastLogin: 0,
+      }
+  });
+
+  adminAuthLogin("first.last1@gmail.com", "INVal1dPassword1");
+  result = adminUserDetails(authUserId);
+  expect(result).toMatchObject({ user:
+      {
+        userId: authUserId,
+        name: "first last",
+        email: "first.last1@gmail.com",
+        numSuccessfulLogins: 1,
+        numFailedPasswordsSinceLastLogin: 1,
+      }
+  });
+
+  adminAuthLogin("first.last1@gmail.com", "INVal1dPassword1");
+  result = adminUserDetails(authUserId);
+  expect(result).toMatchObject({ user:
+      {
+        userId: authUserId,
+        name: "first last",
+        email: "first.last1@gmail.com",
+        numSuccessfulLogins: 1,
+        numFailedPasswordsSinceLastLogin: 2,
+      }
+  });
+
+  adminAuthLogin("first.last1@gmail.com", "Val1dPassword1");
+  result = adminUserDetails(authUserId);
+  expect(result).toMatchObject({ user:
+      {
+        userId: authUserId,
+        name: "first last",
+        email: "first.last1@gmail.com",
+        numSuccessfulLogins: 2,
+        numFailedPasswordsSinceLastLogin: 0,
+      }
+  });
 });

@@ -22,8 +22,8 @@ let data = {
             authId: 1,
             name: 'My Quiz',
             description: 'This is my quiz',
-            time_created: 202309211910,
-            time_last_edit: 202309211912,
+            timeCreated: 202309211910,
+            timeLastEdited: 202309211912,
             in_trash: true,
             questions: [
                 {
