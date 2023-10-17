@@ -1,4 +1,4 @@
-import { getData } from './dataStore.js';
+import { getData } from './dataStore';
 
 /*  findQuiz
     Given a quizId, returns the quiz object

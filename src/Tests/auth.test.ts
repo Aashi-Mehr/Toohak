@@ -53,6 +53,7 @@ function requestRegister(email: string, password: string, nameFirst: string,
   else return result;
 }
 
+/*
 // POST LOGIN Define wrapper function
 function requestLogin(email: string, password: string): AuthUserId {
   const res = request(
@@ -71,6 +72,7 @@ function requestLogin(email: string, password: string): AuthUserId {
   if ('error' in result) return { authUserId: -1 };
   else return result;
 }
+*/
 
 // GET DETAILS Define wrapper function
 function requestDetails(authUserId: number): Details | ErrorObject {

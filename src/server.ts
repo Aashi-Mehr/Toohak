@@ -15,7 +15,7 @@ import {
   // comment :/)
   // adminAuthLogin,
   adminUserDetails
-} from './auth.js';
+} from './auth';
 
 // import {
 // adminQuizList,
@@ -24,7 +24,7 @@ import {
 // adminQuizRemove,
 // adminQuizNameUpdate,
 // adminQuizDescriptionUpdate
-// } from './quiz.js';
+// } from './quiz';
 
 import { clear } from './other.js';
 

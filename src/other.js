@@ -14,7 +14,7 @@
 //
 // clear (parameters: void(); return: empty{})
 // Reset state of the application back to the start
-import { setData } from './dataStore.js';
+import { setData } from './dataStore';
 
 function clear() {
   const emptyData = {
