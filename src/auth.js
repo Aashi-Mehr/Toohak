@@ -58,7 +58,7 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
     }
 
     let timestamp = new Date().valueOf();
-    let randomId = Math.floor(Math.random() * 1000000) + 1;
+    let randomId = (Math.floor(Math.random() * 1000000) + 1) % 100000000;
     let authUserId = timestamp * randomId;
 
     // If no error, push the new user and return the authUserId
@@ -89,7 +89,12 @@ export function adminAuthLogin(email, password) {
     let users = getData().users;
 
     for (let user of users) {
-        if (user.email === email && user.password === password) {
+        if (user.email === email && user.password != password) {
+            user.failed_password_num++;
+        }
+        else if (user.email === email && user.password === password) {
+            user.failed_password_num = 0;
+            user.successful_log_time++;
             return { authUserId: user.authUserId };
         }
     }

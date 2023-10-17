@@ -7,14 +7,21 @@
 // 05/10/2023
 //
 
-import { adminQuizList } from '../quiz.js';
-import { adminQuizCreate } from '../quiz.js';
+import {
+    adminQuizList,
+    adminQuizCreate,
+    adminQuizInfo,
+    adminQuizRemove
+} from '../quiz.js';
+
 import { adminAuthRegister } from '../auth.js';
-import { adminQuizInfo } from '../quiz.js';
 import { clear } from '../other.js';
 
-test('Test Invalid User Ids', () => {
+beforeEach(() => {
     clear();
+});
+
+test('Test Invalid User Ids', () => {
     // Register user with id: 1
     adminAuthRegister("first.last1@gmail.com", "abcd1234", "first", "last");
 
@@ -28,7 +35,6 @@ test('Test Invalid User Ids', () => {
 });
 
 test('Test valid format User Id but not exist in data base', () => {
-    clear();
     // Register user with id: 1
     adminAuthRegister("first.last2@gmail.com", "efgh5678", "first2", "last2");
 
@@ -37,10 +43,9 @@ test('Test valid format User Id but not exist in data base', () => {
     expect(result).toMatchObject({ error: expect.any(String) });
 });
 
-test('Test Valid User Ids', () => {
-    clear();
-    
-    let authId = adminAuthRegister('1531_user1@gmail.com', 'C123321c', 'first', 'last').authUserId;
+test('VALID 1 Quiz', () => {
+    let authId = adminAuthRegister('1531_user1@gmail.com', 'C123321c', 'first',
+                                   'last').authUserId;
     let qzId = adminQuizCreate(authId, 'first last', '').quizId;
 
     let result = adminQuizList(authId);
@@ -52,4 +57,35 @@ test('Test Valid User Ids', () => {
             }
         ]
     });
+});
+
+test('VALID 2 Quizzes', () => {
+    let authId = adminAuthRegister('1531_user1@gmail.com', 'C123321c', 'first',
+                                   'last').authUserId;
+    let qzId1 = adminQuizCreate(authId, 'first last1', '').quizId;
+    let qzId2 = adminQuizCreate(authId, 'first last2', '').quizId;
+
+    let result = adminQuizList(authId);
+    expect(result).toMatchObject({
+        quizzes: [
+            {
+                quizId: qzId1,
+                name: 'first last1', 
+            },
+            {
+                quizId: qzId2,
+                name: 'first last2', 
+            }
+        ]
+    });
+});
+
+test('VALID After Removal', () => {
+    let authId = adminAuthRegister('1531_user1@gmail.com', 'C123321c', 'first',
+                                   'last').authUserId;
+    let qzId = adminQuizCreate(authId, 'first last1', '').quizId;
+    adminQuizRemove(authId, qzId);
+
+    let result = adminQuizList(authId);
+    expect(result).toMatchObject({ quizzes: [ ] });
 });

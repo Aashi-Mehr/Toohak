@@ -7,13 +7,21 @@
 // 05/10/2023
 //
 
-import { adminQuizInfo } from '../quiz.js';
-import { adminQuizCreate } from '../quiz.js';
+import {
+    adminQuizInfo,
+    adminQuizDescriptionUpdate,
+    adminQuizNameUpdate,
+    adminQuizCreate
+} from '../quiz.js';
+
 import { adminAuthRegister } from '../auth.js';
 import { clear } from '../other.js';
 
-test('Test Invalid User Ids', () => {
+beforeEach(() => {
     clear();
+});
+
+test('Test Invalid User Ids', () => {
     // Register user with id: 1
     adminAuthRegister("first.last1@gmail.com", "abcd1234", "first", "last");
 
@@ -27,7 +35,6 @@ test('Test Invalid User Ids', () => {
 });
 
 test('Test Invalid Quiz Ids', () => {
-    clear();
     // Register test id: 2 by user id: 1 
     adminQuizCreate(1, "first last", "fist_test");
 
@@ -41,7 +48,6 @@ test('Test Invalid Quiz Ids', () => {
 });
 
 test('Test valid format User Id but not exist in data base', () =>{
-    clear();
     // Register user with id: 1
     adminAuthRegister("first.last2@gmail.com", "efgh5678", "first2", "last2");
 
@@ -51,8 +57,6 @@ test('Test valid format User Id but not exist in data base', () =>{
 });
 
 test('Test Valid User and Quiz Ids', () => {
-    clear();
-
     let authId = adminAuthRegister('1531_user1@1531.com', 'C123321c', 'first', 'last').authUserId;
     let qzId = adminQuizCreate(authId, 'first last', '').quizId;
 
@@ -63,4 +67,23 @@ test('Test Valid User and Quiz Ids', () => {
         timeLastEdited: expect.any(Number),
         description: expect.any(String),
     });
+});
+
+test('Test successful quiz read - correct timestamp format', () => {
+    let authId = adminAuthRegister('1531_user1@1531.com', 'C123321c', 'first',
+                                   'last').authUserId;
+    let quizId = adminQuizCreate(authId, 'first last', '').quizId;
+
+    const quiz = adminQuizInfo(authId, quizId);
+    expect(quiz.timeCreated.toString()).toMatch(/^\d{10}$/);
+    expect(quiz.timeLastEdited.toString()).toMatch(/^\d{10}$/);
+});
+
+test('Test quizId invalid error, cannot read', () => {
+    let authId = adminAuthRegister('1531_user1@1531.com', 'C123321c', 'first',
+                                   'last').authUserId;
+    let quizId = adminQuizCreate(authId, 'first last', '').quizId;
+
+    const quiz = adminQuizInfo(authId, quizId + 1);
+    expect(quiz).toStrictEqual({ error: expect.any(String) });
 });

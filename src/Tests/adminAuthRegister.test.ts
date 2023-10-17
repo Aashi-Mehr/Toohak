@@ -1,5 +1,3 @@
-import { adminAuthRegister } from '../auth.js';
-import { clear } from '../other.js';
 import request from 'sync-request-curl';
 import { port, url } from '../config.json';
 
@@ -18,7 +16,7 @@ function requestRegister(email: string, password: string, nameFirst: string,
                          nameLast: string) {
     const res = request(
       'POST',
-      SERVER_URL + 'v1/admin/auth/register',
+      SERVER_URL + '/v1/admin/auth/register',
       {
         json: {
           email: email,
@@ -28,15 +26,21 @@ function requestRegister(email: string, password: string, nameFirst: string,
         }
       }
     );
-  
-    // NOTE: information about status code can also be checked/returned
-    // if necessary, through res.statusCode
+
     return JSON.parse(res.body.toString());
 }
 
 // Clearing the datastore, so that the tests are independent of previous data
 beforeEach(() => {
-    clear();
+    const res = request(
+        'DELETE',
+        SERVER_URL + '/v1/clear',
+        {
+          qs: { }
+        }
+    );
+
+    return JSON.parse(res.body.toString());
 });
 
 describe('INVALID Passwords', () => {

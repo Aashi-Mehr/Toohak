@@ -1,4 +1,4 @@
-import { adminQuizRemove, adminQuizCreate } from '../quiz.js';
+import { adminQuizRemove, adminQuizCreate, adminQuizList } from '../quiz.js';
 import { adminAuthRegister } from '../auth.js';
 import { clear } from '../other.js';
 
@@ -21,17 +21,19 @@ test('Test Invalid User IDs', () => {
 
 test('Test Valid User IDs', () => {
   // DEPENDENCY on adminAuthRegister
-  let authUserId1 = adminAuthRegister("first.last1@gmail.com", "Val1dPassword1", "first1", "last1").authUserId;
-  let authUserId2 = adminAuthRegister("first.last2@gmail.com", "Val1dPassword2", "first2", "last2").authUserId;
+  let authUserId1 = adminAuthRegister("first.last1@gmail.com", "Val1dPassword1", "first", "last").authUserId;
+  let authUserId2 = adminAuthRegister("first.last2@gmail.com", "Val1dPassword2", "first", "last").authUserId;
   
-  let quizId1 = adminQuizCreate(authUserId1, "New Quiz Name1", "");
-  let quizId2 = adminQuizCreate(authUserId2, "New Quiz Name2", "");
+  let quizId1 = adminQuizCreate(authUserId1, "New Quiz Name1", "").quizId;
+  let quizId2 = adminQuizCreate(authUserId2, "New Quiz Name2", "").quizId;
 
   let result = adminQuizRemove(authUserId1, quizId1);
   expect(result).toMatchObject({ });
+  expect(adminQuizList(authUserId1).quizzes).toStrictEqual([]);
 
   result = adminQuizRemove(authUserId2, quizId2);
   expect(result).toMatchObject({ });
+  expect(adminQuizList(authUserId2).quizzes).toStrictEqual([]);
 
   quizId1 = adminQuizCreate(authUserId1, "New Quiz Name1", "");
   quizId2 = adminQuizCreate(authUserId2, "New Quiz Name2", "");

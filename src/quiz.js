@@ -1,4 +1,21 @@
-import { getData } from './dataStore.js';
+import { getData, setData } from './dataStore.js';
+
+/*  findQuiz
+    Given a quizId, returns the quiz object
+
+    Parameters:
+        quizId
+
+    Output:
+        quiz: refer to data.md
+ */
+function findQuiz(quizId) {
+    for (let quiz of getData().quizzes) if (quizId === quiz.quizId) {
+        return quiz;
+    }
+
+    return null;
+}
 
 /*  adminQuizList
     Provide a list of all quizzes that are owned by the currently logged in user.
@@ -9,7 +26,6 @@ import { getData } from './dataStore.js';
     Output:
         quizzes: { quizId: , name: }
  */
-
 function adminQuizList( authUserId ) {
     // Checking if the user exists
     let users = getData().users;
@@ -24,7 +40,7 @@ function adminQuizList( authUserId ) {
 
     // Looping through quizzes in dataStore
     for (let quiz of allQuizzes) {
-        if (quiz.authId === authUserId) {
+        if (quiz.authId === authUserId && quiz.in_trash === false) {
             // If it belongs to the relevant user, it needs to be returned
             userQuizzes.push({
                 quizId: quiz.quizId,
@@ -33,7 +49,7 @@ function adminQuizList( authUserId ) {
         }
     }
 
-    // Quizzes list 
+    // Quizzes list
     return { quizzes: userQuizzes };
 }
 
@@ -73,7 +89,7 @@ function adminQuizCreate(authUserId, name, description) {
     }
 
     // Returning and altering data
-    const timestamp = new Date().valueOf(); 
+    const timestamp = Math.floor(Date.now() / 1000);
     const randomId = Math.floor(Math.random() * 1000000) + 1;
     const quizId = timestamp * randomId % 100000000;
 
@@ -82,8 +98,10 @@ function adminQuizCreate(authUserId, name, description) {
         authId: authUserId,
         name: name,
         description: description,
-        time_created: timestamp,
-        time_last_edit: timestamp,
+        timeCreated: timestamp,
+        timeLastEdited: timestamp,
+        in_trash: false,
+        questions: []
     })
 
     return { quizId: quizId };
@@ -100,28 +118,22 @@ function adminQuizCreate(authUserId, name, description) {
         { }: Empty List
  */
 function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a positive integer
-    if (!Number.isInteger(authUserId) || authUserId <= 0) {
-        return { error: 'AuthUserId is not a valid user' };
-    }
-    if (!Number.isInteger(quizId) || quizId <= 0) {
-        return { error: 'QuizId is not a valid Quiz' };
-    }
-
     let users = getData().users;
     let exists = false;
 
     for (let user of users) if (user.authUserId === authUserId) exists = true;
     if (!exists) return { error: "Invalid user ID" };
 
-    let quizzes = getData().quizzes;
-    for (let i = 0; i < quizzes.length; i++) {
-        if (quizzes[i].quizId === quizId && quizzes[i].authId === authUserId) {
-            quizzes.splice(i, 1);
-            return { };
-        }
+    let quiz = findQuiz(quizId);
+    if (!quiz) return { error: 'Quiz ID is invalid' };
+
+    if (quiz.authId === authUserId && quiz.in_trash === false) {
+        quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+        quiz.in_trash = true;
+        return { done: true };
     }
 
-    return { error: 'Quiz ID is invalid' };
+    return { error: 'Quiz is not owned by user' };
 }
 
 
@@ -138,23 +150,22 @@ function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a posit
  */
 function adminQuizInfo( authUserId, quizId ) {
     // Gathering all quizzes
-    let quizzes = getData().quizzes;
+    let quiz = findQuiz(quizId);
+    if (!quiz) return { error: "No such quiz" };
 
-    for (let quiz of quizzes) {
-        if (quiz.quizId === quizId && quiz.authId === authUserId) {
-            // If it's the quiz that's being searched for, return it
-            return {
-                quizId: quiz.quizId,
-                name: quiz.name,
-                timeCreated: quiz.time_created,
-                timeLastEdited: quiz.time_last_edit,
-                description: quiz.description
-            };
-        }
+    if (quiz.authId === authUserId && quiz.in_trash === false) {
+        // If it's the quiz that's being searched for, return it
+        return {
+            quizId: quiz.quizId,
+            name: quiz.name,
+            timeCreated: quiz.timeCreated,
+            timeLastEdited: quiz.timeLastEdited,
+            description: quiz.description
+        };
     }
-
+    
     // If it gets through without returning, then it doesn't exist
-    return { error: "No such quiz" };
+    return { error: "Quiz is not owned by user" };
 }
 
 /*  adminQuizNameUpdate
@@ -169,13 +180,6 @@ function adminQuizInfo( authUserId, quizId ) {
         { }: Rempty Object
  */
 function adminQuizNameUpdate( authUserId, quizId, name ) {
-    if (!Number.isInteger(authUserId) || authUserId <= 0) {
-        return { error: 'AuthUserId is not a valid user' };
-    }
-    if (!Number.isInteger(quizId) || quizId <= 0) {
-        return { error: 'QuizId is not a valid Quiz' };
-    }
-
     let users = getData().users;
     let exists = false;
 
@@ -192,19 +196,22 @@ function adminQuizNameUpdate( authUserId, quizId, name ) {
         return { error: 'Name must be between 3 and 30 characters long' };
     }
 
-    let quizzes = getData().quizzes;
-    for (let i = 0; i < quizzes.length; i++) {
-        if (quizzes[i].quizId === quizId && quizzes[i].authId === authUserId) {
-            if (quizzes[i].name === name) {
-                return { error: 'Name hasn\'t been changed' };
-            }
+    let quiz = findQuiz(quizId);
+    if (!quiz) return { error: 'Quiz ID is invalid' };
 
-            quizzes[i].name = name;
-            return { };
+    for (let quiz of getData().quizzes) {
+        if (name === quiz.name && quizId !== quiz.quizId) {
+            return { error: 'Name is already in use' };
         }
     }
 
-    return { error: 'Quiz ID is invalid' };
+    if (quiz.authId === authUserId && quiz.in_trash === false) {
+        quiz.name = name;
+        quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+        return {};
+    }
+
+    return { error: 'Quiz is not owned by user' };
 }
 
 /*  adminQuizDescriptionUpdate
@@ -219,21 +226,20 @@ function adminQuizNameUpdate( authUserId, quizId, name ) {
         { }: Rempty Object
  */
 function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
-    // Getting quizz data from dataStore
-    let quizzesData = getData().quizzes;
+    if (description.length > 100) return { error: "Descrption too long" };
 
-    // Looping through quizzesData to find the quiz with matching authUserId and quizId
-    for ( let quiz of quizzesData ) {
-        // Compare authUserId and quizId
-        if ( authUserId === quiz.authUserId && quizId === quiz.quizId) {
-            // Updating the initial quiz description with the new description
-            quiz.description = description;
-            // Exit when its done
-            return { };
-        }
+    let quiz = findQuiz(quizId);
+    if (!quiz) return { error: "QuizId doesn't exist" };
+
+    if (authUserId === quiz.authId && quiz.in_trash === false) {
+        quiz.description = description;
+        quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+
+        return { };
     }
-    // Exit with an error message if the quiz with inputted authId and quizId is not found
-    return { error: "Quiz with inputted authUserId and quizId id not found" };
+
+    // Exit with an error message if the quiz not correct
+    return { error: "Quiz not owned by user" };
 }
 
 // last edit: 29/09/2023 by Zhejun Gu
