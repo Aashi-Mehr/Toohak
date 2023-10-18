@@ -4,13 +4,13 @@
 // Zhejun Gu (z5351573)
 //
 // edit:
-// 05/10/2023
+// 18/10/2023
 //
 
 import {
   adminQuizInfo,
   adminQuizCreate
-} from '../quiz.js';
+} from '../quiz';
 
 import { adminAuthRegister } from '../auth';
 import { clear } from '../other.js';

@@ -1,5 +1,5 @@
 // Import functions
-import { adminQuizCreate } from '../quiz.js';
+import { adminQuizCreate } from '../quiz';
 import { adminAuthRegister } from '../auth';
 import { clear } from '../other.js';
 
