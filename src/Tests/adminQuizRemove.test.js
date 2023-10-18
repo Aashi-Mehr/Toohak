@@ -1,4 +1,4 @@
-import { adminQuizRemove, adminQuizCreate, adminQuizList } from '../quiz.js';
+import { adminQuizRemove, adminQuizCreate, adminQuizList } from '../quiz';
 import { adminAuthRegister } from '../auth';
 import { clear } from '../other.js';
 
