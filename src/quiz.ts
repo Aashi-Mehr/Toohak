@@ -4,12 +4,12 @@ import { getData } from './dataStore';
     Given a quizId, returns the quiz object
 
     Parameters:
-        quizId
+        quizId: number
 
     Output:
         quiz: refer to data.md
  */
-function findQuiz(quizId) {
+function findQuiz(quizId: number) {
   for (const quiz of getData().quizzes) {
     if (quizId === quiz.quizId) {
       return quiz;
@@ -23,12 +23,12 @@ function findQuiz(quizId) {
     Provide a list of all quizzes that are owned by the currently logged in user.
 
     Parameters:
-        authUserId:
+        authUserId: number
 
     Output:
-        quizzes: { quizId: , name: }
+        quizzes: { quizId: number, name: string }
  */
-function adminQuizList(authUserId) {
+function adminQuizList(authUserId: number) {
   // Checking if the user exists
   const users = getData().users;
   let exists = false;
@@ -59,14 +59,14 @@ function adminQuizList(authUserId) {
     Given basic details about a new quiz, create one for the logged in user.
 
     Parameters:
-        authUserId:
-        name:
-        description:
+        authUserId: number
+        name: string
+        description: any
 
     Returns:
-        quizId:
+        quizId: number
  */
-function adminQuizCreate(authUserId, name, description) {
+function adminQuizCreate(authUserId: number, name: string, description: any) {
   // Error checking
   const invalidName = /[^a-zA-Z0-9 ']/.test(name);
   if (invalidName || name.length < 3 || name.length > 30) {
@@ -113,13 +113,14 @@ function adminQuizCreate(authUserId, name, description) {
     Given a particular quiz, permanently remove the quiz
 
     Parameters:
-        authUserId:
-        quizId:
+        authUserId: number
+        quizId: number
 
     Returns:
         { }: Empty List
  */
-function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a positive integer
+function adminQuizRemove(authUserId: number, quizId: number) {
+  // Check if authUserId is a positive integer
   const users = getData().users;
   let exists = false;
 
@@ -142,13 +143,13 @@ function adminQuizRemove(authUserId, quizId) { // Check if authUserId is a posit
     Get all of the relevant information about the current quiz.
 
     Parameters:
-        authUserId:
-        quizId:
+        authUserId: number
+        quizId: number
 
     Returns:
         Quiz Object
  */
-function adminQuizInfo(authUserId, quizId) {
+function adminQuizInfo(authUserId: number, quizId: number) {
   // Gathering all quizzes
   const quiz = findQuiz(quizId);
   if (!quiz) return { error: 'No such quiz' };
@@ -172,14 +173,14 @@ function adminQuizInfo(authUserId, quizId) {
     Update the name of the relevant quiz.
 
     Parameters:
-        authUserId:
-        quizId:
-        name:
+        authUserId: number
+        quizId: number
+        name: string
 
     Returns:
         { }: Rempty Object
  */
-function adminQuizNameUpdate(authUserId, quizId, name) {
+function adminQuizNameUpdate(authUserId: number, quizId: number, name: string) {
   const users = getData().users;
   let exists = false;
 
@@ -218,14 +219,15 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
     Update the description of the relevant quiz.
 
     Parameters:
-        authUserId:
-        quizId:
-        description:
+        authUserId: number
+        quizId: number
+        description: any
 
     Returns:
         { }: Rempty Object
  */
-function adminQuizDescriptionUpdate(authUserId, quizId, description) {
+function adminQuizDescriptionUpdate(authUserId: number, quizId: number,
+  description: any) {
   if (description.length > 100) return { error: 'Descrption too long' };
 
   const quiz = findQuiz(quizId);
