@@ -4,10 +4,10 @@ import { getData } from './dataStore';
     Given a quizId, returns the quiz object
 
     Parameters:
-        quizId: number
+      quizId: number
 
     Output:
-        quiz: refer to data.md
+      quiz: refer to data.md
  */
 function findQuiz(quizId: number) {
   for (const quiz of getData().quizzes) {
@@ -23,10 +23,10 @@ function findQuiz(quizId: number) {
     Provide a list of all quizzes that are owned by the currently logged in user.
 
     Parameters:
-        authUserId: number
+      authUserId: number
 
     Output:
-        quizzes: { quizId: number, name: string }
+      quizzes: { quizId: number, name: string }
  */
 function adminQuizList(authUserId: number) {
   // Checking if the user exists
@@ -59,12 +59,12 @@ function adminQuizList(authUserId: number) {
     Given basic details about a new quiz, create one for the logged in user.
 
     Parameters:
-        authUserId: number
-        name: string
-        description: any
+      authUserId: number
+      name: string
+      description: any
 
     Returns:
-        quizId: number
+      quizId: number
  */
 function adminQuizCreate(authUserId: number, name: string, description: any) {
   // Error checking
@@ -113,11 +113,11 @@ function adminQuizCreate(authUserId: number, name: string, description: any) {
     Given a particular quiz, permanently remove the quiz
 
     Parameters:
-        authUserId: number
-        quizId: number
+      authUserId: number
+      quizId: number
 
     Returns:
-        { }: Empty List
+      { }: Empty List
  */
 function adminQuizRemove(authUserId: number, quizId: number) {
   // Check if authUserId is a positive integer
@@ -143,11 +143,11 @@ function adminQuizRemove(authUserId: number, quizId: number) {
     Get all of the relevant information about the current quiz.
 
     Parameters:
-        authUserId: number
-        quizId: number
+      authUserId: number
+      quizId: number
 
     Returns:
-        Quiz Object
+      Quiz Object
  */
 function adminQuizInfo(authUserId: number, quizId: number) {
   // Gathering all quizzes
@@ -173,12 +173,12 @@ function adminQuizInfo(authUserId: number, quizId: number) {
     Update the name of the relevant quiz.
 
     Parameters:
-        authUserId: number
-        quizId: number
-        name: string
+      authUserId: number
+      quizId: number
+      name: string
 
     Returns:
-        { }: Rempty Object
+      { }: Rempty Object
  */
 function adminQuizNameUpdate(authUserId: number, quizId: number, name: string) {
   const users = getData().users;
@@ -219,12 +219,12 @@ function adminQuizNameUpdate(authUserId: number, quizId: number, name: string) {
     Update the description of the relevant quiz.
 
     Parameters:
-        authUserId: number
-        quizId: number
-        description: any
+      authUserId: number
+      quizId: number
+      description: any
 
     Returns:
-        { }: Rempty Object
+      { }: Rempty Object
  */
 function adminQuizDescriptionUpdate(authUserId: number, quizId: number,
   description: any) {
