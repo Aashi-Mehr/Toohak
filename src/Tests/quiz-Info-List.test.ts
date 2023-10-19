@@ -77,7 +77,7 @@ function requestQuiz(authUserId: number, name: string, description: any): QuizId
 }
 
 // QUIZ LIST Define wrapper function
-function requestList(authUserId: number | string): QuizList | ErrorObject {
+function requestList(authUserId: number | string): QuizList {
   const res = request(
     'GET',
     SERVER_URL + '/v1/admin/quiz/list',
@@ -112,7 +112,7 @@ function requestInfo(authUserId: number | string, quizId: number): QuizDetailed 
     SERVER_URL + '/v1/admin/quiz/' + quizId,
     {
       json: {
-        authUserId: authUserId,
+        authUserId: authUserId
       }
     }
   );
@@ -254,8 +254,7 @@ describe('adminQuizInfo', () => {
   });
 
   test('Test successful quiz read - correct timestamp format', () => {
-    userId = requestRegister('1531_user1@1531.com', 'C123321c', 'first',
-      'last');
+    userId = requestRegister('1531_user1@1531.com', 'C123321c', 'first', 'last');
     quizId = requestQuiz(userId.authUserId, 'first last', '').quizId;
 
     quiz = requestInfo(userId.authUserId, quizId);
