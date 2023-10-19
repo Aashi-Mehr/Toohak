@@ -12,7 +12,6 @@
 
 import request from 'sync-request-curl';
 import { port, url } from '../config.json';
-import { describe } from 'node:test';
 import { QuizDetailed, QuizList } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
