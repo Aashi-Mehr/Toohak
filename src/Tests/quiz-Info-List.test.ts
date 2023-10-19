@@ -58,7 +58,7 @@ function requestRegister(email: string, password: string, nameFirst: string,
 }
 
 // QUIZ CREATE Define wrapper function
-function requestQuiz(authUserId: number, name: string, description: string): QuizId {
+function requestQuiz(authUserId: number, name: string, description: any): QuizId {
   const res = request(
     'POST',
     SERVER_URL + '/v1/admin/quiz',
