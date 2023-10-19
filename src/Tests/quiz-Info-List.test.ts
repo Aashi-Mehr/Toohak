@@ -82,7 +82,7 @@ function requestList(authUserId: number | string): QuizList | ErrorObject {
     'GET',
     SERVER_URL + '/v1/admin/quiz/list',
     {
-      json: {
+      qs: {
         authUserId: authUserId
       }
     }
@@ -91,7 +91,7 @@ function requestList(authUserId: number | string): QuizList | ErrorObject {
 }
 
 // QUIZ REMOVE Define wrapper function
-function requestRemove(authUserId: number, quizId: QuizId | ErrorObject):
+function requestRemove(authUserId: number, quizId: number):
   ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
@@ -139,7 +139,7 @@ beforeEach(() => {
 describe('adminQuizList', () => {
   let userId: AuthUserId;
   let quiz: QuizList | ErrorObject;
-  let quizId: QuizId | ErrorObject;
+  let quizId: number;
 
   test('INVALID User Id: Type of string or negative number', () => {
     quiz = requestList('123321');
@@ -157,7 +157,7 @@ describe('adminQuizList', () => {
 
   test('VALID 1 Quiz', () => {
     userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first', 'last');
-    quizId = requestQuiz(userId.authUserId, 'first last', '');
+    quizId = requestQuiz(userId.authUserId, 'first last', '').quizId;
 
     quiz = requestList(userId.authUserId);
     expect(quiz).toMatchObject({
@@ -192,7 +192,7 @@ describe('adminQuizList', () => {
 
   test('VALID After Removal', () => {
     userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first', 'last');
-    quizId = requestQuiz(userId.authUserId, 'first last1', '');
+    quizId = requestQuiz(userId.authUserId, 'first last1', '').quizId;
     requestRemove(userId.authUserId, quizId);
 
     const result = requestList(userId.authUserId);
