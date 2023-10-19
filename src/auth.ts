@@ -1,26 +1,53 @@
 // Import functions from files
 // import { UserInfo } from 'os';
-import { UserAdd, Details, ErrorObject, getData } from './dataStore';
+// import { getTokenSourceMapRange } from 'typescript';
+import {
+  getData,
+  ErrorObject,
+  Details,
+  UserAdd,
+  AuthUserId,
+  getUniqueID
+} from './dataStore';
 
-/*  adminAuthRegister
+/** getUser
+  * Loops through all tokens and users to identify the user
+  *
+  * @param { number } token - The session ID for the user
+  *
+  * @returns { UserAdd } - If the token exists and is valid
+  * @returns { undefined } - If the token is invalid
+*/
+/*
+function getUser(token: number): UserAdd | null {
+  for (const sess of getData().sessions) {
+    if (sess.token === token && sess.is_valid) {
+      for (const user of getData().users) {
+        if (user.authUserId === sess.authUserId) {
+          return user;
+        }
+      }
+    }
+  }
+}
+*/
 
-    Parameters:
-      email:      string
-      password:   string
-      nameFirst:  string
-      nameLast:   string
-
-    Output:
-      { authUserId: number } | { error: string }
-
-    Edits:
-      05/10/2023 by Zhejun Gu
-      17/10/2023 by Aashi
-        Migrating to TypeScript
- */
+/** adminAuthRegister
+  * Checks email, password, and name then adds the user to the database
+  *
+  * @param { string } email - The email to register
+  * @param { string } password - The user's password
+  * @param { string } nameFirst - The user's first name
+  * @param { string } nameLast - The user's last name
+  *
+  * @returns { AuthUserId } - If the deails are valid
+  * @returns { ErrorObject } - If the details are invalid
+  */
 export function adminAuthRegister(email: string, password: string,
-  nameFirst: string, nameLast: string) {
-  const users = getData().users;
+  nameFirst: string, nameLast: string): AuthUserId | ErrorObject {
+  const data = getData();
+  const users = data.users;
+  const sessions = data.sessions;
 
   // ERROR CHECKING
   // Password needs to have letters and numbers, greater than 8 characters
@@ -52,9 +79,8 @@ export function adminAuthRegister(email: string, password: string,
   for (const user of users) if (user.email === email) return { error: 'Used' };
 
   // ADDING TO DATA
-  const timestamp = Math.floor(Date.now() / 1000);
-  const randomId = (Math.floor(Math.random() * 1000000) + 1) % 100000000;
-  const authUserId = timestamp * randomId % 100000000;
+  const authUserId = getUniqueID(data);
+  const token = getUniqueID(data);
 
   // If no error, push the new user and return the authUserId
   users.push({
@@ -68,23 +94,27 @@ export function adminAuthRegister(email: string, password: string,
     failed_password_num: 0,
   });
 
+  sessions.push({
+    token: token,
+    authUserId: authUserId,
+    is_valid: true
+  });
+
+  // return { token: token };
   return { authUserId: authUserId };
 }
 
-/*  adminUserLogin
-
-    Parameters:
-        email:
-        password:
-
-    Output:
-        authUserId:
-
-    Edits:
-      17/10/2023 by Aashi
-        Migrating to TypeScript
- */
-export function adminAuthLogin(email: string, password: string) {
+/** adminUserLogin
+  * Logs the user into the system if the given details are correct
+  *
+  * @param { string } email - The user's email
+  * @param { string } password - The user's password
+  *
+  * @returns { AuthUserId } - If the deails are valid
+  * @returns { ErrorObject } - If the details are invalid
+  */
+export function adminAuthLogin(email: string, password: string):
+  AuthUserId | ErrorObject {
   const users = getData().users;
 
   for (const user of users) {
@@ -93,41 +123,41 @@ export function adminAuthLogin(email: string, password: string) {
     } else if (user.email === email && user.password === password) {
       user.failed_password_num = 0;
       user.successful_log_time++;
+      // Need to create a token (getUniqueId()) and add it to sessions,
+      // then return token
       return { authUserId: user.authUserId };
     }
   }
 
-  return { error: 'Email or password is incorrect ' };
+  return { error: 'Email or password is incorrect' };
 }
 
-/*  adminUserDetails
-
-    Parameters:
-      authUserId: number
-
-    Output:
-      { user: { userId, name, email, numSuccessfulLogins } } | { error: string }
-
-    Edits:
-      05/10/2023 by Zhejun Gu
-      17/10/2023 by Aashi
-        Migrating to TypeScript
- */
+/** adminUserDetails
+  * Returns the user's details if their authUserId exists
+  *
+  * @param { number } authUserId - The user's ID
+  *
+  * @returns { Details } - If the authUserId is valid
+  * @returns { ErrorObject } - If the ID is invalid
+  */
 export function adminUserDetails(authUserId: number): Details | ErrorObject {
+  // let user = getUser(token);
   let user: UserAdd;
+  let exists = false;
   for (const person of getData().users) {
     if (person.authUserId === authUserId) {
       user = person;
+      exists = true;
     }
   }
 
-  if (user === undefined) return { error: 'Invalid authUserId' };
+  if (!exists) return { error: 'Invalid token' };
 
   // Return the user's details
   return {
     user:
       {
-        userId: authUserId,
+        userId: user.authUserId,
         name: user.name,
         email: user.email,
         numSuccessfulLogins: user.successful_log_time,

@@ -20,6 +20,7 @@ function clear() {
   const emptyData = {
     users: [],
     quizzes: [],
+    sessions: []
   };
 
   setData(emptyData);
