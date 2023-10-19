@@ -66,9 +66,13 @@ interface QuizAdd {
 
 // INTERFACE Session
 interface SessionAdd {
-  sessionId: number,
+  token: number,
   authUserId: number,
   is_valid: boolean,
+}
+
+interface Token {
+  token: number
 }
 
 // INTERFACE Datastore
@@ -89,14 +93,39 @@ let data: Datastore = {
 function getData(): Datastore { return data; }
 
 // Use setData(newData) to pass modified data
-function setData(newData: Datastore): null {
-  data = newData;
-  return null;
+function setData(newData: Datastore) { data = newData; }
+
+/** getUniqueID
+  * Creates a unique ID (For authUserId, quizId, or token)
+  *
+  * @returns { number } - All cases
+*/
+function getUniqueID(): number {
+  // Creates a random 8 digit ID, which hasn't been used prior
+  const usedIds: number[] = [];
+  const allIds: number[] = [];
+
+  for (const user of data.users) usedIds.push(user.authUserId);
+  for (const quiz of data.quizzes) usedIds.push(quiz.quizId);
+  // for (let sess of data.sessions) usedIds.push(sess.token);
+
+  for (let i = 10000000; i < 100000000; i++) allIds.push(i);
+
+  for (const id of usedIds) {
+    if (allIds.indexOf(id) !== -1) {
+      allIds.splice(allIds.indexOf(id), 1);
+    }
+  }
+
+  const randomPos = Math.floor(Math.random() * allIds.length);
+
+  return allIds[randomPos];
 }
 
 export {
   getData,
   setData,
+  getUniqueID,
   ErrorObject,
   AuthUserId,
   User,
@@ -109,5 +138,6 @@ export {
   Question,
   QuizAdd,
   SessionAdd,
+  Token,
   Datastore
 };
