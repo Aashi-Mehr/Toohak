@@ -20,7 +20,7 @@ import {
 import {
   adminQuizList,
   adminQuizInfo,
-// adminQuizCreate,
+  adminQuizCreate,
 // adminQuizRemove,
 // adminQuizNameUpdate,
 // adminQuizDescriptionUpdate
@@ -71,6 +71,15 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   let { authUserId } = req.body;
   authUserId = parseInt(authUserId);
   const response = adminUserDetails(authUserId);
+
+  if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+});
+
+// adminQuizCreate
+app.post('/v1/admin/quiz', (req: Request, res: Response) => {
+  const { authUserId, name, description } = req.body;
+  const response = adminQuizCreate(authUserId, name, description);
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
