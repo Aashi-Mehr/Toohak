@@ -17,14 +17,14 @@ import {
   adminUserDetails
 } from './auth';
 
-// import {
-// adminQuizList,
-// adminQuizInfo,
+import {
+  adminQuizList,
+  adminQuizInfo,
 // adminQuizCreate,
 // adminQuizRemove,
 // adminQuizNameUpdate,
 // adminQuizDescriptionUpdate
-// } from './quiz';
+} from './quiz';
 
 import { clear } from './other.js';
 
@@ -71,6 +71,27 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   let { authUserId } = req.body;
   authUserId = parseInt(authUserId);
   const response = adminUserDetails(authUserId);
+
+  if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+});
+
+// adminQuizInfo
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  let { authUserId } = req.body;
+  authUserId = parseInt(authUserId);
+  const quizId = req.params.quizid;
+  const response = adminQuizInfo(authUserId, parseInt(quizId));
+
+  if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+});
+
+// adminQuizList
+app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+  let { authUserId } = req.body;
+  authUserId = parseInt(authUserId);
+  const response = adminQuizList(authUserId);
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
