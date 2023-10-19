@@ -77,7 +77,7 @@ function requestQuiz(authUserId: number, name: string, description: any): QuizId
 }
 
 // QUIZ LIST Define wrapper function
-function requestList(authUserId: number | string): QuizList {
+function requestList(authUserId: number | string): QuizList | ErrorObject {
   const res = request(
     'GET',
     SERVER_URL + '/v1/admin/quiz/list',
@@ -150,14 +150,14 @@ describe('adminQuizList', () => {
   });
 
   test('INVALID User Id: Not in the data base', () => {
-    userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 
+    userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first',
       'last').authUserId;
     quiz = requestList(11);
     expect(quiz).toMatchObject({ error: expect.any(String) });
   });
 
   test('VALID 1 Quiz', () => {
-    userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first', 
+    userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first',
       'last').authUserId;
     quizId = requestQuiz(userId, 'first last', '').quizId;
 
@@ -173,13 +173,12 @@ describe('adminQuizList', () => {
   });
 
   test('VALID 2 Quizzes', () => {
-    userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first', 
+    userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first',
       'last').authUserId;
     const quizId1 = requestQuiz(userId, 'first last1', '');
     const quizId2 = requestQuiz(userId, 'first last2', '');
 
-    quiz = requestList(userId);
-    expect(quiz).toMatchObject({
+    expect(requestList(userId)).toMatchObject({
       quizzes: [
         {
           quizId: quizId1,
@@ -194,7 +193,7 @@ describe('adminQuizList', () => {
   });
 
   test('VALID After Removal', () => {
-    userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first', 
+    userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first',
       'last').authUserId;
     quizId = requestQuiz(userId, 'first last1', '').quizId;
     requestRemove(userId, quizId);
