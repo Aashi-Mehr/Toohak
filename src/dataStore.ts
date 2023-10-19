@@ -1,6 +1,3 @@
-// import { Session } from "inspector"
-// import { string } from "yaml/dist/schema/common/string"
-
 // INTERFACES Other
 interface ErrorObject { error: string }
 
@@ -66,9 +63,13 @@ interface QuizAdd {
 
 // INTERFACE Session
 interface SessionAdd {
-  sessionId: number,
+  token: number,
   authUserId: number,
   is_valid: boolean,
+}
+
+interface Token {
+  token: number
 }
 
 // INTERFACE Datastore
@@ -78,25 +79,66 @@ interface Datastore {
   sessions: SessionAdd[]
 }
 
-// Datastore
+// INTERFACE Datastore
 let data: Datastore = {
   users: [],
   quizzes: [],
   sessions: []
 };
 
-// Use getData() to access the data
+// DATASTORE FUNCTIONS
+/** getData
+  * Access the data
+  *
+  * @returns { Datastore } - All cases
+  */
 function getData(): Datastore { return data; }
 
-// Use setData(newData) to pass modified data
-function setData(newData: Datastore): null {
-  data = newData;
-  return null;
+/** setData
+  * Reset data to modified date
+  *
+  * @param { Datastore } newData - Data to set
+  */
+function setData(newData: Datastore) { data = newData; }
+
+/** getUniqueID
+  * Creates a unique ID (For authUserId, quizId, or token)
+  *
+  * @returns { number } - All cases
+  */
+function getUniqueID(allData: Datastore): number {
+  // Creates a random 8 (Or greater) digit ID, which hasn't been used prior
+  const usedIds: number[] = [];
+  const allIds: number[] = [];
+
+  for (const user of allData.users) usedIds.push(user.authUserId);
+  for (const quiz of allData.quizzes) usedIds.push(quiz.quizId);
+  for (const sess of allData.sessions) usedIds.push(sess.token);
+
+  const smallestId = 10000000;
+  const increment = 10000;
+  for (let j = 0; allIds.length <= 0; j++) {
+    const begin = smallestId + j * increment;
+    const end = begin + increment;
+    for (let i = begin; i < end; i++) allIds.push(i);
+
+    const len = usedIds.length;
+    for (let i = 0; i < len; i++) {
+      if (allIds.indexOf(usedIds[0]) !== -1) {
+        allIds.splice(allIds.indexOf(usedIds[0]), 1);
+        usedIds.splice(0, 1);
+      }
+    }
+  }
+
+  const randomPos = Math.floor(Math.random() * allIds.length);
+  return allIds[randomPos];
 }
 
 export {
   getData,
   setData,
+  getUniqueID,
   ErrorObject,
   AuthUserId,
   User,
@@ -109,5 +151,6 @@ export {
   Question,
   QuizAdd,
   SessionAdd,
+  Token,
   Datastore
 };

@@ -1,5 +1,5 @@
 import { adminAuthRegister } from '../auth';
-import { adminQuizCreate } from '../quiz.js';
+import { adminQuizCreate } from '../quiz';
 import { clear } from '../other.js';
 
 test('Clear Users', () => {

@@ -2,7 +2,7 @@ import {
   adminQuizCreate,
   adminQuizDescriptionUpdate,
   adminQuizInfo
-} from '../quiz.js';
+} from '../quiz';
 import { adminAuthRegister } from '../auth';
 import { clear } from '../other.js';
 
