@@ -18,7 +18,6 @@ import {
   * @returns { UserAdd } - If the token exists and is valid
   * @returns { undefined } - If the token is invalid
 */
-
 /*
 function getUser(token: number): UserAdd | null {
   for (const sess of getData().sessions) {

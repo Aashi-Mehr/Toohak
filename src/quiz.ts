@@ -1,15 +1,21 @@
-import { getData } from './dataStore';
+import {
+  ErrorObject,
+  QuizAdd,
+  QuizDetailed,
+  QuizId,
+  QuizList,
+  getData
+} from './dataStore';
 
-/*  findQuiz
-    Given a quizId, returns the quiz object
-
-    Parameters:
-      quizId: number
-
-    Output:
-      quiz: refer to data.md
- */
-function findQuiz(quizId: number) {
+/** findQuiz
+  * Loops through all quizzes to find the quiz with given quizId
+  *
+  * @param { number } quizId - The quizID for the quiz
+  *
+  * @returns { QuizAdd } - If the quiz exists and is valid
+  * @returns { null } - If the token is invalid
+  */
+function findQuiz(quizId: number): QuizAdd | null {
   for (const quiz of getData().quizzes) {
     if (quizId === quiz.quizId) {
       return quiz;
@@ -19,16 +25,15 @@ function findQuiz(quizId: number) {
   return null;
 }
 
-/*  adminQuizList
-    Provide a list of all quizzes that are owned by the currently logged in user.
-
-    Parameters:
-      authUserId: number
-
-    Output:
-      quizzes: { quizId: number, name: string }
- */
-function adminQuizList(authUserId: number) {
+/** adminQuizList
+  * Lists all of the quizzes belonging to a particular user
+  *
+  * @param { number } authUserId - The authUserId for the user
+  *
+  * @returns { QuizList } - If the authUserId exists and is valid
+  * @returns { ErrorObject } - If the authUserId is invalid
+  */
+function adminQuizList(authUserId: number): QuizList | ErrorObject {
   // Checking if the user exists
   const users = getData().users;
   let exists = false;
@@ -55,18 +60,18 @@ function adminQuizList(authUserId: number) {
   return { quizzes: userQuizzes };
 }
 
-/*  adminQuizCreate
-    Given basic details about a new quiz, create one for the logged in user.
-
-    Parameters:
-      authUserId: number
-      name: string
-      description: any
-
-    Returns:
-      quizId: number
- */
-function adminQuizCreate(authUserId: number, name: string, description: any) {
+/** adminQuizCreate
+  * Creates a quiz for a particular user
+  *
+  * @param { number } authUserId - The authUserId for the user
+  * @param { string } name - The name of the quiz
+  * @param { string } description - The description for the quiz
+  *
+  * @returns { QuizId } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+function adminQuizCreate(authUserId: number, name: string, description: any):
+  QuizId | ErrorObject {
   // Error checking
   const invalidName = /[^a-zA-Z0-9 ']/.test(name);
   if (invalidName || name.length < 3 || name.length > 30) {
@@ -109,17 +114,17 @@ function adminQuizCreate(authUserId: number, name: string, description: any) {
   return { quizId: quizId };
 }
 
-/*  adminQuizRemove
-    Given a particular quiz, permanently remove the quiz
-
-    Parameters:
-      authUserId: number
-      quizId: number
-
-    Returns:
-      { }: Empty List
- */
-function adminQuizRemove(authUserId: number, quizId: number) {
+/** adminQuizRemove
+  * Given a particular quiz, permanently remove the quiz
+  *
+  * @param { number } authUserId - The authUserId for the user
+  * @param { number } quizId - The quizId of the quiz
+  *
+  * @returns { Record<string, never> } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+function adminQuizRemove(authUserId: number, quizId: number):
+  ErrorObject | Record<string, never> {
   // Check if authUserId is a positive integer
   const users = getData().users;
   let exists = false;
@@ -133,23 +138,23 @@ function adminQuizRemove(authUserId: number, quizId: number) {
   if (quiz.authId === authUserId && quiz.in_trash === false) {
     quiz.timeLastEdited = Math.floor(Date.now() / 1000);
     quiz.in_trash = true;
-    return { done: true };
+    return { };
   }
 
   return { error: 'Quiz is not owned by user' };
 }
 
-/*  adminQuizInfo
-    Get all of the relevant information about the current quiz.
-
-    Parameters:
-      authUserId: number
-      quizId: number
-
-    Returns:
-      Quiz Object
- */
-function adminQuizInfo(authUserId: number, quizId: number) {
+/** adminQuizInfo
+  * Get all of the relevant information about the current quiz.
+  *
+  * @param { number } authUserId - The authUserId for the user
+  * @param { number } quizId - The quizId of the quiz
+  *
+  * @returns { QuizDetailed } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+function adminQuizInfo(authUserId: number, quizId: number):
+  QuizDetailed | ErrorObject {
   // Gathering all quizzes
   const quiz = findQuiz(quizId);
   if (!quiz) return { error: 'No such quiz' };
@@ -169,25 +174,25 @@ function adminQuizInfo(authUserId: number, quizId: number) {
   return { error: 'Quiz is not owned by user' };
 }
 
-/*  adminQuizNameUpdate
-    Update the name of the relevant quiz.
-
-    Parameters:
-      authUserId: number
-      quizId: number
-      name: string
-
-    Returns:
-      { }: Rempty Object
- */
-function adminQuizNameUpdate(authUserId: number, quizId: number, name: string) {
+/** adminQuizNameUpdate
+  * Update the name of the relevant quiz.
+  *
+  * @param { number } authUserId - The authUserId for the user
+  * @param { number } quizId - The quizId of the quiz
+  * @param { string } name - The new name of the quiz
+  *
+  * @returns { Record<string, never> } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+function adminQuizNameUpdate(authUserId: number, quizId: number, name: string):
+  ErrorObject | Record<string, never> {
   const users = getData().users;
   let exists = false;
 
   for (const user of users) if (user.authUserId === authUserId) exists = true;
   if (!exists) return { error: 'Invalid user ID' };
 
-  // Check if the name contains invalid characters (only alphanumeric and spaces allowed)
+  // Check if the name contains invalid, non-alphanumeric characters
   if (!/^[a-zA-Z0-9\s]+$/.test(name)) {
     return { error: 'Name contains invalid characters.' };
   }
@@ -209,25 +214,24 @@ function adminQuizNameUpdate(authUserId: number, quizId: number, name: string) {
   if (quiz.authId === authUserId && quiz.in_trash === false) {
     quiz.name = name;
     quiz.timeLastEdited = Math.floor(Date.now() / 1000);
-    return {};
+    return { };
   }
 
   return { error: 'Quiz is not owned by user' };
 }
 
-/*  adminQuizDescriptionUpdate
-    Update the description of the relevant quiz.
-
-    Parameters:
-      authUserId: number
-      quizId: number
-      description: any
-
-    Returns:
-      { }: Rempty Object
- */
+/** adminQuizDescriptionUpdate
+  * Update the description of the relevant quiz.
+  *
+  * @param { number } authUserId - The authUserId for the user
+  * @param { number } quizId - The quizId of the quiz
+  * @param { string } description - The new description of the quiz
+  *
+  * @returns { Record<string, never> } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
 function adminQuizDescriptionUpdate(authUserId: number, quizId: number,
-  description: any) {
+  description: any): ErrorObject | Record<string, never> {
   if (description.length > 100) return { error: 'Descrption too long' };
 
   const quiz = findQuiz(quizId);
