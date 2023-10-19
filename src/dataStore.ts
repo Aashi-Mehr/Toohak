@@ -100,14 +100,14 @@ function setData(newData: Datastore) { data = newData; }
   *
   * @returns { number } - All cases
 */
-function getUniqueID(): number {
+function getUniqueID(allData: Datastore): number {
   // Creates a random 8 digit ID, which hasn't been used prior
   const usedIds: number[] = [];
   const allIds: number[] = [];
 
-  for (const user of data.users) usedIds.push(user.authUserId);
-  for (const quiz of data.quizzes) usedIds.push(quiz.quizId);
-  // for (let sess of data.sessions) usedIds.push(sess.token);
+  for (const user of allData.users) usedIds.push(user.authUserId);
+  for (const quiz of allData.quizzes) usedIds.push(quiz.quizId);
+  for (const sess of allData.sessions) usedIds.push(sess.token);
 
   for (let i = 10000000; i < 100000000; i++) allIds.push(i);
 

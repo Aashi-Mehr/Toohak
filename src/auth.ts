@@ -46,8 +46,9 @@ function getUser(token: number): UserAdd | null {
   */
 export function adminAuthRegister(email: string, password: string,
   nameFirst: string, nameLast: string): AuthUserId | ErrorObject {
-  const users = getData().users;
-  const sessions = getData().sessions;
+  const data = getData();
+  const users = data.users;
+  const sessions = data.sessions;
 
   // ERROR CHECKING
   // Password needs to have letters and numbers, greater than 8 characters
@@ -79,8 +80,8 @@ export function adminAuthRegister(email: string, password: string,
   for (const user of users) if (user.email === email) return { error: 'Used' };
 
   // ADDING TO DATA
-  const authUserId = users.length + 1; // getUniqueID();
-  const token = getUniqueID();
+  const authUserId = getUniqueID(data);
+  const token = getUniqueID(data);
 
   // If no error, push the new user and return the authUserId
   users.push({
