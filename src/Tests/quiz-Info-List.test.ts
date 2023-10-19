@@ -204,7 +204,7 @@ describe('adminQuizList', () => {
 describe('adminQuizInfo', () => {
   let userId: AuthUserId;
   let quiz: QuizDetailed | ErrorObject;
-  let quizId: QuizId | ErrorObject;
+  let quizId: number;
 
   test('INVALID User Id: Not a number or out of range number', () => {
     quiz = requestInfo('12321', 1);
@@ -216,7 +216,7 @@ describe('adminQuizInfo', () => {
 
   test('INVALID User Id: Invalid quizId or quizId not matching', () => {
     // Register test id: 2 by user id: 1
-    quizId = requestQuiz(1, 'first last', 'fist_test');
+    quizId = requestQuiz(1, 'first last', 'fist_test').quizId;
 
     // Quiz ID does not refer to a valid quiz
     quiz = requestInfo(1, -100);
@@ -238,7 +238,7 @@ describe('adminQuizInfo', () => {
 
   test('Test Valid User and Quiz Ids', () => {
     userId = requestRegister('1531_user1@1531.com', 'C123321c', 'first', 'last');
-    quizId = requestQuiz(userId.authUserId, 'first last', '');
+    quizId = requestQuiz(userId.authUserId, 'first last', '').quizId;
 
     expect(requestInfo(userId.authUserId, quizId)).toMatchObject({
       quizId: quizId,
@@ -252,7 +252,7 @@ describe('adminQuizInfo', () => {
   test('Test successful quiz read - correct timestamp format', () => {
     userId = requestRegister('1531_user1@1531.com', 'C123321c', 'first',
       'last');
-    quizId = requestQuiz(userId.authUserId, 'first last', '');
+    quizId = requestQuiz(userId.authUserId, 'first last', '').quizId;
 
     quiz = requestInfo(userId.authUserId, quizId);
     expect(quiz.timeCreated.toString()).toMatch(/^\d{10}$/);
@@ -261,9 +261,9 @@ describe('adminQuizInfo', () => {
 
   test('Test quizId invalid error, cannot read', () => {
     userId = requestRegister('1531_user1@1531.com', 'C123321c', 'first', 'last');
-    quizId = requestQuiz(userId.authUserId, 'first last', '');
+    quizId = requestQuiz(userId.authUserId, 'first last', '').quizId;
 
-    const quiz = requestInfo(userId.authUserId, quizId.quizId + 1);
+    const quiz = requestInfo(userId.authUserId, quizId + 1);
     expect(quiz).toStrictEqual({ error: expect.any(String) });
   });
 });
