@@ -82,7 +82,7 @@ function requestList(authUserId: number | string): QuizList | ErrorObject {
     'GET',
     SERVER_URL + '/v1/admin/quiz/list',
     {
-      qs: {
+      json: {
         authUserId: authUserId
       }
     }
@@ -106,7 +106,7 @@ function requestRemove(authUserId: number, quizId: number):
 }
 
 // QUIZ INFO Define wrapper function
-function requestInfo(authUserId: number | any, quizId: number | any): QuizDetailed {
+function requestInfo(authUserId: number | string, quizId: number): QuizDetailed {
   const res = request(
     'GET',
     SERVER_URL + '/v1/admin/quiz/' + quizId,
