@@ -98,9 +98,9 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
 
 // adminQuizList
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
-  let { authUserId } = req.body;
-  authUserId = parseInt(authUserId);
-  const response = adminQuizList(authUserId);
+  const { authUserId } = req.query;
+  const userId = parseInt(authUserId as string);
+  const response = adminQuizList(userId);
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);

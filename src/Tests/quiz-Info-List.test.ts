@@ -12,7 +12,6 @@
 
 import request from 'sync-request-curl';
 import { port, url } from '../config.json';
-import { QuizDetailed, QuizList } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
 
@@ -31,6 +30,21 @@ interface AuthUserId {
 interface QuizId {
   quizId: number
 }
+
+interface QuizBrief {
+  quizId: number,
+  name: string
+}
+
+interface QuizDetailed {
+  quizId: number,
+  name: string,
+  timeCreated: number,
+  timeLastEdited: number,
+  description: string
+}
+
+interface QuizList { quizzes: QuizBrief[] }
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// ////////////////////////// Wrapper Functions ///////////////////////////////
@@ -80,16 +94,12 @@ function requestQuiz(authUserId: number, name: string, description: any): QuizId
 function requestList(authUserId: number | string): QuizList | ErrorObject {
   const res = request(
     'GET',
-    SERVER_URL + '/v1/admin/quiz/list',
-    {
-      json: {
-        authUserId: authUserId
-      }
-    }
+    `${SERVER_URL}/v1/admin/quiz/list?authUserId=${authUserId}`,
+    {}
   );
   const result = JSON.parse(res.body.toString());
 
-  if ('error' in result) { return { error: 'er' + `${authUserId}` }; } else { return result; }
+  if ('error' in result) { return { error: 'error' }; } else { return result; }
 }
 
 /* // QUIZ REMOVE Define wrapper function
