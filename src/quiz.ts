@@ -85,9 +85,11 @@ function adminQuizCreate(authUserId: number, name: string, description: any):
   const users = getData().users;
   let exists = false;
 
+  // Error checking: Invalid user ID
   for (const user of users) if (user.authUserId === authUserId) exists = true;
   if (!exists) return { error: 'Invalid user ID' };
 
+  // Error checking: In used quiz name
   const createdQuizzes = getData().quizzes;
   for (const quiz of createdQuizzes) {
     if (quiz.authId === authUserId && quiz.name === name) {
