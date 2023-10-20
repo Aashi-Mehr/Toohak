@@ -82,6 +82,7 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const response = adminQuizCreate(authUserId, name, description);
 
   if ('error' in response) return res.status(400).json(response);
+  if (authUserId === '') return res.status(401).json(response);
   res.json(response);
 });
 
@@ -92,7 +93,9 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const quizId = req.params.quizid;
   const response = adminQuizInfo(authUserId, parseInt(quizId));
 
-  if ('error' in response) return res.status(400).json(response);
+  if ('No such quiz' in response) return res.status(400).json(response);
+  if (authUserId === '') return res.status(401).json(response);
+  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
   res.json(response);
 });
 
@@ -102,7 +105,7 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   const userId = parseInt(authUserId as string);
   const response = adminQuizList(userId);
 
-  if ('error' in response) return res.status(400).json(response);
+  if ('error' in response) return res.status(401).json(response);
   res.json(response);
 });
 

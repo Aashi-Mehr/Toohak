@@ -97,7 +97,7 @@ function requestList(authUserId: number | string): QuizList | ErrorObject {
     `${SERVER_URL}/v1/admin/quiz/list?authUserId=${authUserId}`,
     {}
   );
-  const result = JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body as string);
 
   if ('error' in result) { return { error: 'error' }; } else { return result; }
 }
