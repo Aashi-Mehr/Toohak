@@ -17,14 +17,14 @@ import {
   adminUserDetails
 } from './auth';
 
-// import {
-// adminQuizList,
-// adminQuizInfo,
-// adminQuizCreate,
+import {
+  adminQuizList,
+  adminQuizInfo,
+  adminQuizCreate,
 // adminQuizRemove,
 // adminQuizNameUpdate,
 // adminQuizDescriptionUpdate
-// } from './quiz';
+} from './quiz';
 
 import { clear } from './other.js';
 
@@ -73,6 +73,39 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   const response = adminUserDetails(authUserId);
 
   if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+});
+
+// adminQuizCreate
+app.post('/v1/admin/quiz', (req: Request, res: Response) => {
+  const { authUserId, name, description } = req.body;
+  const response = adminQuizCreate(authUserId, name, description);
+
+  if ('error' in response) return res.status(400).json(response);
+  if (authUserId === '') return res.status(401).json(response);
+  res.json(response);
+});
+
+// adminQuizInfo
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  let { authUserId } = req.body;
+  authUserId = parseInt(authUserId);
+  const quizId = req.params.quizid;
+  const response = adminQuizInfo(authUserId, parseInt(quizId));
+
+  if ('No such quiz' in response) return res.status(400).json(response);
+  if (authUserId === '') return res.status(401).json(response);
+  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  res.json(response);
+});
+
+// adminQuizList
+app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+  const { authUserId } = req.query;
+  const userId = parseInt(authUserId as string);
+  const response = adminQuizList(userId);
+
+  if ('error' in response) return res.status(401).json(response);
   res.json(response);
 });
 
