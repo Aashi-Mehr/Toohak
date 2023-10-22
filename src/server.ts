@@ -10,10 +10,8 @@ import path from 'path';
 import process from 'process';
 
 import {
+  adminAuthLogin,
   adminAuthRegister,
-  // Uncomment the functions that you need (Lint gives an error if it's not in a
-  // comment :/)
-  // adminAuthLogin,
   adminUserDetails
 } from './auth';
 
@@ -21,9 +19,11 @@ import {
   adminQuizList,
   adminQuizInfo,
   adminQuizCreate,
-// adminQuizRemove,
-// adminQuizNameUpdate,
-// adminQuizDescriptionUpdate
+  // Uncomment the functions that you need (Lint gives an error if it's not in a
+  // comment :/)
+  // adminQuizRemove,
+  // adminQuizNameUpdate,
+  // adminQuizDescriptionUpdate
 } from './quiz';
 
 import { clear } from './other.js';
@@ -66,11 +66,20 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// adminAuthLogin
+app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const response = adminAuthLogin(email, password);
+
+  if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+});
+
 // adminUserDetails
 app.get('/v1/admin/user/details', (req: Request, res: Response) => {
-  let { authUserId } = req.body;
-  authUserId = parseInt(authUserId);
-  const response = adminUserDetails(authUserId);
+  let { token } = req.body;
+  token = parseInt(token);
+  const response = adminUserDetails(token);
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);

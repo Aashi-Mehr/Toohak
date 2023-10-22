@@ -26,7 +26,7 @@ test('Test Invalid User IDs', () => {
 
 test('Test Valid User IDs', () => {
   const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'Val1dPassword1',
-    'first', 'last').authUserId;
+    'first', 'last').token;
   const quizId1 = adminQuizCreate(authUserId1, 'New Name', '').quizId;
 
   let result = adminQuizNameUpdate(authUserId1, quizId1, 'Updated Name');
@@ -45,7 +45,7 @@ test('Test Valid User IDs', () => {
 test('Test Invalid Quiz Name', () => {
   // Name contains invalid characters (should only contain alphanumeric and spaces)
   const authUserId = adminAuthRegister('first.last1@gmail.com', 'Val1dPassword1',
-    'first', 'last').authUserId;
+    'first', 'last').token;
   const quizId1 = adminQuizCreate(authUserId, 'New Quiz Name', '');
 
   let result = adminQuizNameUpdate(authUserId, quizId1, 'Invalid@Name');

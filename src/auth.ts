@@ -1,36 +1,12 @@
 // Import functions from files
-// import { UserInfo } from 'os';
-// import { getTokenSourceMapRange } from 'typescript';
 import {
   getData,
+  getUser,
   ErrorObject,
   Details,
-  UserAdd,
-  AuthUserId,
-  getUniqueID
+  getUniqueID,
+  Token,
 } from './dataStore';
-
-/** getUser
-  * Loops through all tokens and users to identify the user
-  *
-  * @param { number } token - The session ID for the user
-  *
-  * @returns { UserAdd } - If the token exists and is valid
-  * @returns { undefined } - If the token is invalid
-*/
-/*
-function getUser(token: number): UserAdd | null {
-  for (const sess of getData().sessions) {
-    if (sess.token === token && sess.is_valid) {
-      for (const user of getData().users) {
-        if (user.authUserId === sess.authUserId) {
-          return user;
-        }
-      }
-    }
-  }
-}
-*/
 
 /** adminAuthRegister
   * Checks email, password, and name then adds the user to the database
@@ -40,11 +16,11 @@ function getUser(token: number): UserAdd | null {
   * @param { string } nameFirst - The user's first name
   * @param { string } nameLast - The user's last name
   *
-  * @returns { AuthUserId } - If the deails are valid
+  * @returns { Token } - If the deails are valid
   * @returns { ErrorObject } - If the details are invalid
   */
 export function adminAuthRegister(email: string, password: string,
-  nameFirst: string, nameLast: string): AuthUserId | ErrorObject {
+  nameFirst: string, nameLast: string): Token | ErrorObject {
   const data = getData();
   const users = data.users;
   const sessions = data.sessions;
@@ -82,7 +58,7 @@ export function adminAuthRegister(email: string, password: string,
   const authUserId = getUniqueID(data);
   const token = getUniqueID(data);
 
-  // If no error, push the new user and return the authUserId
+  // If no error, push the new user and return the token
   users.push({
     authUserId: authUserId,
     nameFirst: nameFirst,
@@ -100,8 +76,7 @@ export function adminAuthRegister(email: string, password: string,
     is_valid: true
   });
 
-  // return { token: token };
-  return { authUserId: authUserId };
+  return { token: token };
 }
 
 /** adminUserLogin
@@ -110,48 +85,53 @@ export function adminAuthRegister(email: string, password: string,
   * @param { string } email - The user's email
   * @param { string } password - The user's password
   *
-  * @returns { AuthUserId } - If the deails are valid
+  * @returns { Token } - If the deails are valid
   * @returns { ErrorObject } - If the details are invalid
   */
 export function adminAuthLogin(email: string, password: string):
-  AuthUserId | ErrorObject {
+  Token | ErrorObject {
   const users = getData().users;
 
   for (const user of users) {
+    // If the password is incorrect, but the email is correct, then attempts
+    // need to be increased
     if (user.email === email && user.password !== password) {
       user.failed_password_num++;
     } else if (user.email === email && user.password === password) {
+      // Both the password and email are correct, so the user is logged-in
       user.failed_password_num = 0;
       user.successful_log_time++;
-      // Need to create a token (getUniqueId()) and add it to sessions,
-      // then return token
-      return { authUserId: user.authUserId };
+
+      // The sessions needs to be added
+      const token: number = getUniqueID(getData());
+      getData().sessions.push({
+        token: token,
+        authUserId: user.authUserId,
+        is_valid: true
+      });
+
+      // Token needs to be returned
+      return { token: token };
     }
   }
 
+  // If all of the above code ran, but the token wasn't returned, then the
+  // details were incorrect
   return { error: 'Email or password is incorrect' };
 }
 
 /** adminUserDetails
-  * Returns the user's details if their authUserId exists
+  * Returns the user's details if their token exists
   *
-  * @param { number } authUserId - The user's ID
+  * @param { number } token - The user's ID
   *
-  * @returns { Details } - If the authUserId is valid
+  * @returns { Details } - If the token is valid
   * @returns { ErrorObject } - If the ID is invalid
   */
-export function adminUserDetails(authUserId: number): Details | ErrorObject {
-  // let user = getUser(token);
-  let user: UserAdd;
-  let exists = false;
-  for (const person of getData().users) {
-    if (person.authUserId === authUserId) {
-      user = person;
-      exists = true;
-    }
-  }
-
-  if (!exists) return { error: 'Invalid token' };
+export function adminUserDetails(token: number): Details | ErrorObject {
+  // Finds the user using the token, undefined is returned if not found
+  const user = getUser(token, getData());
+  if (!user) return { error: 'Invalid token' };
 
   // Return the user's details
   return {
