@@ -84,6 +84,21 @@ function requestDetails(token: number): Details | ErrorObject {
   return JSON.parse(res.body.toString());
 }
 
+// POST LOGOUT Define wrapper function
+function requestLogout(token: number): ErrorObject | Record<string, never> {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/auth/logout',
+    {
+      json: {
+        token: token
+      }
+    }
+  );
+
+  return JSON.parse(res.body.toString());
+}
+
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
@@ -420,5 +435,80 @@ describe('adminUserDetails', () => {
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
+  });
+});
+
+describe('adminAuthLogout', () => {
+  let result: ErrorObject | Record<string, never>;
+  let token: number;
+
+  test('INVALID Token: Doesn\'t Exist', () => {
+    // Logging out a token that doesn't exist
+    token = requestRegister('first.last1@gmail.com', 'invalidpassword',
+      'first', 'last').token;
+    result = requestLogout(token + 1);
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Token: Outside valid range', () => {
+    // Logging out a token that's outside the valid range
+    result = requestLogout(0);
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Token: Already Logged Out', () => {
+    // Logging out an invalid token
+    token = requestRegister('first.last1@gmail.com', 'Val1dPassword',
+      'first', 'last').token;
+    requestLogout(token);
+    result = requestLogout(token);
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('VALID Token: Simple Case 1', () => {
+    token = requestRegister('first.last1@gmail.com', 'Val1dPassword1',
+      'first', 'last').token;
+    result = requestLogout(token);
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID Token: Simple Case 2', () => {
+    token = requestRegister('first.last2@gmail.com', 'Val1dPassword2',
+      'first', 'last').token;
+    result = requestLogout(token);
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID Token: Simple Case 3', () => {
+    token = requestRegister('first.last3@gmail.com', 'Val1dPassword3',
+      'first', 'last').token;
+    result = requestLogout(token);
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID Token: Complex Case 1', () => {
+    requestRegister('first.last1@gmail.com', 'Val1dPassword1', 'first', 'last');
+    token = requestLogin('first.last1@gmail.com', 'Val1dPassword1').token;
+    result = requestLogout(token);
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID Token: Complex Case 2', () => {
+    token = requestRegister('first.last2@gmail.com', 'Val1dPassword2',
+      'first', 'last').token;
+    requestLogin('first.last2@gmail.com', 'Val1dPassword2');
+    result = requestLogout(token);
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID Token: Complex Case 3', () => {
+    token = requestRegister('first.last3@gmail.com', 'Val1dPassword3',
+      'first', 'last').token;
+    requestLogout(token);
+    requestLogin('first.last3@gmail.com', 'Val1dPassword3');
+    requestLogin('first.last3@gmail.com', 'Val1dPassword3');
+    token = requestLogin('first.last3@gmail.com', 'Val1dPassword3').token;
+    result = requestLogout(token);
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
 });
