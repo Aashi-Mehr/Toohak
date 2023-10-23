@@ -21,15 +21,15 @@ test('AuthUserId is not a valid user', () => {
 });
 
 test('Quiz ID does not refer to a valid quiz', () => {
-  const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').authUserId;
+  const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
   const result = adminQuizDescriptionUpdate(authUserId1, quizId, description);
 
   expect(result).toMatchObject({ error: expect.any(String) });
 });
 
 test('Quiz ID does not refer to a quiz that this user owns', () => {
-  const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').authUserId;
-  const authUserId2 = adminAuthRegister('first.last2@gmail.com', 'abcd1234', 'first', 'last').authUserId;
+  const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
+  const authUserId2 = adminAuthRegister('first.last2@gmail.com', 'abcd1234', 'first', 'last').token;
   const quizId1 = adminQuizCreate(authUserId2, 'first last', 'fist_test').quizId;
 
   const result = adminQuizDescriptionUpdate(authUserId1, quizId1, description);
@@ -38,7 +38,7 @@ test('Quiz ID does not refer to a quiz that this user owns', () => {
 });
 
 test('Description is more than 100 characters in length', () => {
-  const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').authUserId;
+  const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
   const quizId1 = adminQuizCreate(authUserId1, 'first last', 'fist_test').quizId;
   let longDescription = '';
 
@@ -50,7 +50,7 @@ test('Description is more than 100 characters in length', () => {
 
 describe('VALID Tests', () => {
   test('Case 1', () => {
-    const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').authUserId;
+    const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
     const quizId1 = adminQuizCreate(authUserId1, 'first last', 'fist_test').quizId;
 
     const result = adminQuizDescriptionUpdate(authUserId1, quizId1, description);

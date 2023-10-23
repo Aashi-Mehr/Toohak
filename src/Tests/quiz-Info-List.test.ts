@@ -23,8 +23,8 @@ interface ErrorObject {
   error: string
 }
 
-interface AuthUserId {
-  authUserId: number
+interface Token {
+  token: number
 }
 
 interface QuizId {
@@ -52,7 +52,7 @@ interface QuizList { quizzes: QuizBrief[] }
 
 // POST REGISTER Define wrapper function
 function requestRegister(email: string, password: string, nameFirst: string,
-  nameLast: string): AuthUserId {
+  nameLast: string): Token {
   const res = request(
     'POST',
     SERVER_URL + '/v1/admin/auth/register',
@@ -68,7 +68,8 @@ function requestRegister(email: string, password: string, nameFirst: string,
 
   const result = JSON.parse(res.body.toString());
 
-  if ('error' in result) { return { authUserId: -1 }; } else { return result; }
+  if ('error' in result) return { token: -1 };
+  else return result;
 }
 
 // QUIZ CREATE Define wrapper function
@@ -171,9 +172,9 @@ describe('adminQuizList', () => {
   /* test('VALID 1 Quiz', () => {
     userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first',
       'last');
-    quizId = requestQuiz(userId.authUserId, 'first last', '').quizId;
+    quizId = requestQuiz(userId.token, 'first last', '').quizId;
 
-    quiz = requestList(userId.authUserId);
+    quiz = requestList(userId.token);
     expect(quiz).toMatchObject({
       quizzes: [
         {
@@ -187,10 +188,10 @@ describe('adminQuizList', () => {
   test('VALID 2 Quizzes', () => {
     userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first',
       'last');
-    const quizId1 = requestQuiz(userId.authUserId, 'first last1', '');
-    const quizId2 = requestQuiz(userId.authUserId, 'first last2', '');
+    const quizId1 = requestQuiz(userId.token, 'first last1', '');
+    const quizId2 = requestQuiz(userId.token, 'first last2', '');
 
-    quiz = requestList(userId.authUserId);
+    quiz = requestList(userId.token);
     expect(quiz).toMatchObject({
       quizzes: [
         {
@@ -208,17 +209,17 @@ describe('adminQuizList', () => {
   test('VALID After Removal', () => {
     userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first',
       'last');
-    quizId = requestQuiz(userId.authUserId, 'first last1', '').quizId;
-    requestRemove(userId.authUserId, quizId);
+    quizId = requestQuiz(userId.token, 'first last1', '').quizId;
+    requestRemove(userId.token, quizId);
 
-    const result = requestList(userId.authUserId);
+    const result = requestList(userId.token);
     expect(result).toMatchObject({ quizzes: [] });
   }); */
 });
 
 // Test function : adminQuizInfo
 describe('adminQuizInfo', () => {
-  let userId: AuthUserId;
+  let userId: Token;
   let quiz: QuizDetailed | ErrorObject;
   let quizId: number;
 
@@ -254,9 +255,9 @@ describe('adminQuizInfo', () => {
 
   test('Test Valid User and Quiz Ids', () => {
     userId = requestRegister('1531_user1@1531.com', 'C123321c', 'first', 'last');
-    quizId = requestQuiz(userId.authUserId, 'first last', '').quizId;
+    quizId = requestQuiz(userId.token, 'first last', '').quizId;
 
-    expect(requestInfo(userId.authUserId, quizId)).toMatchObject({
+    expect(requestInfo(userId.token, quizId)).toMatchObject({
       quizId: quizId,
       name: 'first last',
       timeCreated: expect.any(Number),
@@ -267,18 +268,18 @@ describe('adminQuizInfo', () => {
 
   test('Test successful quiz read - correct timestamp format', () => {
     userId = requestRegister('1531_user1@1531.com', 'C123321c', 'first', 'last');
-    quizId = requestQuiz(userId.authUserId, 'first last', '').quizId;
+    quizId = requestQuiz(userId.token, 'first last', '').quizId;
 
-    quiz = requestInfo(userId.authUserId, quizId);
+    quiz = requestInfo(userId.token, quizId);
     expect(quiz.timeCreated.toString()).toMatch(/^\d{10}$/);
     expect(quiz.timeLastEdited.toString()).toMatch(/^\d{10}$/);
   });
 
   test('Test quizId invalid error, cannot read', () => {
     userId = requestRegister('1531_user1@1531.com', 'C123321c', 'first', 'last');
-    quizId = requestQuiz(userId.authUserId, 'first last', '').quizId;
+    quizId = requestQuiz(userId.token, 'first last', '').quizId;
 
-    const quiz = requestInfo(userId.authUserId, quizId + 1);
+    const quiz = requestInfo(userId.token, quizId + 1);
     expect(quiz).toStrictEqual({ error: expect.any(String) });
   });
 });

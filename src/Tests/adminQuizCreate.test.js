@@ -7,6 +7,8 @@ beforeEach(() => {
   clear();
 });
 
+// REMEMBER TO UPDATE COMMENTS TO CHANGE AUTHUSERID TO TOKEN!!!
+
 // Test : Invalid AuthUserId Format
 test('Test Invalid AuthUserId Format', () => {
   // authUserId contains characters
@@ -37,7 +39,7 @@ test('Test Non-existing AuthUserId', () => {
 
 // Test : Name With Invalid Characters
 test('Test Name With Invalid Characters', () => {
-  const authId = adminAuthRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last').authUserId;
+  const authId = adminAuthRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last').token;
 
   // Name contains spaces, but also special characters
   let result = adminQuizCreate(authId, 'Qu1# COMP', 'quizDescription');
@@ -56,7 +58,7 @@ test('Test Name With Invalid Characters', () => {
 
 // Test : Name Length
 test('Test Name Length', () => {
-  const authId = adminAuthRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last').authUserId;
+  const authId = adminAuthRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last').token;
 
   // Name is less than 3 characters long
   let result = adminQuizCreate(authId, 'Qu', 'quizDescription');
@@ -85,7 +87,7 @@ test('Test Name Length', () => {
 
 // Test : Quiz Name Is Already Used
 test('Test Quiz Name Is Already Used', () => {
-  const authId = adminAuthRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last').authUserId;
+  const authId = adminAuthRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last').token;
   adminQuizCreate(authId, 'quizName1', 'This quiz is about COMP1531');
 
   // Name is already used by the current logged in user for another quiz
@@ -95,7 +97,7 @@ test('Test Quiz Name Is Already Used', () => {
 
 // Test : Description Length
 test('Test Description Length', () => {
-  const authId = adminAuthRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last').authUserId;
+  const authId = adminAuthRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last').token;
 
   // Description is more than 100 characters
   const result = adminQuizCreate(authId, 'COMP Quiz ', 'This might be the longest quiz description ever been tested. This quiz is the most amazing quiz ever been made.');
@@ -104,7 +106,7 @@ test('Test Description Length', () => {
 
 // Test : Valid AuthUserId, Name and Description
 test('Test Valid AuthUserId, name and description', () => {
-  const authId = adminAuthRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last').authUserId;
+  const authId = adminAuthRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last').token;
   const result = adminQuizCreate(authId, 'COMP Quiz', 'COMP1531 Iteration 1 Quiz.');
   expect(result).toMatchObject({ quizId: expect.any(Number) });
 });
