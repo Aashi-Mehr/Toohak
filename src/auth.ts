@@ -90,6 +90,7 @@ export function adminAuthRegister(email: string, password: string,
     password: password,
     successful_log_time: 0,
     failed_password_num: 0,
+    prev_passwords: [password]
   });
 
   data.sessions.push({
@@ -136,6 +137,41 @@ export function adminUserDetailsEdit(token: number, email: string,
 
   return { };
 }
+
+/** adminUserPasswordEdit
+  * Checks token, email, and name then changes the user's details
+  *
+  * @param { number } token - The user's token
+  * @param { number } oldPass - The new email
+  * @param { number } newPass - The new first name
+  *
+  * @returns { Record<string, never> } - If the deails are valid
+  * @returns { ErrorObject } - If the details are invalid
+  */
+/* export function adminUserPasswordEdit(token: number, oldPass: string,
+  newPass: string): ErrorObject | Record<string, never> {
+  // ERROR CHECKING
+  // Ensuring the user is valid
+  const user = getUser(token, getData());
+  if (!user) return { error: 'Invalid token' };
+
+  // Password needs to have letters and numbers, greater than 8 characters
+  const hasLetter = /[a-zA-Z]/.test(newPass);
+  const hasNumber = /\d/.test(newPass);
+
+  if (hasLetter === false) return { error: 'Password needs letters' };
+  if (hasNumber === false) return { error: 'Password needs numbers' };
+  if (newPass.length < 8) return { error: 'Password is too short' };
+
+  for (let pass of user.prev_passwords) {
+    if (newPass === pass) return { error: 'Cannot reuse old password' };
+  }
+
+  user.prev_passwords.push(newPass);
+  user.password = newPass;
+
+  return { };
+} */
 
 /** adminUserLogin
   * Logs the user into the system if the given details are correct

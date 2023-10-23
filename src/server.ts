@@ -14,7 +14,8 @@ import {
   adminAuthRegister,
   adminUserDetails,
   adminAuthLogout,
-  adminUserDetailsEdit
+  adminUserDetailsEdit,
+  // adminUserPasswordEdit
 } from './auth';
 
 import {
@@ -106,6 +107,16 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
 });
+
+/* // adminUserPasswordsEdit
+app.put('/v1/admin/user/password', (req: Request, res: Response) => {
+  let { token, oldPassword, newPassword } = req.body;
+  token = parseInt(token);
+  const response = adminUserPasswordEdit(token, oldPassword, newPassword);
+
+  if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+}); */
 
 // adminQuizCreate
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
