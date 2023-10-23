@@ -21,8 +21,8 @@ test('Test Invalid User IDs', () => {
 
 test('Test Valid User IDs', () => {
   // DEPENDENCY on adminAuthRegister
-  const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'Val1dPassword1', 'first', 'last').authUserId;
-  const authUserId2 = adminAuthRegister('first.last2@gmail.com', 'Val1dPassword2', 'first', 'last').authUserId;
+  const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'Val1dPassword1', 'first', 'last').token;
+  const authUserId2 = adminAuthRegister('first.last2@gmail.com', 'Val1dPassword2', 'first', 'last').token;
 
   let quizId1 = adminQuizCreate(authUserId1, 'New Quiz Name1', '').quizId;
   let quizId2 = adminQuizCreate(authUserId2, 'New Quiz Name2', '').quizId;
@@ -47,7 +47,7 @@ test('Test Valid User IDs', () => {
 });
 
 test('Test Invalid QuizIDs', () => {
-  const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'Val1dPassword1', 'first1', 'last1').authUserId;
+  const authUserId1 = adminAuthRegister('first.last1@gmail.com', 'Val1dPassword1', 'first1', 'last1').token;
   const quizId1 = adminQuizCreate(authUserId1, 'New Quiz Name1', '');
 
   // Quiz ID does not refer to a valid quiz

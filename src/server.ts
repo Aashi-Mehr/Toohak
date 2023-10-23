@@ -10,21 +10,22 @@ import path from 'path';
 import process from 'process';
 
 import {
+  adminAuthLogin,
   adminAuthRegister,
-  // Uncomment the functions that you need (Lint gives an error if it's not in a
-  // comment :/)
-  // adminAuthLogin,
-  adminUserDetails
+  adminUserDetails,
+  adminAuthLogout
 } from './auth';
 
-// import {
-// adminQuizList,
-// adminQuizInfo,
-// adminQuizCreate,
-// adminQuizRemove,
-// adminQuizNameUpdate,
-// adminQuizDescriptionUpdate
-// } from './quiz';
+import {
+  adminQuizList,
+  adminQuizInfo,
+  adminQuizCreate,
+  // Uncomment the functions that you need (Lint gives an error if it's not in a
+  // comment :/)
+  // adminQuizRemove,
+  // adminQuizNameUpdate,
+  // adminQuizDescriptionUpdate
+} from './quiz';
 
 import { clear } from './other.js';
 
@@ -66,13 +67,65 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   res.json(response);
 });
 
-// adminUserDetails
-app.get('/v1/admin/user/details', (req: Request, res: Response) => {
-  let { authUserId } = req.body;
-  authUserId = parseInt(authUserId);
-  const response = adminUserDetails(authUserId);
+// adminAuthLogin
+app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const response = adminAuthLogin(email, password);
 
   if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+});
+
+// adminUserDetails
+app.get('/v1/admin/user/details', (req: Request, res: Response) => {
+  let { token } = req.body;
+  token = parseInt(token);
+  const response = adminUserDetails(token);
+
+  if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+});
+
+// adminAuthLogout
+app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
+  let { token } = req.body;
+  token = parseInt(token);
+  const response = adminAuthLogout(token);
+
+  if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+});
+
+// adminQuizCreate
+app.post('/v1/admin/quiz', (req: Request, res: Response) => {
+  const { authUserId, name, description } = req.body;
+  const response = adminQuizCreate(authUserId, name, description);
+
+  if ('error' in response) return res.status(400).json(response);
+  if (authUserId === '') return res.status(401).json(response);
+  res.json(response);
+});
+
+// adminQuizInfo
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  let { authUserId } = req.body;
+  authUserId = parseInt(authUserId);
+  const quizId = req.params.quizid;
+  const response = adminQuizInfo(authUserId, parseInt(quizId));
+
+  if ('No such quiz' in response) return res.status(400).json(response);
+  if (authUserId === '') return res.status(401).json(response);
+  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  res.json(response);
+});
+
+// adminQuizList
+app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+  const { authUserId } = req.query;
+  const userId = parseInt(authUserId as string);
+  const response = adminQuizList(userId);
+
+  if ('error' in response) return res.status(401).json(response);
   res.json(response);
 });
 

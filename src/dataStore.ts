@@ -101,6 +101,65 @@ function getData(): Datastore { return data; }
   */
 function setData(newData: Datastore) { data = newData; }
 
+/** getUser
+  * Loops through all tokens and users to identify the user
+  *
+  * @param { number } token - The session ID for the user
+  *
+  * @returns { UserAdd } - If the token exists and is valid
+  * @returns { undefined } - If the token is invalid
+*/
+function getUser(token: number, allData: Datastore): UserAdd | undefined {
+  for (const sess of allData.sessions) {
+    if (sess.token === token && sess.is_valid) {
+      for (const user of allData.users) {
+        if (user.authUserId === sess.authUserId) {
+          return user;
+        }
+      }
+    }
+  }
+
+  return undefined;
+}
+
+/** getQuiz
+  * Loops through all quizzes to find the quiz with given quizId
+  *
+  * @param { number } quizId - The quizID for the quiz
+  *
+  * @returns { QuizAdd } - If the quiz exists and is valid
+  * @returns { undefined } - If the quizId is invalid
+  */
+function getQuiz(quizId: number, quizzes: QuizAdd[]): QuizAdd | undefined {
+  for (const quiz of quizzes) {
+    if (quizId === quiz.quizId) {
+      return quiz;
+    }
+  }
+
+  return undefined;
+}
+
+/** getSession
+  * Loops through all sessions to find the session with given token
+  *
+  * @param { number } token - The token for the session
+  *
+  * @returns { SessionAdd } - If the token exists and is valid
+  * @returns { undefined } - If the token is invalid
+  */
+function getSession(token: number, sessions: SessionAdd[]):
+  SessionAdd | undefined {
+  for (const sess of sessions) {
+    if (token === sess.token && sess.is_valid === true) {
+      return sess;
+    }
+  }
+
+  return undefined;
+}
+
 /** getUniqueID
   * Creates a unique ID (For authUserId, quizId, or token)
   *
@@ -138,6 +197,9 @@ function getUniqueID(allData: Datastore): number {
 export {
   getData,
   setData,
+  getUser,
+  getQuiz,
+  getSession,
   getUniqueID,
   ErrorObject,
   AuthUserId,
