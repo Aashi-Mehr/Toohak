@@ -2,6 +2,7 @@
 import {
   getData,
   getUser,
+  getSession,
   ErrorObject,
   Details,
   getUniqueID,
@@ -123,10 +124,10 @@ export function adminAuthLogin(email: string, password: string):
 /** adminUserDetails
   * Returns the user's details if their token exists
   *
-  * @param { number } token - The user's ID
+  * @param { number } token - The user's session token
   *
   * @returns { Details } - If the token is valid
-  * @returns { ErrorObject } - If the ID is invalid
+  * @returns { ErrorObject } - If the token is invalid
   */
 export function adminUserDetails(token: number): Details | ErrorObject {
   // Finds the user using the token, undefined is returned if not found
@@ -144,4 +145,22 @@ export function adminUserDetails(token: number): Details | ErrorObject {
         numFailedPasswordsSinceLastLogin: user.failed_password_num,
       }
   };
+}
+
+/** adminAuthLogout
+  * Returns the user's details if their token exists
+  *
+  * @param { number } token - The user's session token
+  *
+  * @returns { Record<string, never> } - If the token is valid
+  * @returns { ErrorObject } - If the token is invalid
+  */
+export function adminAuthLogout(token: number):
+  ErrorObject | Record<string, never> {
+  // Finds the user using the token, undefined is returned if not found
+  const session = getSession(token, getData().sessions);
+  if (!session) return { error: 'Invalid token' };
+
+  session.is_valid = false;
+  return { };
 }

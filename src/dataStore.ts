@@ -129,12 +129,31 @@ function getUser(token: number, allData: Datastore): UserAdd | undefined {
   * @param { number } quizId - The quizID for the quiz
   *
   * @returns { QuizAdd } - If the quiz exists and is valid
-  * @returns { undefined } - If the token is invalid
+  * @returns { undefined } - If the quizId is invalid
   */
 function getQuiz(quizId: number, quizzes: QuizAdd[]): QuizAdd | undefined {
   for (const quiz of quizzes) {
     if (quizId === quiz.quizId) {
       return quiz;
+    }
+  }
+
+  return undefined;
+}
+
+/** getSession
+  * Loops through all sessions to find the session with given token
+  *
+  * @param { number } token - The token for the session
+  *
+  * @returns { SessionAdd } - If the token exists and is valid
+  * @returns { undefined } - If the token is invalid
+  */
+function getSession(token: number, sessions: SessionAdd[]):
+  SessionAdd | undefined {
+  for (const sess of sessions) {
+    if (token === sess.token && sess.is_valid === true) {
+      return sess;
     }
   }
 
@@ -180,6 +199,7 @@ export {
   setData,
   getUser,
   getQuiz,
+  getSession,
   getUniqueID,
   ErrorObject,
   AuthUserId,
