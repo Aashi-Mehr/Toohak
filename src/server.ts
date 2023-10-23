@@ -60,6 +60,10 @@ app.get('/echo', (req: Request, res: Response) => {
   return res.json(ret);
 });
 
+// ====================================================================
+//  ========================= AUTH FUNCTIONS =========================
+// ====================================================================
+
 // adminAuthRegister
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   const { email, password, nameFirst, nameLast } = req.body;
@@ -118,6 +122,10 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// ====================================================================
+//  ========================= QUIZ FUNCTIONS =========================
+// ====================================================================
+
 // adminQuizCreate
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const { authUserId, name, description } = req.body;
@@ -150,6 +158,10 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   if ('error' in response) return res.status(401).json(response);
   res.json(response);
 });
+
+// ====================================================================
+//  ======================== OTHER FUNCTIONS =========================
+// ====================================================================
 
 // clear
 app.delete('/v1/clear', (req: Request, res: Response) => {
