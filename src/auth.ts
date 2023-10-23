@@ -9,19 +9,19 @@ import {
   Token,
 } from './dataStore';
 
-/** adminAuthRegister
-  * Checks email, password, and name then adds the user to the database
+/** adminDetailsCheck
+  * Checks email, password, and name then returns its validity
   *
-  * @param { string } email - The email to register
+  * @param { string } email - The email
   * @param { string } password - The user's password
   * @param { string } nameFirst - The user's first name
   * @param { string } nameLast - The user's last name
   *
-  * @returns { Token } - If the deails are valid
+  * @returns { Record<string, never> } - If the deails are valid
   * @returns { ErrorObject } - If the details are invalid
   */
-export function adminAuthRegister(email: string, password: string,
-  nameFirst: string, nameLast: string): Token | ErrorObject {
+function detailsCheck(email: string, password: string,
+  nameFirst: string, nameLast: string): ErrorObject | Token {
   const data = getData();
   const users = data.users;
   const sessions = data.sessions;
@@ -55,12 +55,34 @@ export function adminAuthRegister(email: string, password: string,
   // Email cannot be duplicated
   for (const user of users) if (user.email === email) return { error: 'Used' };
 
+  // No errors, hence details are valid
+  return { token: -1 };
+}
+
+/** adminAuthRegister
+  * Checks email, password, and name then adds the user to the database
+  *
+  * @param { string } email - The email to register
+  * @param { string } password - The user's password
+  * @param { string } nameFirst - The user's first name
+  * @param { string } nameLast - The user's last name
+  *
+  * @returns { Token } - If the deails are valid
+  * @returns { ErrorObject } - If the details are invalid
+  */
+export function adminAuthRegister(email: string, password: string,
+  nameFirst: string, nameLast: string): Token | ErrorObject {
+  const valid = detailsCheck(email, password, nameFirst, nameLast);
+  if ("error" in valid) return valid;
+
+  const data = getData();
+
   // ADDING TO DATA
   const authUserId = getUniqueID(data);
   const token = getUniqueID(data);
 
   // If no error, push the new user and return the token
-  users.push({
+  data.users.push({
     authUserId: authUserId,
     nameFirst: nameFirst,
     nameLast: nameLast,
@@ -71,7 +93,7 @@ export function adminAuthRegister(email: string, password: string,
     failed_password_num: 0,
   });
 
-  sessions.push({
+  data.sessions.push({
     token: token,
     authUserId: authUserId,
     is_valid: true
@@ -79,6 +101,43 @@ export function adminAuthRegister(email: string, password: string,
 
   return { token: token };
 }
+
+/** adminUserDetailsEdit
+  * Checks token, email, and name then changes the user's details
+  *
+  * @param { number } token - The user's token
+  * @param { string } email - The new email
+  * @param { string } nameFirst - The new first name
+  * @param { string } nameLast - The new last name
+  *
+  * @returns { Record<string, never> } - If the deails are valid
+  * @returns { ErrorObject } - If the details are invalid
+  */
+/*
+export function adminUserDetailsEdit(token: number, email: string,
+  nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
+  // ERROR CHECKING
+  let user = getUser(token, getData());
+  if (!user) return { error: "Invalid token" };
+
+  const users = getData().users;
+  getData().users.splice(users.indexOf(user), 1);
+
+  const valid = detailsCheck(email, user.password, nameFirst, nameLast);
+  if ("error" in valid) {
+    users.push(user);
+    return valid;
+  }
+
+  // ALTERING DATA If no error, push the new user and return the token
+  user.email = email;
+  user.nameFirst = nameFirst;
+  user.nameLast = nameLast,
+  user.name = nameFirst + ' ' + nameLast;
+  users.push(user);
+
+  return { };
+}*/
 
 /** adminUserLogin
   * Logs the user into the system if the given details are correct
