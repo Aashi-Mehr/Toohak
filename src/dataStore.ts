@@ -22,7 +22,8 @@ interface UserAdd {
   email: string,
   password: string,
   successful_log_time: number,
-  failed_password_num: number
+  failed_password_num: number,
+  prev_passwords: string[]
 }
 
 // INTERFACES Quiz

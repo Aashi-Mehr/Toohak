@@ -118,6 +118,24 @@ function requestDetailsEdit(token: number, email: string, nameFirst: string,
   return JSON.parse(res.body.toString());
 }
 
+// PUT EDIT PASSWORD Define wrapper function
+function requestPasswordEdit(token: number, oldPass: string, newPass: string):
+  ErrorObject | Record<string, never> {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/user/password',
+    {
+      json: {
+        token: token,
+        oldPassword: oldPass,
+        newPassword: newPass
+      }
+    }
+  );
+
+  return JSON.parse(res.body.toString());
+}
+
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
@@ -629,6 +647,71 @@ describe('adminUserDetailsEdit', () => {
     result = requestDetailsEdit(token, 'hayden.smith@unsw.edu.au', 'Hayden',
       'Smith');
 
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+});
+
+describe('adminUserPasswordEdit', () => {
+  let result: Record<string, never> | ErrorObject;
+  let token: number;
+
+  beforeEach(() => {
+    token = requestRegister('first.last@gmail.com', 'Val1dPassword', 'first',
+      'last').token;
+  });
+
+  test('INVALID token: Out of the possible range', () => {
+    result = requestPasswordEdit(0, 'Val1dPassword', 'NewVal1dPassword');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID token: Incorrect ID', () => {
+    result = requestPasswordEdit(token + 1, 'Val1dPassword', 'NewVal1dPass');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Password: No numbers', () => {
+    result = requestPasswordEdit(token, 'Val1dPassword', 'newpassword');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Password: No letters', () => {
+    result = requestPasswordEdit(token, 'Val1dPassword', '1234567890');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Password: Less than 8 characters', () => {
+    result = requestPasswordEdit(token, 'Val1dPassword', 'newpass');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Password: Not changed', () => {
+    requestPasswordEdit(token, 'Val1dPassword', 'NewVal1dPass');
+    result = requestPasswordEdit(token, 'NewVal1dPass', 'Val1dPassword');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Password: Used before', () => {
+    result = requestPasswordEdit(token, 'Val1dPassword', 'newpass');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('VALID token: Simple Case 1', () => {
+    result = requestPasswordEdit(token, 'Val1dPassword', 'NewVal1dPass');
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID token: Simple Case 2', () => {
+    token = requestRegister('first.last2@gmail.com',
+      'Val1dPassword2', 'first', 'last').token;
+    result = requestPasswordEdit(token, 'Val1dPassword2', 'NEWVal1dPassword2');
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID token: Simple Case 3', () => {
+    token = requestRegister('first.last2@gmail.com',
+      'Val1dPassword2', 'first', 'last').token;
+    result = requestPasswordEdit(token, 'Val1dPassword2', 'Val1dPassword');
     expect(Object.keys(result).length).toStrictEqual(0);
   });
 });

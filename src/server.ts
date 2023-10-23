@@ -14,7 +14,8 @@ import {
   adminAuthRegister,
   adminUserDetails,
   adminAuthLogout,
-  adminUserDetailsEdit
+  adminUserDetailsEdit,
+  adminUserPasswordEdit
 } from './auth';
 
 import {
@@ -58,6 +59,10 @@ app.get('/echo', (req: Request, res: Response) => {
   if ('error' in ret) res.status(400);
   return res.json(ret);
 });
+
+// ====================================================================
+//  ========================= AUTH FUNCTIONS =========================
+// ====================================================================
 
 // adminAuthRegister
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
@@ -107,6 +112,20 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// adminUserPasswordsEdit
+app.put('/v1/admin/user/password', (req: Request, res: Response) => {
+  let { token, oldPassword, newPassword } = req.body;
+  token = parseInt(token);
+  const response = adminUserPasswordEdit(token, oldPassword, newPassword);
+
+  if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+});
+
+// ====================================================================
+//  ========================= QUIZ FUNCTIONS =========================
+// ====================================================================
+
 // adminQuizCreate
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const { authUserId, name, description } = req.body;
@@ -139,6 +158,10 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   if ('error' in response) return res.status(401).json(response);
   res.json(response);
 });
+
+// ====================================================================
+//  ======================== OTHER FUNCTIONS =========================
+// ====================================================================
 
 // clear
 app.delete('/v1/clear', (req: Request, res: Response) => {
