@@ -148,7 +148,7 @@ export function adminUserDetailsEdit(token: number, email: string,
   * @returns { Record<string, never> } - If the deails are valid
   * @returns { ErrorObject } - If the details are invalid
   */
-/* export function adminUserPasswordEdit(token: number, oldPass: string,
+export function adminUserPasswordEdit(token: number, oldPass: string,
   newPass: string): ErrorObject | Record<string, never> {
   // ERROR CHECKING
   // Ensuring the user is valid
@@ -163,7 +163,7 @@ export function adminUserDetailsEdit(token: number, email: string,
   if (hasNumber === false) return { error: 'Password needs numbers' };
   if (newPass.length < 8) return { error: 'Password is too short' };
 
-  for (let pass of user.prev_passwords) {
+  for (const pass of user.prev_passwords) {
     if (newPass === pass) return { error: 'Cannot reuse old password' };
   }
 
@@ -171,7 +171,7 @@ export function adminUserDetailsEdit(token: number, email: string,
   user.password = newPass;
 
   return { };
-} */
+}
 
 /** adminUserLogin
   * Logs the user into the system if the given details are correct
