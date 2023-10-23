@@ -99,6 +99,25 @@ function requestLogout(token: number): ErrorObject | Record<string, never> {
   return JSON.parse(res.body.toString());
 }
 
+// PUT EDIT DETAILS Define wrapper function
+function requestDetailsEdit(token: number, email: string, nameFirst: string,
+  nameLast: string): ErrorObject | Record<string, never> {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/user/details',
+    {
+      json: {
+        token: token,
+        email: email,
+        nameFirst: nameFirst,
+        nameLast: nameLast
+      }
+    }
+  );
+
+  return JSON.parse(res.body.toString());
+}
+
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
@@ -509,6 +528,107 @@ describe('adminAuthLogout', () => {
     requestLogin('first.last3@gmail.com', 'Val1dPassword3');
     token = requestLogin('first.last3@gmail.com', 'Val1dPassword3').token;
     result = requestLogout(token);
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+});
+
+describe('adminUserDetailsEdit', () => {
+  let result: Record<string, never> | ErrorObject;
+  let token: number;
+
+  beforeEach(() => {
+    token = requestRegister('first.last@gmail.com', 'Val1dPassword', 'first',
+      'last').token;
+  });
+
+  test('INVALID token: Out of the possible range', () => {
+    result = requestDetailsEdit(0, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID token: Incorrect ID', () => {
+    result = requestDetailsEdit(token + 1, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Name: First name contains numbers', () => {
+    result = requestDetailsEdit(token, 'first.last4@gmail.com', '1nval1d first',
+      'last');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Name: Last name contains numbers', () => {
+    result = requestDetailsEdit(token, 'first.last5@gmail.com', 'first',
+      '1nval1d last');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Name: First name less than 2 characters', () => {
+    result = requestDetailsEdit(token, 'first.last6@gmail.com', 'a', 'last');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Name: Last name less than 2 characters', () => {
+    result = requestDetailsEdit(token, 'first.last9@gmail.com', 'first', 'a');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Name: First name more than 20 characters', () => {
+    result = requestDetailsEdit(token, 'first.last7@gmail.com',
+      'abcdefghijklmnopqrstuvwxyz', 'last');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Name: Last name more than 20 characters', () => {
+    result = requestDetailsEdit(token, 'first.last8@gmail.com', 'a',
+      'abcdefghijklmnopqrstuvwxyz');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Email: Does not satisfy validator.isEmail function', () => {
+    result = requestDetailsEdit(token, 'first..last@email',
+      'first', 'last');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID details: Email already exists', () => {
+    requestRegister('first.last2@gmail.com', 'Val1dPassword1', 'first', 'last');
+    result = requestDetailsEdit(token, 'first.last2@gmail.com', 'firs', 'last');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('VALID token: Simple Case 1', () => {
+    result = requestDetailsEdit(token, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith');
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID token: Simple Case 2', () => {
+    token = requestRegister('first.last2@gmail.com',
+      'Val1dPassword2', 'first', 'last').token;
+    result = requestDetailsEdit(token, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith');
+
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID token: Simple Case 3', () => {
+    token = requestRegister('first.last3@gmail.com',
+      'Val1dPassword3', 'first', 'last').token;
+    result = requestDetailsEdit(token, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith');
+
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID token: Simple Case 4', () => {
+    token = requestRegister('first.last4@gmail.com',
+      'Val1dPassword4', 'first', 'last').token;
+    result = requestDetailsEdit(token, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith');
+
     expect(Object.keys(result).length).toStrictEqual(0);
   });
 });

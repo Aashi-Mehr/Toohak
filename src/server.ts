@@ -13,7 +13,8 @@ import {
   adminAuthLogin,
   adminAuthRegister,
   adminUserDetails,
-  adminAuthLogout
+  adminAuthLogout,
+  adminUserDetailsEdit
 } from './auth';
 
 import {
@@ -91,6 +92,16 @@ app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
   let { token } = req.body;
   token = parseInt(token);
   const response = adminAuthLogout(token);
+
+  if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+});
+
+// adminUserDetailsEdit
+app.put('/v1/admin/user/details', (req: Request, res: Response) => {
+  let { token, email, nameFirst, nameLast } = req.body;
+  token = parseInt(token);
+  const response = adminUserDetailsEdit(token, email, nameFirst, nameLast);
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
