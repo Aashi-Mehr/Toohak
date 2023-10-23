@@ -24,7 +24,6 @@ function detailsCheck(email: string, password: string,
   nameFirst: string, nameLast: string): ErrorObject | Token {
   const data = getData();
   const users = data.users;
-  const sessions = data.sessions;
 
   // ERROR CHECKING
   // Password needs to have letters and numbers, greater than 8 characters
@@ -73,7 +72,7 @@ function detailsCheck(email: string, password: string,
 export function adminAuthRegister(email: string, password: string,
   nameFirst: string, nameLast: string): Token | ErrorObject {
   const valid = detailsCheck(email, password, nameFirst, nameLast);
-  if ("error" in valid) return valid;
+  if ('error' in valid) return valid;
 
   const data = getData();
 
@@ -113,18 +112,17 @@ export function adminAuthRegister(email: string, password: string,
   * @returns { Record<string, never> } - If the deails are valid
   * @returns { ErrorObject } - If the details are invalid
   */
-/*
 export function adminUserDetailsEdit(token: number, email: string,
   nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
   // ERROR CHECKING
-  let user = getUser(token, getData());
-  if (!user) return { error: "Invalid token" };
+  const user = getUser(token, getData());
+  if (!user) return { error: 'Invalid token' };
 
   const users = getData().users;
   getData().users.splice(users.indexOf(user), 1);
 
   const valid = detailsCheck(email, user.password, nameFirst, nameLast);
-  if ("error" in valid) {
+  if ('error' in valid) {
     users.push(user);
     return valid;
   }
@@ -132,12 +130,12 @@ export function adminUserDetailsEdit(token: number, email: string,
   // ALTERING DATA If no error, push the new user and return the token
   user.email = email;
   user.nameFirst = nameFirst;
-  user.nameLast = nameLast,
+  user.nameLast = nameLast;
   user.name = nameFirst + ' ' + nameLast;
   users.push(user);
 
   return { };
-}*/
+}
 
 /** adminUserLogin
   * Logs the user into the system if the given details are correct
