@@ -75,6 +75,8 @@ export function requestQuizDescriptionUpdate(token: number | string, quizId: num
     }
   );
   return JSON.parse(res.body.toString());
+<<<<<<< 3e126666d1a904cfad27e2abbcec9515084c4c10
+=======
 }
 
 export function requestQuestionCreate(token: number | string, quizId: number, questionBody: QuestionBody): QuestionId {
@@ -89,4 +91,5 @@ export function requestQuestionCreate(token: number | string, quizId: number, qu
     }
   );
   return JSON.parse(res.body.toString());
+>>>>>>> f6b58822d6342ae99637929e8e5e45d15b2ae0f5
 }
