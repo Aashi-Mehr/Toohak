@@ -169,7 +169,7 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   if (token === '') return res.status(401).json(response);
   if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
   if ('error' in response) return res.status(400).json(response);
-  
+
   res.json(response);
 });
 
