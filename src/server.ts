@@ -188,7 +188,7 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const response = adminQuestionCreate(token, quizId, questionBody);
 
-  if (token === '') return res.status(401).json(response);
+  if (token === '' || 'Invalid user ID' in response) return res.status(401).json(response);
   if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
   if ('error' in response) return res.status(400).json(response);
 

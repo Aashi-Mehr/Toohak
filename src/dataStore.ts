@@ -4,7 +4,7 @@ interface ErrorObject { error: string }
 // INTERFACES Auth
 interface AuthUserId { authUserId: number }
 
-interface Ansewr {
+interface AnswerBody {
   answer: string,
   correct: boolean,
 }
@@ -12,9 +12,8 @@ interface Ansewr {
 interface QuestionBody {
   question: string,
   duration: number,
-  email: number,
   points: number,
-  answers: Answer
+  answers: AnswerBody[]
 }
 
 interface QuestionId {
@@ -61,11 +60,19 @@ interface QuizDetailed {
 
 interface QuizList { quizzes: QuizBrief[] }
 
+interface Answer {
+  answerId: number,
+  answer: string,
+  colour: string,
+  correct: boolean
+}
+
 interface Question {
+  questionId: number, 
   question: string,
   duration: number,
   points: number,
-  answer: string,
+  answer: Answer[],
 }
 
 interface QuizAdd {

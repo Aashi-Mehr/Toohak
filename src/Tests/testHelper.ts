@@ -34,7 +34,7 @@ export function requestRegister(email: string, password: string, nameFirst: stri
   return JSON.parse(res.body.toString());
 }
 
-export function requestQuizCreate(token: number, name: string, description: any): QuizId {
+export function requestQuizCreate(token: number | string, name: string, description: any): QuizId {
   const res = request(
     'POST',
     SERVER_URL + '/v1/admin/quiz',
@@ -79,7 +79,7 @@ export function requestQuizDescriptionUpdate(token: number | string, quizId: num
 
 export function requestQuestionCreate(token: number | string, quizId: number, questionBody: QuestionBody): QuestionId {
   const res = request(
-    'PUT',
+    'POST',
     SERVER_URL + '/v1/admin/quiz/' + quizId + '/question',
     {
       json: {
