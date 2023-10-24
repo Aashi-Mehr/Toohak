@@ -5,7 +5,8 @@ import {
   QuizList,
   getData,
   getQuiz,
-  getUser
+  getUser,
+  QuizBrief
 } from './dataStore';
 
 /** adminQuizList
@@ -227,12 +228,46 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
   return { error: 'Quiz not owned by user' };
 }
 
-// last edit: 18/10/2023 by Zhejun Gu
+/** adminQuizTrash
+  * View the quizzes that are currently in the trash for the logged in user
+  *
+  * @param { number } token - The authUserId for the user
+  *
+  * @returns { QuizBrief } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+function adminQuizTrash(token: number, quizId: number):
+  ErrorObject | QuizBrief {
+  // Check if authUserId is a positive integer
+  const user = getUser(token, getData());
+  if (!user) return { error: 'Invalid user ID' };
+
+  // Gathering quizzes
+  const allQuizzes = getData().quizzes;
+  const removedQuizzes = [];
+
+  // Looping through quizzes in dataStore
+  for (const quiz of allQuizzes) {
+    if (quiz.authId === user.authUserId && quiz.in_trash === true) {
+      // If it belongs to the relevant user, it needs to be returned
+      removedQuizzes.push({
+        quizId: quiz.quizId,
+        name: quiz.name
+      });
+    }
+  }
+
+  // Quizzes list
+  return { quizzes: removedQuizzes };
+}
+
+// last edit: 25/10/2023 by Alya
 export {
   adminQuizList,
   adminQuizInfo,
   adminQuizCreate,
   adminQuizRemove,
   adminQuizNameUpdate,
-  adminQuizDescriptionUpdate
+  adminQuizDescriptionUpdate,
+  adminQuizTrash
 };
