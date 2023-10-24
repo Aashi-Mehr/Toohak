@@ -31,8 +31,10 @@ function detailsCheck(email: string, password: string,
   const hasNumber = /\d/.test(password);
 
   if (hasLetter === false || hasNumber === false) {
-    return { error: 'Password does not contain at least one number and at ' +
-      'least one letter' };
+    return {
+      error: 'Password does not contain at least one number and at ' +
+      'least one letter'
+    };
   }
   if (password.length < 8) {
     return { error: 'Password is less than 8 characters' };
@@ -43,8 +45,10 @@ function detailsCheck(email: string, password: string,
   const invalidnameLast = /[^a-zA-Z -']/.test(nameLast);
 
   if (invalidnameFirst === true || invalidnameLast === true) {
-    return { error: 'Name contains characters other than lowercase letters, ' +
-      'uppercase letters, spaces, hyphens, or apostrophes' };
+    return {
+      error: 'Name contains characters other than lowercase letters, ' +
+      'uppercase letters, spaces, hyphens, or apostrophes'
+    };
   }
   if (nameFirst.length < 2 || nameFirst.length > 20 ||
       nameLast.length < 2 || nameLast.length > 20) {
@@ -58,8 +62,10 @@ function detailsCheck(email: string, password: string,
   }
 
   // Email cannot be duplicated
-  for (const user of users) if (user.email === email) {
-    return { error: 'Email is currently used by another user' };
+  for (const user of users) {
+    if (user.email === email) {
+      return { error: 'Email is currently used by another user' };
+    }
   }
 
   // No errors, hence details are valid
@@ -125,8 +131,12 @@ export function adminUserDetailsEdit(token: number, email: string,
   nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
   // ERROR CHECKING
   const user = getUser(token, getData());
-  if (!user) return { error: 'Token is empty or invalid (does not refer to ' +
-    'valid logged in user session)' };
+  if (!user) {
+    return {
+      error: 'Token is empty or invalid (does not refer to ' +
+    'valid logged in user session)'
+    };
+  }
 
   const users = getData().users;
   getData().users.splice(users.indexOf(user), 1);
@@ -262,8 +272,12 @@ export function adminAuthLogout(token: number):
   ErrorObject | Record<string, never> {
   // Finds the user using the token, undefined is returned if not found
   const session = getSession(token, getData().sessions);
-  if (!session) return { error: 'Token is empty or invalid (does not refer ' +
-    'to valid logged in user session)' };
+  if (!session) {
+    return {
+      error: 'Token is empty or invalid (does not refer ' +
+    'to valid logged in user session)'
+    };
+  }
 
   session.is_valid = false;
   return { };
