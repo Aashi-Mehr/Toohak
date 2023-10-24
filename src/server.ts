@@ -9,6 +9,8 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 
+import data from './data.json';
+
 import {
   adminAuthLogin,
   adminAuthRegister,
@@ -34,6 +36,7 @@ import {
 } from './question';
 
 import { clear } from './other.js';
+import { getData, setData } from './dataStore';
 
 // Set up web app
 const app = express();
@@ -75,6 +78,10 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
+
+  fs.writeFile('./data.json', JSON.stringify(getData()), (err) => {
+    if (err) return res.status(404).json(response);
+  });
 });
 
 // adminAuthLogin
@@ -84,12 +91,15 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
+
+  fs.writeFile('./data.json', JSON.stringify(getData()), (err) => {
+    if (err) return res.status(404).json(response);
+  });
 });
 
 // adminUserDetails
 app.get('/v1/admin/user/details', (req: Request, res: Response) => {
-  let { token } = req.body;
-  token = parseInt(token);
+  const token = parseInt(req.query.token as string);
   const response = adminUserDetails(token);
 
   if ('error' in response) return res.status(400).json(response);
@@ -98,32 +108,43 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
 
 // adminAuthLogout
 app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
-  let { token } = req.body;
-  token = parseInt(token);
+  const token = parseInt(req.query.token as string);
   const response = adminAuthLogout(token);
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
+
+  fs.writeFile('./data.json', JSON.stringify(getData()), (err) => {
+    if (err) return res.status(404).json(response);
+  });
 });
 
 // adminUserDetailsEdit
 app.put('/v1/admin/user/details', (req: Request, res: Response) => {
-  let { token, email, nameFirst, nameLast } = req.body;
-  token = parseInt(token);
+  const { email, nameFirst, nameLast } = req.body;
+  const token = parseInt(req.query.token as string);
   const response = adminUserDetailsEdit(token, email, nameFirst, nameLast);
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
+
+  fs.writeFile('./data.json', JSON.stringify(getData()), (err) => {
+    if (err) return res.status(404).json(response);
+  });
 });
 
 // adminUserPasswordsEdit
 app.put('/v1/admin/user/password', (req: Request, res: Response) => {
-  let { token, oldPassword, newPassword } = req.body;
-  token = parseInt(token);
+  const { oldPassword, newPassword } = req.body;
+  const token = parseInt(req.query.token as string);
   const response = adminUserPasswordEdit(token, oldPassword, newPassword);
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
+
+  fs.writeFile('./data.json', JSON.stringify(getData()), (err) => {
+    if (err) return res.status(404).json(response);
+  });
 });
 
 // ====================================================================
@@ -132,32 +153,33 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
 
 // adminQuizCreate
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
-  const { token, name, description } = req.body;
+  const { name, description } = req.body;
+  const token = parseInt(req.query.token as string);
   const response = adminQuizCreate(token, name, description);
 
   if ('error' in response) return res.status(400).json(response);
-  if (token === '') return res.status(401).json(response);
   res.json(response);
+
+  fs.writeFile('./data.json', JSON.stringify(getData()), (err) => {
+    if (err) return res.status(404).json(response);
+  });
 });
 
 // adminQuizInfo
 app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  let { token } = req.body;
-  token = parseInt(token);
+  const token = parseInt(req.query.token as string);
   const quizId = req.params.quizid;
   const response = adminQuizInfo(token, parseInt(quizId));
 
   if ('No such quiz' in response) return res.status(400).json(response);
-  if (token === '') return res.status(401).json(response);
   if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
   res.json(response);
 });
 
 // adminQuizList
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
-  const { token } = req.query;
-  const userId = parseInt(token as string);
-  const response = adminQuizList(userId);
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizList(token);
 
   if ('error' in response) return res.status(401).json(response);
   res.json(response);
@@ -165,16 +187,19 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
 
 // adminQuizDescriptionUpdate
 app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
-  let { token, description } = req.body;
-  token = parseInt(token);
+  const { description } = req.body;
+  const token = parseInt(req.query.token as string);
   const quizId = parseInt(req.params.quizid);
   const response = adminQuizDescriptionUpdate(token, quizId, description);
 
-  if (token === '') return res.status(401).json(response);
   if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
   if ('error' in response) return res.status(400).json(response);
 
   res.json(response);
+
+  fs.writeFile('./data.json', JSON.stringify(getData()), (err) => {
+    if (err) return res.status(404).json(response);
+  });
 });
 
 // ====================================================================
@@ -183,16 +208,18 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 
 // adminQuestionCreate
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
-  let { token, questionBody } = req.body;
-  token = parseInt(token);
-  const quizId = parseInt(req.params.quizid);
+  const { questionBody } = req.body;
+  const token = parseInt(req.query.token as string); const quizId = parseInt(req.params.quizid);
   const response = adminQuestionCreate(token, quizId, questionBody);
 
-  if (token === '' || 'Invalid user ID' in response) return res.status(401).json(response);
   if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
   if ('error' in response) return res.status(400).json(response);
 
   res.json(response);
+
+  fs.writeFile('./data.json', JSON.stringify(getData()), (err) => {
+    if (err) return res.status(404).json(response);
+  });
 });
 
 // ====================================================================
@@ -204,6 +231,10 @@ app.delete('/v1/clear', (req: Request, res: Response) => {
   const response = clear();
 
   res.json(response);
+
+  fs.writeFile('./data.json', JSON.stringify(getData()), (err) => {
+    if (err) return res.status(404).json(response);
+  });
 });
 
 // ====================================================================
@@ -229,6 +260,9 @@ app.use((req: Request, res: Response) => {
 const server = app.listen(PORT, HOST, () => {
   // DO NOT CHANGE THIS LINE
   console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
+
+  // On start, import all data from data.json and set it to data in dataStore
+  setData(data);
 });
 
 // For coverage, handle Ctrl+C gracefully

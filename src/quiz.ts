@@ -131,6 +131,7 @@ function adminQuizRemove(token: number, quizId: number):
 function adminQuizInfo(token: number, quizId: number):
   QuizDetailed | ErrorObject {
   // Ensuring the login session is valid
+
   const user = getUser(token, getData());
   if (!user) return { error: 'No such token' };
 
