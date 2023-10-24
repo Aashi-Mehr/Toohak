@@ -73,13 +73,13 @@ function requestRegister(email: string, password: string, nameFirst: string,
 }
 
 // QUIZ CREATE Define wrapper function
-function requestQuiz(authUserId: number, name: string, description: any): QuizId {
+function requestQuiz(token: number, name: string, description: any): QuizId {
   const res = request(
     'POST',
     SERVER_URL + '/v1/admin/quiz',
     {
       json: {
-        authUserId: authUserId,
+        token: token,
         name: name,
         description: description
       }
@@ -92,10 +92,10 @@ function requestQuiz(authUserId: number, name: string, description: any): QuizId
 }
 
 // QUIZ LIST Define wrapper function
-function requestList(authUserId: number | string): QuizList | ErrorObject {
+function requestList(token: number | string): QuizList | ErrorObject {
   const res = request(
     'GET',
-    `${SERVER_URL}/v1/admin/quiz/list?authUserId=${authUserId}`,
+    `${SERVER_URL}/v1/admin/quiz/list?token=${token}`,
     {}
   );
   const result = JSON.parse(res.body as string);
@@ -104,14 +104,14 @@ function requestList(authUserId: number | string): QuizList | ErrorObject {
 }
 
 /* // QUIZ REMOVE Define wrapper function
-function requestRemove(authUserId: number, quizId: number):
+function requestRemove(token: number, quizId: number):
   ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
     SERVER_URL + '/v1/admin/quiz/' + quizId,
     {
       json: {
-        authUserId: authUserId
+        token: token
       }
     }
   );
@@ -119,13 +119,13 @@ function requestRemove(authUserId: number, quizId: number):
 } */
 
 // QUIZ INFO Define wrapper function
-function requestInfo(authUserId: number | string, quizId: number): QuizDetailed {
+function requestInfo(token: number | string, quizId: number): QuizDetailed {
   const res = request(
     'GET',
     SERVER_URL + '/v1/admin/quiz/' + quizId,
     {
       json: {
-        authUserId: authUserId
+        token: token
       }
     }
   );
@@ -150,7 +150,7 @@ beforeEach(() => {
 
 // Test function : adminQuizList
 describe('adminQuizList', () => {
-  /* let userId: AuthUserId; */
+  /* let userId: token; */
   let quiz: QuizList | ErrorObject;
   /* let quizId: number; */
 

@@ -26,7 +26,7 @@ import {
   // comment :/)
   // adminQuizRemove,
   // adminQuizNameUpdate,
-  // adminQuizDescriptionUpdate
+  adminQuizDescriptionUpdate
 } from './quiz';
 
 import { clear } from './other.js';
@@ -128,34 +128,48 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
 
 // adminQuizCreate
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
-  const { authUserId, name, description } = req.body;
-  const response = adminQuizCreate(authUserId, name, description);
+  const { token, name, description } = req.body;
+  const response = adminQuizCreate(token, name, description);
 
   if ('error' in response) return res.status(400).json(response);
-  if (authUserId === '') return res.status(401).json(response);
+  if (token === '') return res.status(401).json(response);
   res.json(response);
 });
 
 // adminQuizInfo
 app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  let { authUserId } = req.body;
-  authUserId = parseInt(authUserId);
+  let { token } = req.body;
+  token = parseInt(token);
   const quizId = req.params.quizid;
-  const response = adminQuizInfo(authUserId, parseInt(quizId));
+  const response = adminQuizInfo(token, parseInt(quizId));
 
   if ('No such quiz' in response) return res.status(400).json(response);
-  if (authUserId === '') return res.status(401).json(response);
+  if (token === '') return res.status(401).json(response);
   if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
   res.json(response);
 });
 
 // adminQuizList
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
-  const { authUserId } = req.query;
-  const userId = parseInt(authUserId as string);
+  const { token } = req.query;
+  const userId = parseInt(token as string);
   const response = adminQuizList(userId);
 
   if ('error' in response) return res.status(401).json(response);
+  res.json(response);
+});
+
+// adminQuizDescriptionUpdate
+app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
+  let { token, description } = req.body;
+  token = parseInt(token);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizDescriptionUpdate(token, quizId, description);
+
+  if (token === '') return res.status(401).json(response);
+  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  if ('error' in response) return res.status(400).json(response);
+  
   res.json(response);
 });
 
