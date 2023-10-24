@@ -1,9 +1,9 @@
 import {
-	requestClear,
-	requestRegister,
-	requestQuizCreate,
-	requestQuizInfo,
-	requestQuizTransfer
+  requestClear,
+  requestRegister,
+  requestQuizCreate,
+  requestQuizInfo,
+  requestQuizTransfer
 } from './testHelper';
 
 /// ////////////////////////////////////////////////////////////////////////////
@@ -21,66 +21,64 @@ beforeEach(() => {
 });
 
 describe('requestQuizTransfer', () => {
+  let token1: number;
+  let token2: number;
+  let quizId1: number;
 
-	let token1: number;
-	let token2: number;
-	let quizId1: number;
+  beforeEach(() => {
+    token1 = requestRegister(email1, 'abcd1234', 'first', 'last').token;
+    token2 = requestRegister(email2, 'abcd1234', 'first', 'last').token;
+    quizId1 = requestQuizCreate(token1, 'first last', 'fist_test').quizId;
+  });
 
-	beforeEach(() => {
-		token1 = requestRegister(email1, 'abcd1234', 'first', 'last').token;
-		token2 = requestRegister(email2, 'abcd1234', 'first', 'last').token;
-		quizId1 = requestQuizCreate(token1, 'first last', 'fist_test').quizId;
-	});
+  describe('ERROR Tests', () => {
+    test('token is not a valid user', () => {
+      // token is not an integer
+      const result = requestQuizTransfer(invalidUser, quizId1, email2);
+      expect(result).toMatchObject(ERROR);
+    });
 
-	describe('ERROR Tests', () => {
+    test('Quiz ID does not refer to a valid quiz', () => {
+      const result = requestQuizTransfer(token1, quizId, email2);
 
-		test('token is not a valid user', () => {
-			// token is not an integer
-			const result = requestQuizTransfer(invalidUser, quizId1, email2);
-			expect(result).toMatchObject(ERROR);
-		});
+      expect(result).toMatchObject(ERROR);
+    });
 
-		test('Quiz ID does not refer to a valid quiz', () => {
-			const result = requestQuizTransfer(token1, quizId, email2);
+    test('Quiz ID does not refer to a quiz that this user owns', () => {
+      const quizId2 = requestQuizCreate(token2, 'first last', 'fist_test').quizId;
 
-			expect(result).toMatchObject(ERROR);
-		});
+      const result = requestQuizTransfer(token1, quizId2, email2);
 
-		test('Quiz ID does not refer to a quiz that this user owns', () => {
-			const quizId2 = requestQuizCreate(token2, 'first last', 'fist_test').quizId;
+      expect(result).toMatchObject(ERROR);
+    });
 
-			const result = requestQuizTransfer(token1, quizId2, email2);
+    test('userEmail is not a real user', () => {
+      const result = requestQuizTransfer(token1, quizId1, 'invalid@gmail.com');
+      expect(result).toMatchObject(ERROR);
+    });
 
-			expect(result).toMatchObject(ERROR);
-		});
+    test('userEmail is the current logged in user', () => {
+      const result = requestQuizTransfer(token1, quizId1, email1);
+      expect(result).toMatchObject(ERROR);
+    });
 
-		test('userEmail is not a real user', () => {
-			const result = requestQuizTransfer(token1, quizId1, 'invalid@gmail.com');
-			expect(result).toMatchObject(ERROR);
-		});
+    test('Quiz ID refers to a quiz that has a name that is already used by the target user', () => {
+      requestQuizCreate(token2, 'first last', 'fist_test');
+      const result = requestQuizTransfer(token1, quizId1, email2);
+      expect(result).toMatchObject(ERROR);
+    });
+  });
 
-		test('userEmail is the current logged in user', () => {
-			const result = requestQuizTransfer(token1, quizId1, email1);
-			expect(result).toMatchObject(ERROR);
-		});
+  describe('VALID Tests', () => {
+    test('successful case', () => {
+      const result = requestQuizTransfer(token1, quizId1, email2);
+      expect(result).toMatchObject({});
+    });
 
-		test('Quiz ID refers to a quiz that has a name that is already used by the target user', () => {
-			requestQuizCreate(token2, 'first last', 'fist_test');
-			const result = requestQuizTransfer(token1, quizId1, email2);
-			expect(result).toMatchObject(ERROR);
-		});
-	});
-
-	describe('VALID Tests', () => {
-		test('successful case', () => {
-			const result = requestQuizTransfer(token1, quizId1, email2);
-			expect(result).toMatchObject({});
-		});
-
-		test('successful transferred', () => {
-			requestQuizTransfer(token1, quizId1, email2);
-			expect(requestQuizInfo(token1, quizId1)).toMatchObject(ERROR);
-			expect(requestQuizInfo(token2, quizId1)).not.toMatchObject(ERROR);
-		});
-	});
+    test('successful transferred', () => {
+      requestQuizTransfer(token1, quizId1, email2);
+      expect(requestQuizInfo(token1, quizId1)).toMatchObject(ERROR);
+      expect(requestQuizInfo(token2, quizId1)).not.toMatchObject(ERROR);
+    });
+  });
 });

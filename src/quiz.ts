@@ -228,16 +228,6 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
   return { error: 'Quiz not owned by user' };
 }
 
-// last edit: 18/10/2023 by Zhejun Gu
-export {
-  adminQuizList,
-  adminQuizInfo,
-  adminQuizCreate,
-  adminQuizRemove,
-  adminQuizNameUpdate,
-  adminQuizDescriptionUpdate
-};
-
 /** adminQuizTransfer
   * Transfer a quiz from one user to another user
   *
