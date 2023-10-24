@@ -114,9 +114,6 @@ describe('adminAuthRegister', () => {
   });
 });
 
-/**
-  * Potentialld add more tests for valid cases
-  */
 describe('adminAuthLogin', () => {
   let result: Token;
 
@@ -562,7 +559,9 @@ describe('adminUserPasswordEdit', () => {
   });
 
   test('INVALID Password: Used before', () => {
-    result = requestPasswordEdit(token, 'Val1dPassword', 'newpass');
+    requestPasswordEdit(token, 'Val1dPassword', 'newpass123');
+    requestPasswordEdit(token, 'newpass123', 'newnewpass123');
+    result = requestPasswordEdit(token, 'newnewpass123', 'Val1dPassword');
     expect(result).toMatchObject({ error: expect.any(String) });
   });
 
