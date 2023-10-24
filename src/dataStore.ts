@@ -4,6 +4,22 @@ interface ErrorObject { error: string }
 // INTERFACES Auth
 interface AuthUserId { authUserId: number }
 
+interface AnswerBody {
+  answer: string,
+  correct: boolean,
+}
+
+interface QuestionBody {
+  question: string,
+  duration: number,
+  points: number,
+  answers: AnswerBody[]
+}
+
+interface QuestionId {
+  questionId: number
+}
+
 interface User {
   userId: number,
   name: string,
@@ -44,11 +60,19 @@ interface QuizDetailed {
 
 interface QuizList { quizzes: QuizBrief[] }
 
+interface Answer {
+  answerId: number,
+  answer: string,
+  colour: string,
+  correct: boolean
+}
+
 interface Question {
+  questionId: number,
   question: string,
   duration: number,
   points: number,
-  answer: string,
+  answer: Answer[],
 }
 
 interface QuizAdd {
@@ -215,5 +239,7 @@ export {
   QuizAdd,
   SessionAdd,
   Token,
-  Datastore
+  Datastore,
+  QuestionBody,
+  QuestionId,
 };

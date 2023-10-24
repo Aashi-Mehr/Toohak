@@ -22,5 +22,8 @@ tests:
 
 linting:
   stage: checks
+  only:
+    - master
+    - merge_requests
   script:
     - npm run lint
