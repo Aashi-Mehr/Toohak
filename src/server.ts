@@ -121,7 +121,7 @@ app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
 
 // adminUserDetailsEdit
 app.put('/v1/admin/user/details', (req: Request, res: Response) => {
-  let { email, nameFirst, nameLast } = req.body;
+  const { email, nameFirst, nameLast } = req.body;
   const token = parseInt(req.query.token as string);
   const response = adminUserDetailsEdit(token, email, nameFirst, nameLast);
 
@@ -135,7 +135,7 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
 
 // adminUserPasswordsEdit
 app.put('/v1/admin/user/password', (req: Request, res: Response) => {
-  let { oldPassword, newPassword } = req.body;
+  const { oldPassword, newPassword } = req.body;
   const token = parseInt(req.query.token as string);
   const response = adminUserPasswordEdit(token, oldPassword, newPassword);
 
@@ -187,7 +187,7 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
 
 // adminQuizDescriptionUpdate
 app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
-  let { description } = req.body;
+  const { description } = req.body;
   const token = parseInt(req.query.token as string);
   const quizId = parseInt(req.params.quizid);
   const response = adminQuizDescriptionUpdate(token, quizId, description);
@@ -208,8 +208,8 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 
 // adminQuestionCreate
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
-  let { questionBody } = req.body;
-  const token = parseInt(req.query.token as string);  const quizId = parseInt(req.params.quizid);
+  const { questionBody } = req.body;
+  const token = parseInt(req.query.token as string); const quizId = parseInt(req.params.quizid);
   const response = adminQuestionCreate(token, quizId, questionBody);
 
   if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }

@@ -1,10 +1,9 @@
-import request from 'sync-request-curl';
-import { port, url } from '../config.json';
 import {
   Token,
   ErrorObject,
   Details
 } from '../dataStore';
+
 import {
   requestRegister,
   requestLogin,
@@ -14,8 +13,6 @@ import {
   requestPasswordEdit,
   requestClear
 } from './testHelper';
-
-const SERVER_URL = `${url}:${port}`;
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
