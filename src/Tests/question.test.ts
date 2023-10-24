@@ -1,0 +1,466 @@
+import {
+  requestClear,
+  requestRegister,
+  requestQuizCreate,
+  requestQuizInfo,
+	requestQuestionCreate
+} from './testHelper';
+
+/// ////////////////////////////////////////////////////////////////////////////
+/// //////////////////////////////// Tests /////////////////////////////////////
+/// ////////////////////////////////////////////////////////////////////////////
+
+const ERROR = { error: expect.any(String) };
+
+const invalidUser = "10000";
+const quizId = -4123214;
+const description = 'New description';
+const invlalidQuestionString1 = "asdf";
+const invlalidQuestionString2 = "qweasdzsfhkngkujdfhgujklhgjbfrtyfghvbnsadsafsafsafc";
+const questionString = "How to call a person without a body and a nose?";
+
+const answers = [
+	{
+		answer: "Nobody Knows",
+		correct: true
+	},
+	{
+		answer: "Onebody Knows",
+		correct: false
+	}
+]
+
+const answers2 = [
+	{
+		answer: "Nobody Knows",
+		correct: true
+	},
+	{
+		answer: "Onebody Knows",
+		correct: false
+	},
+	{
+		answer: "Twobody Knows",
+		correct: true
+	},
+	{
+		answer: "Threebody Knows",
+		correct: false
+	}
+]
+
+const answers3 = [
+	{
+		answer: "Nobody Knows",
+		correct: true
+	},
+	{
+		answer: "Onebody Knows",
+		correct: true
+	},
+	{
+		answer: "Twobody Knows",
+		correct: true
+	},
+	{
+		answer: "Threebody Knows",
+		correct: true
+	}
+]
+
+const invalidAnswerLength1 = [
+	{
+		answer: "Nobody Knows",
+		correct: true
+	}
+]
+
+const invalidAnswerLength2 = [
+	{
+		answer: "Nobody Knows",
+		correct: true
+	},
+	{
+		answer: "Onebody Knows",
+		correct: false
+	},
+	{
+		answer: "Twobody Knows",
+		correct: false
+	},
+	{
+		answer: "Threebody Knows",
+		correct: false
+	},
+	{
+		answer: "Fourbody Knows",
+		correct: false
+	},
+	{
+		answer: "Fivebody Knows",
+		correct: false
+	},
+	{
+		answer: "Sixbody Knows",
+		correct: false
+	}
+]
+
+const answersInvliadStringLength1 = [
+	{
+		answer: "Nobody Knows",
+		correct: true
+	},
+	{
+		answer: "",
+		correct: false
+	},
+	{
+		answer: "Twobody Knows",
+		correct: false
+	},
+	{
+		answer: "Threebody Knows",
+		correct: false
+	}
+]
+
+const answersInvliadStringLength2 = [
+	{
+		answer: "Nobody Knows",
+		correct: true
+	},
+	{
+		answer: "Onebody Knows",
+		correct: false
+	},
+	{
+		answer: "Twobody Knows",
+		correct: false
+	},
+	{
+		answer: "Threebody Knowsssssssssssssssss",
+		correct: false
+	}
+]
+
+const answersDuplicateAnswers = [
+	{
+		answer: "Nobody Knows",
+		correct: true
+	},
+	{
+		answer: "Onebody Knows",
+		correct: false
+	},
+	{
+		answer: "Nobody Knows",
+		correct: false
+	},
+	{
+		answer: "Threebody Knows",
+		correct: false
+	}
+]
+
+const answersNoCorrect = [
+	{
+		answer: "Nobody Knows",
+		correct: false
+	},
+	{
+		answer: "Onebody Knows",
+		correct: false
+	},
+	{
+		answer: "Twobody Knows",
+		correct: false
+	},
+	{
+		answer: "Threebody Knows",
+		correct: false
+	}
+]
+
+
+const questionBody = {
+	question: {
+		question: questionString,
+		duration: 60,
+		points: 5,
+		answers: answers,
+	}
+}
+
+const questionBody2 = {
+	question: {
+		question: questionString,
+		duration: 30,
+		points: 7,
+		answers: answers2,
+	}
+}
+
+const questionBody3 = {
+	question: {
+		question: questionString,
+		duration: 12,
+		points: 3,
+		answers: answers3,
+	}
+}
+
+const questionBodyNegativeDuration = {
+	question: {
+		question: questionString,
+		duration: -1,
+		points: 5,
+		answers: answers,
+	}
+}
+
+const questionBodyInvalidPoint1 = {
+	question: {
+		question: questionString,
+		duration: 60,
+		points: 0,
+		answers: answers,
+	}
+}
+
+const questionBodyInvalidPoint2 = {
+	question: {
+		question: questionString,
+		duration: 60,
+		points: 11,
+		answers: answers,
+	}
+}
+
+
+beforeEach(() => {
+  requestClear();
+});
+
+describe('questionCreate', () => {
+	
+	describe('ERROR Tests 401 403', () => {
+		test('token is not a valid user', () => {
+			// token is not an integer
+			const result = requestQuestionCreate(invalidUser, quizId, questionBody);
+			expect(result).toMatchObject(ERROR);
+		});
+
+		test('Quiz ID does not refer to a valid quiz', () => {
+			const token1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
+			const result = requestQuestionCreate(token1, quizId, questionBody);
+
+			expect(result).toMatchObject(ERROR);
+		});
+
+		test('Quiz ID does not refer to a quiz that this user owns', () => {
+			const token1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
+			const token2 = requestRegister('first.last2@gmail.com', 'abcd1234', 'first', 'last').token;
+			const quizId1 = requestQuizCreate(token2, 'first last', 'fist_test').quizId;
+
+			const result = requestQuestionCreate(token1, quizId1, questionBody);
+
+			expect(result).toMatchObject(ERROR);
+		});
+	});
+
+	describe('ERROR Tests 400', () => {
+		let token1;
+		let quizId1;
+
+		beforeEach(() => {
+			token1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
+			quizId1 = requestQuizCreate(token2, 'first last', 'fist_test').quizId;
+		});
+
+		test('Question string is less than 5 characters in length', () => {
+			const question = {
+				token: token1,
+				questionBody: {
+					question: invlalidQuestionString1,
+					duration: 60,
+					points: 5,
+					answers: answers,
+				}
+			}
+			const result = requestQuestionCreate(token1, quizId1, question);
+			expect(result).toMatchObject(ERROR);
+		});
+
+		test('Question string is greater than 50 characters in length', () => {
+			const question = {
+				token: token1,
+				questionBody: {
+					question: invlalidQuestionString2,
+					duration: 60,
+					points: 5,
+					answers: answers,
+				}
+			}
+			const result = requestQuestionCreate(token1, quizId1, question);
+			expect(result).toMatchObject(ERROR);
+		});
+
+		test('The question has less than 2 answers', () => {
+			const question = {
+				token: token1,
+				questionBody: {
+					question: questionString,
+					duration: 60,
+					points: 5,
+					answers: invalidAnswerLength1,
+				}
+			}
+			const result = requestQuestionCreate(token1, quizId1, question);
+			expect(result).toMatchObject(ERROR);
+		});
+
+		test('The question has more than 6 answers', () => {
+			const question = {
+				token: token1,
+				questionBody: {
+					question: questionString,
+					duration: 60,
+					points: 5,
+					answers: invalidAnswerLength2,
+				}
+			}
+			const result = requestQuestionCreate(token1, quizId1, question);
+			expect(result).toMatchObject(ERROR);
+		});
+
+		test('The question duration is not a positive number', () => {
+			const result = requestQuestionCreate(token1, quizId1, questionBodyNegativeDuration);
+			expect(result).toMatchObject(ERROR);
+		});
+
+		test('The sum of the question durations in the quiz exceeds 3 minutes', () => {
+			// question body has a length of 60 seconds
+			for (let i = 0; i < 3; i++) {
+				const result = requestQuestionCreate(token1, quizId1, questionBody);
+				expect(result).not.toMatchObject(ERROR);
+			}
+
+			const result = requestQuestionCreate(token1, quizId1, questionBody);
+			expect(result).toMatchObject(ERROR);
+			
+		});
+
+		test('The points awarded for the question are less than 1', () => {
+			const result = requestQuestionCreate(token1, quizId1, questionBodyInvalidPoint1);
+			expect(result).toMatchObject(ERROR);
+		});
+
+		test('The points awarded for the question are greater than 10', () => {
+			const result = requestQuestionCreate(token1, quizId1, questionBodyInvalidPoint2);
+			expect(result).toMatchObject(ERROR);
+		});
+
+		test('The length of any answer is shorter than 1 character long', () => {
+			const question = {
+				token: token1,
+				questionBody: {
+					question: questionString,
+					duration: 60,
+					points: 5,
+					answers: answersInvliadStringLength1,
+				}
+			}
+			const result = requestQuestionCreate(token1, quizId1, question);
+			expect(result).toMatchObject(ERROR);
+		});
+
+		test('The length of any answer is longer than 30 characters long', () => {
+			const question = {
+				token: token1,
+				questionBody: {
+					question: questionString,
+					duration: 60,
+					points: 5,
+					answers: answersInvliadStringLength2,
+				}
+			}
+			const result = requestQuestionCreate(token1, quizId1, question);
+			expect(result).toMatchObject(ERROR);
+		});
+
+		test('Any answer strings are duplicates of one another (within the same question)', () => {
+			const question = {
+				token: token1,
+				questionBody: {
+					question: questionString,
+					duration: 60,
+					points: 5,
+					answers: answersDuplicateAnswers,
+				}
+			}
+			const result = requestQuestionCreate(token1, quizId1, question);
+			expect(result).toMatchObject(ERROR);
+		});
+
+		test('There are no correct answers', () => {
+			const question = {
+				token: token1,
+				questionBody: {
+					question: questionString,
+					duration: 60,
+					points: 5,
+					answers: answersNoCorrect,
+				}
+			}
+			const result = requestQuestionCreate(token1, quizId1, question);
+			expect(result).toMatchObject(ERROR);
+		});
+	});
+
+	describe('VALID Tests', () => {
+		let token1;
+		let quizId1;
+		beforeEach(() => {
+			token1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
+			quizId1 = requestQuizCreate(token2, 'first last', 'fist_test').quizId;
+		});
+
+		test('return question id', () => {
+			const result = requestQuestionCreate(token1, quizId1, questionBody);
+			expect(result).toMatchObject({questionId: expect.any(Number)});
+		});
+
+		test('return unique question id', () => {
+			const result = requestQuestionCreate(token1, quizId1, questionBody);
+			const result2 = requestQuestionCreate(token1, quizId1, questionBody2);
+			expect(result).toMatchObject(result2);
+		});
+
+		test('successfully create the question with correct infos', () => {
+			const questionId = requestQuestionCreate(token1, quizId1, questionBody).questionId;
+			const result = requestQuizInfo(token1, quizId1);
+			expect(result.questions[0]).toMatchObject({
+				questionId: questionId,
+				question: questionString,
+				duration: 60,
+				points: 5,
+				answers: [
+					{
+						answerId: expect.any(Number),
+						answer: "Nobody Knows",
+						correct: true,
+						colour: expect.any(String)
+
+					},
+					{
+						answerId: expect.any(Number),
+						answer: "Onebody Knows",
+						correct: false,
+						colour: expect.any(String)
+					}
+				]
+			});
+		});
+	});
+});

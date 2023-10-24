@@ -1,20 +1,20 @@
 
 import request from 'sync-request-curl';
 import { port, url } from '../config.json';
-import { Token, QuizId, QuizDetailed } from '../dataStore';
+import { Token, QuizId, QuizDetailed, QuestionBody, QuestionId } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
 
 export function requestClear() {
-	const res = request(
-		'DELETE',
-			SERVER_URL + '/v1/clear',
-				{
-					qs: {}
-				}
-	);
-	
-	return JSON.parse(res.body.toString());
+  const res = request(
+    'DELETE',
+    SERVER_URL + '/v1/clear',
+    {
+      qs: {}
+    }
+  );
+
+  return JSON.parse(res.body.toString());
 }
 
 export function requestRegister(email: string, password: string, nameFirst: string, nameLast: string): Token {
@@ -70,7 +70,21 @@ export function requestQuizDescriptionUpdate(token: number | string, quizId: num
     {
       json: {
         token: token,
-				description: description,
+        description: description,
+      }
+    }
+  );
+  return JSON.parse(res.body.toString());
+}
+
+export function requestQuestionCreate(token: number | string, quizId: number, questionBody: QuestionBody): QuestionId {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/question',
+    {
+      json: {
+        token: token,
+        questionBody: questionBody,
       }
     }
   );

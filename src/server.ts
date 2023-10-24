@@ -29,6 +29,10 @@ import {
   adminQuizDescriptionUpdate
 } from './quiz';
 
+import {
+  adminQuestionCreate
+} from './question';
+
 import { clear } from './other.js';
 
 // Set up web app
@@ -169,7 +173,25 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   if (token === '') return res.status(401).json(response);
   if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
   if ('error' in response) return res.status(400).json(response);
-  
+
+  res.json(response);
+});
+
+// ====================================================================
+//  ========================= QUESTION FUNCTIONS ======================
+// ====================================================================
+
+// adminQuestionCreate
+app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
+  let { token, questionBody } = req.body;
+  token = parseInt(token);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuestionCreate(token, quizId, questionBody);
+
+  if (token === '') return res.status(401).json(response);
+  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  if ('error' in response) return res.status(400).json(response);
+
   res.json(response);
 });
 

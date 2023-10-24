@@ -4,6 +4,23 @@ interface ErrorObject { error: string }
 // INTERFACES Auth
 interface AuthUserId { authUserId: number }
 
+interface Ansewr {
+  answer: string,
+  correct: boolean,
+}
+
+interface QuestionBody {
+  question: string,
+  duration: number,
+  email: number,
+  points: number,
+  answers: Answer
+}
+
+interface QuestionId {
+  questionId: number
+}
+
 interface User {
   userId: number,
   name: string,
@@ -215,5 +232,7 @@ export {
   QuizAdd,
   SessionAdd,
   Token,
-  Datastore
+  Datastore,
+  QuestionBody,
+  QuestionId,
 };
