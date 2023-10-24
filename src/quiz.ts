@@ -236,7 +236,7 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
   * @returns { QuizBrief } - If the details given are valid
   * @returns { ErrorObject } - If the details given are invalid
   */
-function adminQuizTrash(token: number, quizId: number):
+function adminQuizTrash(token: number):
   ErrorObject | QuizBrief {
   // Check if authUserId is a positive integer
   const user = getUser(token, getData());
