@@ -177,6 +177,20 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// adminQuizTransfer
+app.put('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  let { token, userEmail } = req.body;
+  token = parseInt(token);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizTransfer(token, quizId, userEmail);
+
+  if (token === '') return res.status(401).json(response);
+  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  if ('error' in response) return res.status(400).json(response);
+
+  res.json(response);
+});
+
 // ====================================================================
 //  ========================= QUESTION FUNCTIONS ======================
 // ====================================================================

@@ -90,3 +90,17 @@ export function requestQuestionCreate(token: number | string, quizId: number, qu
   );
   return JSON.parse(res.body.toString());
 }
+
+export function requestQuestionCreate(token: number | string, userEmail: string) {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/transfer',
+    {
+      json: {
+        token: token,
+        userEmail: userEmail,
+      }
+    }
+  );
+  return JSON.parse(res.body.toString());
+}
