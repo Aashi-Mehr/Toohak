@@ -91,7 +91,7 @@ export function requestQuestionCreate(token: number | string, quizId: number, qu
   return JSON.parse(res.body.toString());
 }
 
-export function requestQuestionCreate(token: number | string, userEmail: string) {
+export function requestQuizTransfer(token: number | string, quizId: number, userEmail: string) {
   const res = request(
     'POST',
     SERVER_URL + '/v1/admin/quiz/' + quizId + '/transfer',

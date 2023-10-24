@@ -26,7 +26,8 @@ import {
   // comment :/)
   // adminQuizRemove,
   // adminQuizNameUpdate,
-  adminQuizDescriptionUpdate
+  adminQuizDescriptionUpdate,
+  adminQuizTransfer
 } from './quiz';
 
 import {
@@ -178,7 +179,7 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 });
 
 // adminQuizTransfer
-app.put('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   let { token, userEmail } = req.body;
   token = parseInt(token);
   const quizId = parseInt(req.params.quizid);
