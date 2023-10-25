@@ -14,6 +14,7 @@ import {
 
 const SERVER_URL = `${url}:${port}`;
 
+// DELETE CLEAR Define wrapper function
 export function requestClear() {
   const res = request(
     'DELETE',
@@ -132,7 +133,7 @@ export function requestPasswordEdit(token: number, oldPass: string, newPass: str
   return JSON.parse(res.body.toString());
 }
 
-// QUIZ CREATE Define wrapper function
+// POST QUIZ CREATE Define wrapper function
 export function requestQuizCreate(token: number, name: string,
   description: any): QuizId {
   const res = request(
@@ -153,6 +154,7 @@ export function requestQuizCreate(token: number, name: string,
   else return result;
 }
 
+// GET QUIZ INFO Define wrapper function
 export function requestQuizInfo(token: number | string, quizId: number):
   QuizDetailed {
   const res = request(
@@ -165,7 +167,7 @@ export function requestQuizInfo(token: number | string, quizId: number):
   return JSON.parse(res.body.toString());
 }
 
-// QUIZ LIST Define wrapper function
+// GET QUIZ LIST Define wrapper function
 export function requestQuizList(token: number | string): QuizList | ErrorObject {
   const res = request(
     'GET',
@@ -180,6 +182,7 @@ export function requestQuizList(token: number | string): QuizList | ErrorObject 
   else return result;
 }
 
+// PUT QUIZ DESCRIPTION UODATE Define Wrapper Function
 export function requestQuizDescriptionUpdate(token: number | string,
   quizId: number, description: string) {
   const res = request(
@@ -234,6 +237,36 @@ export function requestQuestionCreate(token: number | string,
       json: {
         token: token,
         questionBody: questionBody,
+      }
+    }
+  );
+  return JSON.parse(res.body.toString());
+}
+
+// GET QUIZ TRASH Define wrapper function
+export function requestQuizTrash(token: number): QuizList | ErrorObject {
+  const res = request(
+    'GET',
+    SERVER_URL + '/v1/admin/quiz/trash?token=' + token,
+    {
+      qs: { }
+    }
+  );
+  // return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body as string);
+
+  if ('error' in result) { return { error: 'error' }; } else { return result; }
+}
+
+// POST QUIZ RESTORE Define wrapper function
+export function requestQuizRestore(token: number, quizId: number):
+  ErrorObject | Record<string, never> {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/restore',
+    {
+      json: {
+        token: token,
       }
     }
   );

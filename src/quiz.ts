@@ -5,7 +5,6 @@ import {
   QuizList,
   getData,
   getQuiz,
-  QuizBrief,
   getUniqueID,
   getUser
 } from './dataStore';
@@ -172,7 +171,6 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
 
   // Check if the name contains invalid, non-alphanumeric characters
   const invalidName = /[^a-zA-Z0-9 ']/.test(name);
-  console.log('The name ' + name + ' is invalid: ', invalidName);
   if (invalidName || name.length < 3 || name.length > 30) {
     return { error: 'Invalid Name' };
   }
@@ -231,11 +229,11 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
   *
   * @param { number } token - The authUserId for the user
   *
-  * @returns { QuizBrief } - If the details given are valid
+  * @returns { QuizList } - If the details given are valid
   * @returns { ErrorObject } - If the details given are invalid
   */
-function adminQuizTrash(token: number, quizId: number):
-  ErrorObject | QuizBrief {
+function adminQuizTrash(token: number):
+  ErrorObject | QuizList {
   // Check if authUserId is a positive integer
   const user = getUser(token, getData());
   if (!user) return { error: 'Invalid user ID' };
@@ -255,8 +253,52 @@ function adminQuizTrash(token: number, quizId: number):
     }
   }
 
-  // Quizzes list
+  // Return QuizList of removedQuizzes
   return { quizzes: removedQuizzes };
+}
+
+/** adminQuizRestore
+  * Restore a particular quiz from the trash back to an active quiz.
+  *
+  * @param { number } token - The authUserId for the user
+  * @param { number } quizId - The quizId for the quiz
+  *
+  * @returns { Record<string, never>  } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+function adminQuizRestore(token: number, quizId: number):
+  ErrorObject | Record<string, never> {
+  // Check if authUserId is valid
+  const user = getUser(token, getData());
+  if (!user) return { error: 'Invalid user ID' };
+
+  // Check if quizId is valid
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz) return { error: 'Quiz is not owned by user' };
+
+  // Loop through quizzes to check for existingQuizzes
+  const existingQuizzes = getData().quizzes;
+  for (const activeQuiz of existingQuizzes) {
+    if (activeQuiz.name === quiz.name &&
+      activeQuiz.authId === user.authUserId &&
+      activeQuiz.in_trash === false) {
+      // Return error if quiz name of the restored quiz is already used
+      // by another active quiz or
+      // quiz is not in trash
+      return { error: 'Quiz name is used by an active quiz' };
+    }
+  }
+
+  // Looping through to match authUserId and quizId
+  // Checking if the quiz is in trash
+  if (user.authUserId === quiz.authId && quiz.in_trash === true) {
+    quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+    quiz.in_trash = false;
+
+    return { };
+  }
+
+  return { error: 'Quiz is not in trash' };
 }
 
 // last edit: 25/10/2023 by Alya
@@ -267,5 +309,6 @@ export {
   adminQuizRemove,
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
-  adminQuizTrash
+  adminQuizTrash,
+  adminQuizRestore
 };
