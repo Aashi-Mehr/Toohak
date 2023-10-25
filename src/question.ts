@@ -167,7 +167,6 @@ export function adminQuestionDuplicate(token: number, quesId: number,
   // Get data from database
   const data = getData();
   const quiz = getQuiz(quizId, getData().quizzes);
-  /* const session = getSession(token, getData().sessions); */
 
   // Get the question asked for duplicating
   let currQues;
