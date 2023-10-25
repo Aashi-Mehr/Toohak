@@ -216,3 +216,20 @@ export function requestQuestionCreate(token: number | string,
   );
   return JSON.parse(res.body.toString());
 }
+
+// GET QUIZ TRASH Define wrapper function
+export function requestQuizTrash(token: number): QuizList | ErrorObject {
+  const res = request(
+    'GET',
+    SERVER_URL + '/v1/admin/user/details',
+    {
+      json: {
+        token: token
+      }
+    }
+  );
+//   return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body as string);
+
+  if ('error' in result) { return { error: 'error' }; } else { return result; }
+}
