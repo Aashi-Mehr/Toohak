@@ -11,11 +11,12 @@
 
 import request from 'sync-request-curl';
 import { port, url } from '../config.json';
-// import { QuizBrief } from '..dataStore';
-import { requestRegister } from '..testHelper';
-import { requestQuizTrash } from '..testHelper';
-import { requestRemove } from '..testHelper';
-import { requestQuizCreate } from '..testHelper';
+import {
+  requestRegister,
+  requestQuizTrash,
+  requestQuizRemove,
+  requestQuizCreate
+} from './testHelp';
 
 const SERVER_URL = `${url}:${port}`;
 
@@ -83,7 +84,7 @@ test('Test Viewing Removed Quiz', () => {
   const quizId: number = requestQuizCreate(11, 'Quiz 1', 'This is Quiz 1').quizId;
 
   // Remove the quiz
-  requestRemove(userId.token, quizId);
+  requestQuizRemove(userId.token, quizId);
 
   // Attempt to view the removed quiz
   const result = requestQuizTrash(userId.token);
