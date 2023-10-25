@@ -9,6 +9,8 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 
+import data from './data.json';
+
 import {
   adminAuthLogin,
   adminAuthRegister,
@@ -26,14 +28,19 @@ import {
   // comment :/)
   // adminQuizRemove,
   // adminQuizNameUpdate,
-  adminQuizDescriptionUpdate
+  adminQuizDescriptionUpdate,
+  adminQuizRemove,
+  adminQuizNameUpdate
 } from './quiz';
 
 import {
-  adminQuestionCreate
+  adminQuestionCreate,
+  adminQuestionMove,
+  adminQuestionDuplicate
 } from './question';
 
 import { clear } from './other.js';
+import { getData, setData } from './dataStore';
 
 // Set up web app
 const app = express();
@@ -54,6 +61,11 @@ const HOST: string = process.env.IP || 'localhost';
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
+function backupData(req: Request, res: Response, response: any) {
+  fs.writeFile('./data.json', JSON.stringify(getData()), (err) => {
+    if (err) return res.status(404).json(response);
+  });
+}
 
 // Example get request
 app.get('/echo', (req: Request, res: Response) => {
@@ -75,6 +87,7 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
+  backupData(req, res, response);
 });
 
 // adminAuthLogin
@@ -84,12 +97,12 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
+  backupData(req, res, response);
 });
 
 // adminUserDetails
 app.get('/v1/admin/user/details', (req: Request, res: Response) => {
-  let { token } = req.body;
-  token = parseInt(token);
+  const token = parseInt(req.query.token as string);
   const response = adminUserDetails(token);
 
   if ('error' in response) return res.status(400).json(response);
@@ -98,82 +111,116 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
 
 // adminAuthLogout
 app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
-  let { token } = req.body;
-  token = parseInt(token);
+  const token = parseInt(req.body.token);
   const response = adminAuthLogout(token);
 
-  if ('error' in response) return res.status(400).json(response);
+  if ('error' in response) return res.status(401).json(response);
   res.json(response);
+  backupData(req, res, response);
 });
 
 // adminUserDetailsEdit
 app.put('/v1/admin/user/details', (req: Request, res: Response) => {
-  let { token, email, nameFirst, nameLast } = req.body;
-  token = parseInt(token);
-  const response = adminUserDetailsEdit(token, email, nameFirst, nameLast);
+  const { token, email, nameFirst, nameLast } = req.body;
+  const response = adminUserDetailsEdit(parseInt(token), email,
+    nameFirst, nameLast);
 
-  if ('error' in response) return res.status(400).json(response);
+  if ('error' in response) {
+    if (response.error.includes('Token')) return res.status(401).json(response);
+    return res.status(400).json(response);
+  }
+
   res.json(response);
+  backupData(req, res, response);
 });
 
 // adminUserPasswordsEdit
 app.put('/v1/admin/user/password', (req: Request, res: Response) => {
-  let { token, oldPassword, newPassword } = req.body;
-  token = parseInt(token);
-  const response = adminUserPasswordEdit(token, oldPassword, newPassword);
+  const { token, oldPassword, newPassword } = req.body;
+  const response = adminUserPasswordEdit(parseInt(token), oldPassword,
+    newPassword);
 
-  if ('error' in response) return res.status(400).json(response);
+  if ('error' in response) {
+    if (response.error.includes('Token')) return res.status(401).json(response);
+    return res.status(400).json(response);
+  }
+
   res.json(response);
+  backupData(req, res, response);
 });
 
 // ====================================================================
 //  ========================= QUIZ FUNCTIONS =========================
 // ====================================================================
 
-// adminQuizCreate
-app.post('/v1/admin/quiz', (req: Request, res: Response) => {
-  const { token, name, description } = req.body;
-  const response = adminQuizCreate(token, name, description);
-
-  if ('error' in response) return res.status(400).json(response);
-  if (token === '') return res.status(401).json(response);
-  res.json(response);
-});
-
-// adminQuizInfo
-app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  let { token } = req.body;
-  token = parseInt(token);
-  const quizId = req.params.quizid;
-  const response = adminQuizInfo(token, parseInt(quizId));
-
-  if ('No such quiz' in response) return res.status(400).json(response);
-  if (token === '') return res.status(401).json(response);
-  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
-  res.json(response);
-});
-
 // adminQuizList
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
-  const { token } = req.query;
-  const userId = parseInt(token as string);
-  const response = adminQuizList(userId);
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizList(token);
 
   if ('error' in response) return res.status(401).json(response);
   res.json(response);
 });
 
-// adminQuizDescriptionUpdate
-app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
-  let { token, description } = req.body;
-  token = parseInt(token);
-  const quizId = parseInt(req.params.quizid);
-  const response = adminQuizDescriptionUpdate(token, quizId, description);
+// adminQuizCreate
+app.post('/v1/admin/quiz', (req: Request, res: Response) => {
+  const { token, name, description } = req.body;
+  const response = adminQuizCreate(parseInt(token), name, description);
 
-  if (token === '') return res.status(401).json(response);
-  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  if ('error' in response) return res.status(400).json(response);
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizRemove
+app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizRemove(token, quizId);
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizNameUpdate
+app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
+  const { token, name } = req.body;
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizNameUpdate(parseInt(token), quizId, name);
+
+  if ('Quiz is not owned by user' in response) {
+    return res.status(403).json(response);
+  }
   if ('error' in response) return res.status(400).json(response);
 
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizDescriptionUpdate
+app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
+  const { token, description } = req.body;
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizDescriptionUpdate(parseInt(token), quizId,
+    description);
+
+  if ('Quiz is not owned by user' in response) {
+    return res.status(403).json(response);
+  }
+  if ('error' in response) return res.status(400).json(response);
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizInfo
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  const quizId = req.params.quizid;
+  const response = adminQuizInfo(token, parseInt(quizId));
+
+  if ('No such quiz' in response) return res.status(400).json(response);
+  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
   res.json(response);
 });
 
@@ -183,17 +230,54 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 
 // adminQuestionCreate
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
-  let { token, questionBody } = req.body;
-  token = parseInt(token);
+  const { token, questionBody } = req.body;
   const quizId = parseInt(req.params.quizid);
-  const response = adminQuestionCreate(token, quizId, questionBody);
+  const response = adminQuestionCreate(parseInt(token), quizId, questionBody);
 
-  if (token === '' || 'Invalid user ID' in response) return res.status(401).json(response);
-  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  if ('Quiz is not owned by user' in response) {
+    return res.status(403).json(response);
+  }
   if ('error' in response) return res.status(400).json(response);
 
   res.json(response);
+  backupData(req, res, response);
 });
+
+// adminQuestionMove
+app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
+  (req: Request, res: Response) => {
+    let { token, newPosition } = req.body;
+    const question = req.params.questionid;
+    const quiz = req.params.quizid;
+
+    token = parseInt(token);
+    const quesId = parseInt(question);
+    const quizId = parseInt(quiz);
+
+    const response = adminQuestionMove(token, newPosition, quesId, quizId);
+    if ('is invalid' in response) return res.status(400).json(response);
+    if ('Token' in response) return res.status(401).json(response);
+    if ('Does not match' in response) return res.status(403).json(response);
+    res.json(response);
+  });
+
+// adminQuestionDuplicate
+app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
+  (req: Request, res: Response) => {
+    const { token } = req.body;
+    const quiz = req.params.quizid;
+    const question = req.params.questionid;
+
+    const token1 = parseInt(token);
+    const quesId = parseInt(question);
+    const quizId = parseInt(quiz);
+
+    const response = adminQuestionDuplicate(token1, quesId, quizId);
+    if ('is invalid' in response) return res.status(400).json(response);
+    if ('Token' in response) return res.status(401).json(response);
+    if ('Does not match' in response) return res.status(403).json(response);
+    res.json(response);
+  });
 
 // ====================================================================
 //  ======================== OTHER FUNCTIONS =========================
@@ -204,6 +288,7 @@ app.delete('/v1/clear', (req: Request, res: Response) => {
   const response = clear();
 
   res.json(response);
+  backupData(req, res, response);
 });
 
 // ====================================================================
@@ -229,9 +314,15 @@ app.use((req: Request, res: Response) => {
 const server = app.listen(PORT, HOST, () => {
   // DO NOT CHANGE THIS LINE
   console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
+
+  // On start, import all data from data.json and set it to data in dataStore
+  setData(data);
+  console.log('Data has been set to:', getData());
 });
 
 // For coverage, handle Ctrl+C gracefully
 process.on('SIGINT', () => {
+  backupData(null, null, null);
+  console.log('Final data should be:', getData());
   server.close(() => console.log('Shutting down server gracefully.'));
 });

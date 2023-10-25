@@ -5,8 +5,9 @@ import {
   QuizList,
   getData,
   getQuiz,
-  getUser,
-  QuizBrief
+  QuizBrief,
+  getUniqueID,
+  getUser
 } from './dataStore';
 
 /** adminQuizList
@@ -76,8 +77,7 @@ function adminQuizCreate(token: number, name: string, description: string):
 
   // Returning and altering data
   const timestamp = Math.floor(Date.now() / 1000);
-  const randomId = Math.floor(Math.random() * 1000000) + 1;
-  const quizId = timestamp * randomId % 100000000;
+  const quizId = getUniqueID(getData());
 
   createdQuizzes.push({
     quizId: quizId,
@@ -132,6 +132,7 @@ function adminQuizRemove(token: number, quizId: number):
 function adminQuizInfo(token: number, quizId: number):
   QuizDetailed | ErrorObject {
   // Ensuring the login session is valid
+
   const user = getUser(token, getData());
   if (!user) return { error: 'No such token' };
 
@@ -170,13 +171,10 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
   if (!user) return { error: 'Invalid user ID' };
 
   // Check if the name contains invalid, non-alphanumeric characters
-  if (!/^[a-zA-Z0-9\s]+$/.test(name)) {
-    return { error: 'Name contains invalid characters.' };
-  }
-
-  // Check if the name length is within the specified limits
-  if (name.length < 3 || name.length > 30) {
-    return { error: 'Name must be between 3 and 30 characters long' };
+  const invalidName = /[^a-zA-Z0-9 ']/.test(name);
+  console.log('The name ' + name + ' is invalid: ', invalidName);
+  if (invalidName || name.length < 3 || name.length > 30) {
+    return { error: 'Invalid Name' };
   }
 
   const quiz = getQuiz(quizId, getData().quizzes);

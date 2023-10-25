@@ -1,140 +1,18 @@
-import request from 'sync-request-curl';
-import { port, url } from '../config.json';
-import { Token } from '../dataStore';
+import {
+  Token,
+  ErrorObject,
+  Details
+} from '../dataStore';
 
-const SERVER_URL = `${url}:${port}`;
-
-/// ////////////////////////////////////////////////////////////////////////////
-/// ////////////////////////////// Interfaces //////////////////////////////////
-/// ////////////////////////////////////////////////////////////////////////////
-
-interface ErrorObject {
-  error : string
-}
-
-interface User {
-  userId: number,
-  name: string,
-  email: string,
-  numSuccessfulLogins: number,
-  numFailedPasswordsSinceLastLogin: number
-}
-
-interface Details {
-  user: User
-}
-
-/// ////////////////////////////////////////////////////////////////////////////
-/// ////////////////////////// Wrapper Functions ///////////////////////////////
-/// ////////////////////////////////////////////////////////////////////////////
-
-// POST REGISTER Define wrapper function
-function requestRegister(email: string, password: string, nameFirst: string,
-  nameLast: string): Token {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/auth/register',
-    {
-      json: {
-        email: email,
-        password: password,
-        nameFirst: nameFirst,
-        nameLast: nameLast
-      }
-    }
-  );
-
-  const result = JSON.parse(res.body.toString());
-
-  if ('error' in result) return { token: -1 };
-  else return result;
-}
-
-// POST LOGIN Define wrapper function
-function requestLogin(email: string, password: string): Token {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/auth/login',
-    {
-      json: {
-        email: email,
-        password: password
-      }
-    }
-  );
-
-  const result = JSON.parse(res.body.toString());
-
-  if ('error' in result) return { token: -1 };
-  else return result;
-}
-
-// GET DETAILS Define wrapper function
-function requestDetails(token: number): Details | ErrorObject {
-  const res = request(
-    'GET',
-    SERVER_URL + '/v1/admin/user/details',
-    {
-      json: {
-        token: token
-      }
-    }
-  );
-
-  return JSON.parse(res.body.toString());
-}
-
-// POST LOGOUT Define wrapper function
-function requestLogout(token: number): ErrorObject | Record<string, never> {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/auth/logout',
-    {
-      json: {
-        token: token
-      }
-    }
-  );
-
-  return JSON.parse(res.body.toString());
-}
-
-// PUT EDIT DETAILS Define wrapper function
-function requestDetailsEdit(token: number, email: string, nameFirst: string,
-  nameLast: string): ErrorObject | Record<string, never> {
-  const res = request(
-    'PUT',
-    SERVER_URL + '/v1/admin/user/details',
-    {
-      json: {
-        token: token,
-        email: email,
-        nameFirst: nameFirst,
-        nameLast: nameLast
-      }
-    }
-  );
-
-  return JSON.parse(res.body.toString());
-}
-
-// PUT EDIT PASSWORD Define wrapper function
-function requestPasswordEdit(token: number, oldPass: string, newPass: string):
-  ErrorObject | Record<string, never> {
-  const res = request(
-    'PUT',
-    SERVER_URL + '/v1/admin/user/password',
-    {
-      json: {
-        token: token,
-        oldPassword: oldPass,
-        newPassword: newPass
-      }
-    }
-  );
-
-  return JSON.parse(res.body.toString());
-}
+import {
+  requestRegister,
+  requestLogin,
+  requestDetails,
+  requestLogout,
+  requestDetailsEdit,
+  requestPasswordEdit,
+  requestClear
+} from './testHelper';
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
@@ -142,15 +20,7 @@ function requestPasswordEdit(token: number, oldPass: string, newPass: string):
 
 // Clearing the datastore, so that the tests are independent of previous data
 beforeEach(() => {
-  const res = request(
-    'DELETE',
-    SERVER_URL + '/v1/clear',
-    {
-      qs: { }
-    }
-  );
-
-  return JSON.parse(res.body.toString());
+  requestClear();
 });
 
 describe('adminAuthRegister', () => {
@@ -244,9 +114,6 @@ describe('adminAuthRegister', () => {
   });
 });
 
-/**
-  * Potentialld add more tests for valid cases
-  */
 describe('adminAuthLogin', () => {
   let result: Token;
 
@@ -692,7 +559,9 @@ describe('adminUserPasswordEdit', () => {
   });
 
   test('INVALID Password: Used before', () => {
-    result = requestPasswordEdit(token, 'Val1dPassword', 'newpass');
+    requestPasswordEdit(token, 'Val1dPassword', 'newpass123');
+    requestPasswordEdit(token, 'newpass123', 'newnewpass123');
+    result = requestPasswordEdit(token, 'newnewpass123', 'Val1dPassword');
     expect(result).toMatchObject({ error: expect.any(String) });
   });
 

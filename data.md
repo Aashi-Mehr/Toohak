@@ -7,10 +7,11 @@ let data = {
             nameFirst: 'Hello',
             nameLast: 'World',
             name: 'Hello World',
-            email: 'Hello_World@1531.com',
-            password: '123456789...',
-            successful_log_time: '15',
-            failed_password_num: '2',
+            email: 'HelloWorld@gmail.com',
+            password: '123456789abcd',
+            successful_log_time: 15,
+            failed_password_num: 2,
+            prev_passwords: ['Password1', 'Password2']
         },
         // ...
     ],
@@ -22,8 +23,8 @@ let data = {
             authId: 1,
             name: 'My Quiz',
             description: 'This is my quiz',
-            timeCreated: 202309211910,
-            timeLastEdited: 202309211912,
+            timeCreated: 2023092119,
+            timeLastEdited: 2023092119,
             in_trash: true,
             questions: [
                 {
