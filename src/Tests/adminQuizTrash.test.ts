@@ -17,6 +17,7 @@ import {
   requestQuizRemove,
   requestQuizCreate
 } from './testHelper';
+import { Token } from './dataStore';
 
 const SERVER_URL = `${url}:${port}`;
 
@@ -41,7 +42,7 @@ beforeEach(() => {
 // Test : Invalid AuthUserId Format
 test('Test Invalid AuthUserId Format', () => {
   // authUserId is empty
-  letresult = requestQuizTrash(0);
+  let result = requestQuizTrash(0);
   expect(result).toMatchObject({ error: expect.any(String) });
 
   // authUserId contains out of range number
