@@ -8,7 +8,8 @@ import {
   setData,
   getUniqueID,
   getUser,
-  getQuiz
+  getQuiz,
+  getSession
 } from './dataStore';
 
 const COLOUR = ['red', 'blue', 'green', 'yellow', 'purple', 'brown', 'orange'];
@@ -94,4 +95,125 @@ export function adminQuestionCreate(token: number, quizId: number, questionBody:
   setData(data);
 
   return { questionId: questionId };
+}
+
+/** adminQuestionMove
+  * Move the given quiz question to a new position
+  *
+  * @param { number } token - The authUserId for the user
+  * @param { number } newPosition - The new position of the moved question
+  * @param { number } quizId - The quizId contain moved question
+  * @param { number } quesId - The quesId of the question being moved
+  *
+  * @returns {} - If the question exists and is successfully moved
+  * @returns { ErrorObject } - If any input error exists
+  */
+export function adminQuestionMove(token: number, newPosition: number,
+  quesId: number, quizId: number): ErrorObject | Record<string, never> {
+  // Get data from database
+  const quiz = getQuiz(quizId, getData().quizzes);
+  const user = getSession(token, getData().sessions);
+
+  // Get the question asked for moving
+  let currQues;
+  let findQues = false;
+  for (const question of quiz.questions) {
+    if (question.questionId === quesId) {
+      findQues = true;
+      currQues = question;
+    }
+  }
+
+  // Error check
+  if (!quiz) return { error: 'Quiz ID is invalid' };
+  if (findQues === false) return { error: 'Ques ID is invalid' };
+  if (newPosition < 0 || newPosition > quiz.questions.length) { return { error: 'New Postion is invalid' }; }
+  if (token === undefined) return { error: 'Token Empty' };
+  if (quiz.authId !== token) { return { error: 'Does not match the given quiz' }; }
+  if (user.is_valid === false) return { error: 'Token is not valid' };
+
+  // Get the question at the new position
+  let swithedQues;
+  for (const question of quiz.questions) {
+    if (question.position === newPosition) {
+      swithedQues = question;
+    }
+  }
+
+  // Switch the position of two questions
+  const tempPos = currQues.position;
+  currQues.position = newPosition;
+  swithedQues.position = tempPos;
+
+  // Update time last edit
+  quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+
+  // Successful movement, return {}
+  return {};
+}
+
+/** adminQuesDup
+  * Duplicate the given quiz question
+  *
+  * @param { number } token - The authUserId for the user
+  * @param { number } quizId - The quizId contain moved question
+  * @param { number } quesId - The quesId of the question being moved
+  *
+  * @returns { newQuestionId } - If the question exists and is successfully duplicated
+  * @returns { ErrorObject } - If any input error exists
+  */
+export function adminQuestionDuplicate(token: number, quesId: number,
+  quizId: number): QuestionId | ErrorObject {
+  // Get data from database
+  const data = getData();
+  const quiz = getQuiz(quizId, getData().quizzes);
+  const user = getSession(token, getData().sessions);
+
+  // Get the question asked for duplicating
+  let currQues;
+  let findQues = false;
+  for (const question of quiz.questions) {
+    if (question.questionId === quesId) {
+      findQues = true;
+      currQues = question;
+    }
+  }
+
+  // Error check
+  if (!quiz) return { error: 'Quiz ID is invalid' };
+  if (findQues === false) return { error: 'Ques ID is invalid' };
+  if (token === undefined) return { error: 'Token empty' };
+  if (quiz.authId !== token) { return { error: 'Does not match the given quiz' }; }
+  if (user.is_valid === false) return { error: 'Token is not valid' };
+
+  // Calculate the duplicated question position
+  const newQuesPos = currQues.position + 1;
+
+  // Move all questions that is after the current question right once
+  for (const question of quiz.questions) {
+    if (question.position > currQues.position) {
+      question.position++;
+    }
+  }
+
+  // Create a new question using the newQuesPosition
+  // Put the newQuestion after the immidiate question
+  const newQuestionId = getUniqueID(data);
+  const newQuestion: Question = {
+    questionId: newQuestionId,
+    position: newQuesPos,
+    question: currQues.question,
+    duration: currQues.duration,
+    points: currQues.points,
+    answer: currQues.answer,
+  };
+
+  // Push newQuestion into data base
+  quiz.questions.push(newQuestion);
+
+  // Update time last edit
+  quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+
+  // Return newQuestionId
+  return { questionId: newQuestionId };
 }

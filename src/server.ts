@@ -32,7 +32,9 @@ import {
 } from './quiz';
 
 import {
-  adminQuestionCreate
+  adminQuestionCreate,
+  adminQuestionMove,
+  adminQuestionDuplicate
 } from './question';
 
 import { clear } from './other.js';
@@ -222,7 +224,7 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   });
 });
 
-/* // adminQuestionMove
+// adminQuestionMove
 app.put('v1/admin/quiz/:quizid/question/:questionid/move',
   (req: Request, res: Response) => {
     let { token, newPosition } = req.body;
@@ -233,7 +235,7 @@ app.put('v1/admin/quiz/:quizid/question/:questionid/move',
     const quesId = parseInt(question);
     const quizId = parseInt(quiz);
 
-    const response = adminQuizQuesMove(token, newPosition, quesId, quizId);
+    const response = adminQuestionMove(token, newPosition, quesId, quizId);
     if ('is invalid' in response) return res.status(400).json(response);
     if ('Token' in response) return res.status(401).json(response);
     if ('Does not match' in response) return res.status(403).json(response);
@@ -251,11 +253,11 @@ app.post('v1/admin/quiz/:quizid/question/:questionid/duplicate',
     const quesId = parseInt(question);
     const quizId = parseInt(quiz);
 
-    const response = adminQuizQuesDup(token, quesId, quizId);
+    const response = adminQuestionDuplicate(token, quesId, quizId);
     if ('is invalid' in response) return res.status(400).json(response);
     if ('Token' in response) return res.status(401).json(response);
     if ('Does not match' in response) return res.status(403).json(response);
-  }); */
+  });
 
 // ====================================================================
 //  ======================== OTHER FUNCTIONS =========================
