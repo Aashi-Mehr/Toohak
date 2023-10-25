@@ -1,7 +1,8 @@
 import {
   Token,
   ErrorObject,
-  Details
+  Details,
+  getData
 } from '../dataStore';
 
 import {
@@ -26,67 +27,79 @@ beforeEach(() => {
 describe('adminAuthRegister', () => {
   let result: Token;
 
+  // Error checking
   test('INVALID Password: No numbers', () => {
+    // Password must contain numbers
     result = requestRegister('first.last1@gmail.com', 'invalidpassword',
       'first', 'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Password: No letters', () => {
+    // Password must contain letters
     result = requestRegister('first.last2@gmail.com', '123456789', 'first',
       'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Password: Less than 8 characters', () => {
+    // Password must be greater than or equal to 8 characters
     result = requestRegister('first.last3@gmail.com', 'acb123', 'first',
       'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Name: First name contains numbers', () => {
+    // Name cannot have non-letter, non-space, non-spostrophe characters
     result = requestRegister('first.last4@gmail.com', 'Val1dPassword',
       '1nval1d first', 'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Name: Last name contains numbers', () => {
+    // Name cannot have non-letter, non-space, non-spostrophe characters
     result = requestRegister('first.last5@gmail.com', 'Val1dPassword',
       'first', '1nval1d last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Name: First name less than 2 characters', () => {
+    // Name must be between 2 and 20 characters
     result = requestRegister('first.last6@gmail.com', 'Val1dPassword', 'a',
       'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Name: Last name less than 2 characters', () => {
+    // Name must be between 2 and 20 characters
     result = requestRegister('first.last9@gmail.com', 'Val1dPassword',
       'first', 'a');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Name: First name more than 20 characters', () => {
+    // Name must be between 2 and 20 characters
     result = requestRegister('first.last7@gmail.com', 'Val1dPassword',
       'abcdefghijklmnopqrstuvwxyz', 'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Name: Last name more than 20 characters', () => {
+    // Name must be between 2 and 20 characters
     result = requestRegister('first.last8@gmail.com', 'Val1dPassword', 'a',
       'abcdefghijklmnopqrstuvwxyz');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Email: Does not satisfy validator.isEmail function', () => {
+    // Email must satisfy validator
     result = requestRegister('first..last@email', 'Val1dPassword',
       'first', 'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Email: Used by another user', () => {
+    // Emails must be unique
     requestRegister('first.last@gmail.com', 'Val1dPassword', 'first',
       'last');
 
@@ -96,21 +109,36 @@ describe('adminAuthRegister', () => {
   });
 
   test('VALID Registration: Case 1', () => {
+    // All correct details, checking simplest case
     result = requestRegister('first.last10@gmail.com', 'Val1dPassword',
       'first', 'last');
     expect(result.token).toBeGreaterThan(0);
   });
 
   test('VALID Registration: Case 2', () => {
+    // All correct details, checking simplest case
     result = requestRegister('first.last@gmail.com', 'Val1dPassword',
       'first', 'last');
     expect(result.token).toBeGreaterThan(0);
   });
 
   test('VALID Registration: Case 3', () => {
+    // All correct details, checking simplest case
     result = requestRegister('first.last2@gmail.com', 'Val1dPassword',
       'firstName', 'lastName');
     expect(result.token).toBeGreaterThan(0);
+  });
+
+  test('VALID Registrations: Multiple Users', () => {
+    result = requestRegister('first.last1@gmail.com', 'Val1dPassword',
+      'firstName', 'lastName');
+    result = requestRegister('first.last2@gmail.com', 'Val1dPassword',
+      'firstName', 'lastName');
+    result = requestRegister('first.last3@gmail.com', 'Val1dPassword',
+      'firstName', 'lastName');
+    result = requestRegister('first.last4@gmail.com', 'Val1dPassword',
+      'firstName', 'lastName');
+    expect(getData().users.length).toStrictEqual(4);
   });
 });
 
@@ -189,10 +217,12 @@ describe('adminUserDetails', () => {
   let token: number;
 
   test('INVALID token: Out of the possible range', () => {
+    // Tokens must be positive, non-null integers
     expect(requestDetails(0)).toMatchObject({ error: expect.any(String) });
   });
 
   test('INVALID token: Incorrect ID', () => {
+    // Testing cases where the token doesn't refer to a valid user
     token = requestRegister('first.last@gmail.com', 'Val1dPassword', 'first',
       'last').token;
     result = requestDetails(token + 1);
@@ -200,6 +230,7 @@ describe('adminUserDetails', () => {
   });
 
   test('VALID token: Simple Case 1', () => {
+    // Valid case 1, simplest case
     token = requestRegister('first.last1@gmail.com', 'Val1dPassword1', 'first',
       'last').token;
     result = requestDetails(token);
@@ -217,6 +248,7 @@ describe('adminUserDetails', () => {
   });
 
   test('VALID token: Simple Case 2', () => {
+    // Valid case 2, simplest case
     token = requestRegister('first.last2@gmail.com',
       'Val1dPassword2', 'first', 'last').token;
     result = requestDetails(token);
@@ -234,6 +266,7 @@ describe('adminUserDetails', () => {
   });
 
   test('VALID token: Simple Case 3', () => {
+    // Valid case 3, simplest case
     token = requestRegister('first.last3@gmail.com',
       'Val1dPassword3', 'first', 'last').token;
     result = requestDetails(token);
@@ -251,6 +284,7 @@ describe('adminUserDetails', () => {
   });
 
   test('VALID token: Simple Case 4', () => {
+    // Valid case 4, simplest case
     token = requestRegister('first.last4@gmail.com',
       'Val1dPassword4', 'first', 'last').token;
     result = requestDetails(token);
@@ -268,6 +302,7 @@ describe('adminUserDetails', () => {
   });
 
   test('VALID token: Complex Case 1', () => {
+    // Valid case logging in, then details must show valid logins increased
     requestRegister('first.last1@gmail.com', 'Val1dPassword1', 'first', 'last');
     token = requestLogin('first.last1@gmail.com', 'Val1dPassword1').token;
 
@@ -285,6 +320,7 @@ describe('adminUserDetails', () => {
   });
 
   test('VALID token: Complex Case 2', () => {
+    // Valid case, failed login attempts must increase
     requestRegister('first.last1@gmail.com', 'Val1dPassword1', 'first', 'last');
     token = requestLogin('first.last1@gmail.com', 'Val1dPassword1').token;
     requestLogin('first.last1@gmail.com', 'INVal1dPassword1');
@@ -303,6 +339,7 @@ describe('adminUserDetails', () => {
   });
 
   test('VALID token: Complex Case 3', () => {
+    // Adding more logins
     requestRegister('first.last1@gmail.com', 'Val1dPassword1', 'first', 'last');
     token = requestLogin('first.last1@gmail.com', 'Val1dPassword1').token;
     requestLogin('first.last1@gmail.com', 'INVal1dPassword1');
@@ -322,6 +359,8 @@ describe('adminUserDetails', () => {
   });
 
   test('VALID token: Complex Case 4', () => {
+    // Adding a mixture of logins and failed logins
+    // Failed logins should reset after a successful login
     requestRegister('first.last1@gmail.com', 'Val1dPassword1', 'first', 'last');
     requestLogin('first.last1@gmail.com', 'Val1dPassword1');
     requestLogin('first.last1@gmail.com', 'INVal1dPassword1');
@@ -370,27 +409,40 @@ describe('adminAuthLogout', () => {
   });
 
   test('VALID Token: Simple Case 1', () => {
+    // Testing the simplest valid case
     token = requestRegister('first.last1@gmail.com', 'Val1dPassword1',
       'first', 'last').token;
     result = requestLogout(token);
     expect(Object.keys(result).length).toStrictEqual(0);
+
+    let info = requestDetails(token);
+    expect(info).toMatchObject({ error: expect.any(String) });
   });
 
   test('VALID Token: Simple Case 2', () => {
+    // Testing the simplest valid case
     token = requestRegister('first.last2@gmail.com', 'Val1dPassword2',
       'first', 'last').token;
     result = requestLogout(token);
     expect(Object.keys(result).length).toStrictEqual(0);
+
+    let info = requestDetails(token);
+    expect(info).toMatchObject({ error: expect.any(String) });
   });
 
   test('VALID Token: Simple Case 3', () => {
+    // Testing the simplest valid case
     token = requestRegister('first.last3@gmail.com', 'Val1dPassword3',
       'first', 'last').token;
     result = requestLogout(token);
     expect(Object.keys(result).length).toStrictEqual(0);
+
+    let info = requestDetails(token);
+    expect(info).toMatchObject({ error: expect.any(String) });
   });
 
   test('VALID Token: Complex Case 1', () => {
+    // Testing logout of a second session
     requestRegister('first.last1@gmail.com', 'Val1dPassword1', 'first', 'last');
     token = requestLogin('first.last1@gmail.com', 'Val1dPassword1').token;
     result = requestLogout(token);
@@ -398,6 +450,7 @@ describe('adminAuthLogout', () => {
   });
 
   test('VALID Token: Complex Case 2', () => {
+    // Testing logout of initial login session
     token = requestRegister('first.last2@gmail.com', 'Val1dPassword2',
       'first', 'last').token;
     requestLogin('first.last2@gmail.com', 'Val1dPassword2');
@@ -406,6 +459,7 @@ describe('adminAuthLogout', () => {
   });
 
   test('VALID Token: Complex Case 3', () => {
+    // Testing multiple sessions
     token = requestRegister('first.last3@gmail.com', 'Val1dPassword3',
       'first', 'last').token;
     requestLogout(token);
