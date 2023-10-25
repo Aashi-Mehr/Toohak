@@ -1,103 +1,18 @@
-import request from 'sync-request-curl';
-import { port, url } from '../config.json';
-import { Token } from '../dataStore';
+import {
+  Token,
+  ErrorObject,
+  Details
+} from '../dataStore';
 
-const SERVER_URL = `${url}:${port}`;
-
-/// ////////////////////////////////////////////////////////////////////////////
-/// ////////////////////////////// Interfaces //////////////////////////////////
-/// ////////////////////////////////////////////////////////////////////////////
-
-interface ErrorObject {
-  error : string
-}
-
-interface User {
-  userId: number,
-  name: string,
-  email: string,
-  numSuccessfulLogins: number,
-  numFailedPasswordsSinceLastLogin: number
-}
-
-interface Details {
-  user: User
-}
-
-/// ////////////////////////////////////////////////////////////////////////////
-/// ////////////////////////// Wrapper Functions ///////////////////////////////
-/// ////////////////////////////////////////////////////////////////////////////
-
-// POST REGISTER Define wrapper function
-function requestRegister(email: string, password: string, nameFirst: string,
-  nameLast: string): Token {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/auth/register',
-    {
-      json: {
-        email: email,
-        password: password,
-        nameFirst: nameFirst,
-        nameLast: nameLast
-      }
-    }
-  );
-
-  const result = JSON.parse(res.body.toString());
-
-  if ('error' in result) return { token: -1 };
-  else return result;
-}
-
-// POST LOGIN Define wrapper function
-function requestLogin(email: string, password: string): Token {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/auth/login',
-    {
-      json: {
-        email: email,
-        password: password
-      }
-    }
-  );
-
-  const result = JSON.parse(res.body.toString());
-
-  if ('error' in result) return { token: -1 };
-  else return result;
-}
-
-// GET DETAILS Define wrapper function
-function requestDetails(token: number): Details | ErrorObject {
-  const res = request(
-    'GET',
-    SERVER_URL + '/v1/admin/user/details',
-    {
-      json: {
-        token: token
-      }
-    }
-  );
-
-  return JSON.parse(res.body.toString());
-}
-
-// POST LOGOUT Define wrapper function
-function requestLogout(token: number): ErrorObject | Record<string, never> {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/auth/logout',
-    {
-      json: {
-        token: token
-      }
-    }
-  );
-
-  return JSON.parse(res.body.toString());
-}
+import {
+  requestRegister,
+  requestLogin,
+  requestDetails,
+  requestLogout,
+  requestDetailsEdit,
+  requestPasswordEdit,
+  requestClear
+} from './testHelper';
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
@@ -105,15 +20,7 @@ function requestLogout(token: number): ErrorObject | Record<string, never> {
 
 // Clearing the datastore, so that the tests are independent of previous data
 beforeEach(() => {
-  const res = request(
-    'DELETE',
-    SERVER_URL + '/v1/clear',
-    {
-      qs: { }
-    }
-  );
-
-  return JSON.parse(res.body.toString());
+  requestClear();
 });
 
 describe('adminAuthRegister', () => {
@@ -509,6 +416,172 @@ describe('adminAuthLogout', () => {
     requestLogin('first.last3@gmail.com', 'Val1dPassword3');
     token = requestLogin('first.last3@gmail.com', 'Val1dPassword3').token;
     result = requestLogout(token);
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+});
+
+describe('adminUserDetailsEdit', () => {
+  let result: Record<string, never> | ErrorObject;
+  let token: number;
+
+  beforeEach(() => {
+    token = requestRegister('first.last@gmail.com', 'Val1dPassword', 'first',
+      'last').token;
+  });
+
+  test('INVALID token: Out of the possible range', () => {
+    result = requestDetailsEdit(0, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID token: Incorrect ID', () => {
+    result = requestDetailsEdit(token + 1, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Name: First name contains numbers', () => {
+    result = requestDetailsEdit(token, 'first.last4@gmail.com', '1nval1d first',
+      'last');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Name: Last name contains numbers', () => {
+    result = requestDetailsEdit(token, 'first.last5@gmail.com', 'first',
+      '1nval1d last');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Name: First name less than 2 characters', () => {
+    result = requestDetailsEdit(token, 'first.last6@gmail.com', 'a', 'last');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Name: Last name less than 2 characters', () => {
+    result = requestDetailsEdit(token, 'first.last9@gmail.com', 'first', 'a');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Name: First name more than 20 characters', () => {
+    result = requestDetailsEdit(token, 'first.last7@gmail.com',
+      'abcdefghijklmnopqrstuvwxyz', 'last');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Name: Last name more than 20 characters', () => {
+    result = requestDetailsEdit(token, 'first.last8@gmail.com', 'a',
+      'abcdefghijklmnopqrstuvwxyz');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Email: Does not satisfy validator.isEmail function', () => {
+    result = requestDetailsEdit(token, 'first..last@email',
+      'first', 'last');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID details: Email already exists', () => {
+    requestRegister('first.last2@gmail.com', 'Val1dPassword1', 'first', 'last');
+    result = requestDetailsEdit(token, 'first.last2@gmail.com', 'firs', 'last');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('VALID token: Simple Case 1', () => {
+    result = requestDetailsEdit(token, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith');
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID token: Simple Case 2', () => {
+    token = requestRegister('first.last2@gmail.com',
+      'Val1dPassword2', 'first', 'last').token;
+    result = requestDetailsEdit(token, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith');
+
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID token: Simple Case 3', () => {
+    token = requestRegister('first.last3@gmail.com',
+      'Val1dPassword3', 'first', 'last').token;
+    result = requestDetailsEdit(token, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith');
+
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID token: Simple Case 4', () => {
+    token = requestRegister('first.last4@gmail.com',
+      'Val1dPassword4', 'first', 'last').token;
+    result = requestDetailsEdit(token, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith');
+
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+});
+
+describe('adminUserPasswordEdit', () => {
+  let result: Record<string, never> | ErrorObject;
+  let token: number;
+
+  beforeEach(() => {
+    token = requestRegister('first.last@gmail.com', 'Val1dPassword', 'first',
+      'last').token;
+  });
+
+  test('INVALID token: Out of the possible range', () => {
+    result = requestPasswordEdit(0, 'Val1dPassword', 'NewVal1dPassword');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID token: Incorrect ID', () => {
+    result = requestPasswordEdit(token + 1, 'Val1dPassword', 'NewVal1dPass');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Password: No numbers', () => {
+    result = requestPasswordEdit(token, 'Val1dPassword', 'newpassword');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Password: No letters', () => {
+    result = requestPasswordEdit(token, 'Val1dPassword', '1234567890');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Password: Less than 8 characters', () => {
+    result = requestPasswordEdit(token, 'Val1dPassword', 'newpass');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Password: Not changed', () => {
+    requestPasswordEdit(token, 'Val1dPassword', 'NewVal1dPass');
+    result = requestPasswordEdit(token, 'NewVal1dPass', 'Val1dPassword');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Password: Used before', () => {
+    result = requestPasswordEdit(token, 'Val1dPassword', 'newpass');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('VALID token: Simple Case 1', () => {
+    result = requestPasswordEdit(token, 'Val1dPassword', 'NewVal1dPass');
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID token: Simple Case 2', () => {
+    token = requestRegister('first.last2@gmail.com',
+      'Val1dPassword2', 'first', 'last').token;
+    result = requestPasswordEdit(token, 'Val1dPassword2', 'NEWVal1dPassword2');
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('VALID token: Simple Case 3', () => {
+    token = requestRegister('first.last2@gmail.com',
+      'Val1dPassword2', 'first', 'last').token;
+    result = requestPasswordEdit(token, 'Val1dPassword2', 'Val1dPassword');
     expect(Object.keys(result).length).toStrictEqual(0);
   });
 });

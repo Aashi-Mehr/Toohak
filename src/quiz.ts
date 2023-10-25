@@ -132,6 +132,7 @@ function adminQuizRemove(token: number, quizId: number):
 function adminQuizInfo(token: number, quizId: number):
   QuizDetailed | ErrorObject {
   // Ensuring the login session is valid
+
   const user = getUser(token, getData());
   if (!user) return { error: 'No such token' };
 
@@ -258,7 +259,10 @@ function adminQuizTrash(token: number):
   }
 
   // Quizzes list
-  return { removedQuizzes: removedQuizzes };
+  return { 
+    quizId: quiz.quizId,
+    name: quiz.name
+  };
 }
 
 // last edit: 25/10/2023 by Alya
