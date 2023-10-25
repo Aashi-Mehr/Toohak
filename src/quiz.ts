@@ -5,8 +5,7 @@ import {
   QuizList,
   getData,
   getQuiz,
-  getUser,
-  QuizBrief
+  getUser
 } from './dataStore';
 
 /** adminQuizList
@@ -234,18 +233,18 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
   *
   * @param { number } token - The authUserId for the user
   *
-  * @returns { QuizBrief } - If the details given are valid
+  * @returns { QuizList } - If the details given are valid
   * @returns { ErrorObject } - If the details given are invalid
   */
 function adminQuizTrash(token: number):
-  ErrorObject | QuizBrief {
+  ErrorObject | QuizList {
   // Check if authUserId is a positive integer
   const user = getUser(token, getData());
   if (!user) return { error: 'Invalid user ID' };
 
   // Gathering quizzes
   const allQuizzes = getData().quizzes;
-  const removedQuizzes: QuizBrief[] = [];
+  const removedQuizzes = [];
 
   // Looping through quizzes in dataStore
   for (const quiz of allQuizzes) {
@@ -263,7 +262,7 @@ function adminQuizTrash(token: number):
   //   quizId: removedQuizzes.quizId,
   //   name: removedQuizzes.name
   // };
-  return { removedQuizzes };
+  return { quizzes: removedQuizzes };
 }
 
 // last edit: 25/10/2023 by Alya
