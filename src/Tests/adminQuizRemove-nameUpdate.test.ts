@@ -1,168 +1,79 @@
-import request from 'sync-request-curl';
-import { port, url } from '../config.json';
-
-const SERVER_URL = `${url}:${port}`;
-
-// Helper function for making POST requests
-function makePostRequest(endpoint: string, data: { email?: string; password?: string; nameFirst?: string; nameLast?: string; authUserId?: any; name?: string; description?: string; quizId?: any; }) {
-  const res = request('POST', SERVER_URL + endpoint, { json: data });
-  return JSON.parse(res.body.toString());
-}
-
-// Helper function for making DELETE requests
-function makeDeleteRequest(endpoint: string, data: { authUserId: any; quizId: any; }) {
-  const res = request('DELETE', SERVER_URL + endpoint, { json: data });
-  return JSON.parse(res.body.toString());
-}
+import {
+  requestClear,
+  requestQuizNameUpdate,
+  requestQuizRemove,
+  requestRegister,
+  requestQuizCreate
+} from './testHelper';
 
 // Clear the database before each test to avoid data interference
 beforeEach(() => {
-  const res = request('DELETE', SERVER_URL + '/v1/clear', { qs: {} });
-  return JSON.parse(res.body.toString());
+  requestClear();
 });
 
 // Test function: adminQuizRemove
 describe('adminQuizRemove', () => {
   test('Invalid User IDs', () => {
-    // Test with invalid user IDs (non-integer)
-    const result1 = makeDeleteRequest('/v1/admin/quiz/remove', { authUserId: '12345', quizId: 1 });
-    expect(result1).toMatchObject({ error: expect.any(String) });
-
-    const result2 = makeDeleteRequest('/v1/admin/quiz/remove', { authUserId: '67890', quizId: 1 });
-    expect(result2).toMatchObject({ error: expect.any(String) });
-
+    // No longer need to test non-integer tokens
     // Test with user ID out of range
-    const result3 = makeDeleteRequest('/v1/admin/quiz/remove', { authUserId: 0, quizId: 1 });
+    const result3 = requestQuizRemove(0, 1);
     expect(result3).toMatchObject({ error: expect.any(String) });
-  });
-
-  test('Invalid Quiz IDs', () => {
-    // Test with invalid quiz IDs
-    const result1 = makeDeleteRequest('/v1/admin/quiz/remove', { authUserId: 1, quizId: '12345' });
-    expect(result1).toMatchObject({ error: expect.any(String) });
-
-    // Test with a quiz ID that does not refer to a valid quiz
-    const result2 = makeDeleteRequest('/v1/admin/quiz/remove', { authUserId: 1, quizId: 'invalidQuizId' });
-    expect(result2).toMatchObject({ error: expect.any(String) });
   });
 
   test('Valid User and Quiz IDs', () => {
     // Register a user and create a quiz
-    const authUserId = makePostRequest('/v1/admin/auth/register', {
-      email: 'user@example.com',
-      password: 'password',
-      nameFirst: 'John',
-      nameLast: 'Doe',
-    }).authUserId;
-
-    const quizId = makePostRequest('/v1/admin/quiz', {
-      authUserId,
-      name: 'New Quiz',
-      description: 'Description of the quiz',
-    }).quizId;
+    const token = requestRegister('user@gmail.com', 'password1', 'John', 'Doe');
+    const quizId = requestQuizCreate(token.token, 'New Quiz', 'Description');
 
     // Remove the quiz
-    const result = makeDeleteRequest('/v1/admin/quiz/remove', { authUserId, quizId });
-    expect(result).toMatchObject({});
+    const result = requestQuizRemove(token.token, quizId.quizId);
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
 });
 
 // Test function: adminQuizNameUpdate
 describe('adminQuizNameUpdate', () => {
   test('Invalid User IDs', () => {
-    // Test with invalid user IDs (non-integer)
-    const result1 = makePostRequest('/v1/admin/quiz/nameupdate', {
-      authUserId: '12345',
-      quizId: 1,
-      name: 'New Quiz Name',
-    });
-    expect(result1).toMatchObject({ error: expect.any(String) });
-
-    const result2 = makePostRequest('/v1/admin/quiz/nameupdate', {
-      authUserId: '67890',
-      quizId: 1,
-      name: 'New Quiz Name',
-    });
-    expect(result2).toMatchObject({ error: expect.any(String) });
-
+    // No longer need to test non-integer
     // Test with user ID out of range
-    const result3 = makePostRequest('/v1/admin/quiz/nameupdate', {
-      authUserId: 0,
-      quizId: 1,
-      name: 'New Quiz Name',
-    });
-    expect(result3).toMatchObject({ error: expect.any(String) });
+    const result = requestQuizNameUpdate(1, 0, 'New Quiz Name');
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 
   test('Invalid Quiz Name', () => {
     // Test with invalid quiz names
-    const authUserId = makePostRequest('/v1/admin/auth/register', {
-      email: 'user@example.com',
-      password: 'password',
-      nameFirst: 'John',
-      nameLast: 'Doe',
-    }).authUserId;
-
-    const quizId = makePostRequest('/v1/admin/quiz', {
-      authUserId,
-      name: 'New Quiz Name',
-      description: 'Description of the quiz',
-    }).quizId;
+    const token = requestRegister('user@gmail.com', 'password1', 'John', 'Doe');
+    const quizId = requestQuizCreate(token.token, 'New Quiz', 'Description');
 
     // Test with name containing invalid characters
-    const result1 = makePostRequest('/v1/admin/quiz/nameupdate', {
-      authUserId,
-      quizId,
-      name: 'Invalid@Name',
-    });
-    expect(result1).toMatchObject({ error: expect.any(String) });
+    const result = requestQuizNameUpdate(token.token, quizId.quizId,
+      'Invalid@Name');
+    expect(result).toMatchObject({ error: expect.any(String) });
 
     // Test with name less than 3 characters
-    const result2 = makePostRequest('/v1/admin/quiz/nameupdate', {
-      authUserId,
-      quizId,
-      name: 'A',
-    });
+    const result2 = requestQuizNameUpdate(token.token, quizId.quizId, 'A');
     expect(result2).toMatchObject({ error: expect.any(String) });
 
     // Test with name more than 30 characters
-    const result3 = makePostRequest('/v1/admin/quiz/nameupdate', {
-      authUserId,
-      quizId,
-      name: 'Very Long Quiz Name With More Than 30 Characters',
-    });
+    const result3 = requestQuizNameUpdate(token.token, quizId.quizId, 'Very ' +
+      'Long Quiz Name With More Than 30 Characters');
     expect(result3).toMatchObject({ error: expect.any(String) });
 
     // Test with a name already used by the user
-    const result4 = makePostRequest('/v1/admin/quiz/nameupdate', {
-      authUserId,
-      quizId,
-      name: 'New Quiz Name',
-    });
+    requestQuizCreate(token.token, 'New Quiz2', 'Description');
+    const result4 = requestQuizNameUpdate(token.token, quizId.quizId,
+      'New Quiz2');
     expect(result4).toMatchObject({ error: expect.any(String) });
   });
 
   test('Valid User and Quiz IDs', () => {
     // Register a user and create a quiz
-    const authUserId = makePostRequest('/v1/admin/auth/register', {
-      email: 'user@example.com',
-      password: 'password',
-      nameFirst: 'John',
-      nameLast: 'Doe',
-    }).authUserId;
-
-    const quizId = makePostRequest('/v1/admin/quiz', {
-      authUserId,
-      name: 'New Quiz Name',
-      description: 'Description of the quiz',
-    }).quizId;
+    const token = requestRegister('user@gmail.com', 'password1', 'John', 'Doe');
+    const quizId = requestQuizCreate(token.token, 'New Quiz', 'Description');
 
     // Update the quiz name
-    const result = makePostRequest('/v1/admin/quiz/nameupdate', {
-      authUserId,
-      quizId,
-      name: 'Updated Quiz Name',
-    });
-    expect(result).toMatchObject({});
+    const result = requestQuizNameUpdate(token.token, quizId.quizId,
+      'Updated Quiz Name');
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
 });

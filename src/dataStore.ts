@@ -69,6 +69,7 @@ interface Answer {
 
 interface Question {
   questionId: number,
+  position: number,
   question: string,
   duration: number,
   points: number,
@@ -105,11 +106,7 @@ interface Datastore {
 }
 
 // INTERFACE Datastore
-let data: Datastore = {
-  users: [],
-  quizzes: [],
-  sessions: []
-};
+let data: Datastore;
 
 // DATASTORE FUNCTIONS
 /** getData
@@ -242,4 +239,5 @@ export {
   Datastore,
   QuestionBody,
   QuestionId,
+  Answer
 };
