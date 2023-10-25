@@ -1,7 +1,8 @@
 import {
   Token,
   ErrorObject,
-  Details
+  Details,
+  getData
 } from '../dataStore';
 
 import {
@@ -26,67 +27,79 @@ beforeEach(() => {
 describe('adminAuthRegister', () => {
   let result: Token;
 
+  // Error checking
   test('INVALID Password: No numbers', () => {
+    // Password must contain numbers
     result = requestRegister('first.last1@gmail.com', 'invalidpassword',
       'first', 'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Password: No letters', () => {
+    // Password must contain letters
     result = requestRegister('first.last2@gmail.com', '123456789', 'first',
       'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Password: Less than 8 characters', () => {
+    // Password must be greater than or equal to 8 characters
     result = requestRegister('first.last3@gmail.com', 'acb123', 'first',
       'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Name: First name contains numbers', () => {
+    // Name cannot have non-letter, non-space, non-spostrophe characters
     result = requestRegister('first.last4@gmail.com', 'Val1dPassword',
       '1nval1d first', 'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Name: Last name contains numbers', () => {
+    // Name cannot have non-letter, non-space, non-spostrophe characters
     result = requestRegister('first.last5@gmail.com', 'Val1dPassword',
       'first', '1nval1d last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Name: First name less than 2 characters', () => {
+    // Name must be between 2 and 20 characters
     result = requestRegister('first.last6@gmail.com', 'Val1dPassword', 'a',
       'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Name: Last name less than 2 characters', () => {
+    // Name must be between 2 and 20 characters
     result = requestRegister('first.last9@gmail.com', 'Val1dPassword',
       'first', 'a');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Name: First name more than 20 characters', () => {
+    // Name must be between 2 and 20 characters
     result = requestRegister('first.last7@gmail.com', 'Val1dPassword',
       'abcdefghijklmnopqrstuvwxyz', 'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Name: Last name more than 20 characters', () => {
+    // Name must be between 2 and 20 characters
     result = requestRegister('first.last8@gmail.com', 'Val1dPassword', 'a',
       'abcdefghijklmnopqrstuvwxyz');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Email: Does not satisfy validator.isEmail function', () => {
+    // Email must satisfy validator
     result = requestRegister('first..last@email', 'Val1dPassword',
       'first', 'last');
     expect(result.token).toStrictEqual(-1);
   });
 
   test('INVALID Email: Used by another user', () => {
+    // Emails must be unique
     requestRegister('first.last@gmail.com', 'Val1dPassword', 'first',
       'last');
 
@@ -96,21 +109,36 @@ describe('adminAuthRegister', () => {
   });
 
   test('VALID Registration: Case 1', () => {
+    // All correct details, checking simplest case
     result = requestRegister('first.last10@gmail.com', 'Val1dPassword',
       'first', 'last');
     expect(result.token).toBeGreaterThan(0);
   });
 
   test('VALID Registration: Case 2', () => {
+    // All correct details, checking simplest case
     result = requestRegister('first.last@gmail.com', 'Val1dPassword',
       'first', 'last');
     expect(result.token).toBeGreaterThan(0);
   });
 
   test('VALID Registration: Case 3', () => {
+    // All correct details, checking simplest case
     result = requestRegister('first.last2@gmail.com', 'Val1dPassword',
       'firstName', 'lastName');
     expect(result.token).toBeGreaterThan(0);
+  });
+
+  test('VALID Registrations: Multiple Users', () => {
+    result = requestRegister('first.last1@gmail.com', 'Val1dPassword',
+      'firstName', 'lastName');
+    result = requestRegister('first.last2@gmail.com', 'Val1dPassword',
+      'firstName', 'lastName');
+    result = requestRegister('first.last3@gmail.com', 'Val1dPassword',
+      'firstName', 'lastName');
+    result = requestRegister('first.last4@gmail.com', 'Val1dPassword',
+      'firstName', 'lastName');
+    expect(getData().users.length).toStrictEqual(4);
   });
 });
 
