@@ -211,7 +211,7 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 // adminQuestionCreate
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { questionBody } = req.body;
-  const token = parseInt(req.query.token as string); 
+  const token = parseInt(req.query.token as string);
   const quizId = parseInt(req.params.quizid);
   const response = adminQuestionCreate(token, quizId, questionBody);
 
