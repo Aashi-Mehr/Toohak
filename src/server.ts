@@ -17,23 +17,28 @@ import {
   adminUserDetails,
   adminAuthLogout,
   adminUserDetailsEdit,
-  adminUserPasswordEdit
+  adminUserPasswordEdit,
 } from './auth';
 
 import {
   adminQuizList,
   adminQuizInfo,
   adminQuizCreate,
+  // Uncomment the functions that you need (Lint gives an error if it's not in a
+  // comment :/)
+  // adminQuizRemove,
+  // adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
+  adminQuizTransfer,
   adminQuizRemove,
   adminQuizNameUpdate,
-  adminQuizTrash
+  adminQuizTrash,
 } from './quiz';
 
 import {
   adminQuestionCreate,
   adminQuestionMove,
-  adminQuestionDuplicate
+  adminQuestionDuplicate,
 } from './question';
 
 import { clear } from './other.js';
@@ -230,6 +235,20 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 
   res.json(response);
   backupData(req, res, response);
+});
+
+// adminQuizTransfer
+app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  let { token, userEmail } = req.body;
+  token = parseInt(token);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizTransfer(token, quizId, userEmail);
+
+  if (token === '') return res.status(401).json(response);
+  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  if ('error' in response) return res.status(400).json(response);
+
+  res.json(response);
 });
 
 // ====================================================================
