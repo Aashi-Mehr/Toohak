@@ -221,11 +221,9 @@ export function requestQuestionCreate(token: number | string,
 export function requestQuizTrash(token: number): QuizList | ErrorObject {
   const res = request(
     'GET',
-    SERVER_URL + '/v1/admin/quiz/trash',
+    SERVER_URL + '/v1/admin/quiz/trash?token=' + token,
     {
-      json: {
-        token: token
-      }
+      qs: { }
     }
   );
   // return JSON.parse(res.body.toString());

@@ -28,7 +28,8 @@ import {
   // comment :/)
   // adminQuizRemove,
   // adminQuizNameUpdate,
-  adminQuizDescriptionUpdate
+  adminQuizDescriptionUpdate,
+  adminQuizTrash
 } from './quiz';
 
 import {
@@ -165,14 +166,12 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   });
 });
 
-// adminQuizInfo
-app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+// adminQuizTrash
+app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
-  const quizId = req.params.quizid;
-  const response = adminQuizInfo(token, parseInt(quizId));
+  const response = adminQuizTrash(token);
 
-  if ('No such quiz' in response) return res.status(400).json(response);
-  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  if ('error' in response) return res.status(401).json(response);
   res.json(response);
 });
 
@@ -182,6 +181,17 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   const response = adminQuizList(token);
 
   if ('error' in response) return res.status(401).json(response);
+  res.json(response);
+});
+
+// adminQuizInfo
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  const quizId = req.params.quizid;
+  const response = adminQuizInfo(token, parseInt(quizId));
+
+  if ('No such quiz' in response) return res.status(400).json(response);
+  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
   res.json(response);
 });
 

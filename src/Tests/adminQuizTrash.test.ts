@@ -66,12 +66,7 @@ test('Test Valid Input', () => {
 
   const result = requestQuizTrash(userId.token);
   expect(result).toMatchObject({
-    quizzes: [
-      {
-        quizId: quizId,
-        name: 'first last',
-      },
-    ],
+    quizzes: [ ],
   });
 });
 
@@ -81,7 +76,8 @@ test('Test Viewing Removed Quiz', () => {
   const quizId: number = requestQuizCreate(userId.token, 'Quiz 1', 'This is Quiz 1').quizId;
 
   // Remove the quiz
-  requestQuizRemove(userId.token, quizId);
+  let res = requestQuizRemove(userId.token, quizId);
+  console.log(res);
 
   // Attempt to view the removed quiz
   const result = requestQuizTrash(userId.token);
