@@ -14,8 +14,8 @@ const ERROR = { error: expect.any(String) };
 
 const invalidUser = 10000;
 const quizId = -4123214;
-const invlalidQuestionString1 = 'asdf';
-const invlalidQuestionString2 = 'qweasdzsfhkngkujdfhgujklhgjbfrtyfghvbnsadsafsafsafc';
+const invlalidQuestion1 = 'asdf';
+const invlalidQuestion2 = 'qweasdzsfhkngkujdfhgujklhgjbfrtyfghvbnsadsafsafsafc';
 const questionString = 'How to call a person without a body and a nose?';
 
 const answers = [
@@ -238,7 +238,7 @@ describe('questionCreate', () => {
 
     test('Question string is less than 5 characters in length', () => {
       const question = {
-        question: invlalidQuestionString1,
+        question: invlalidQuestion1,
         duration: 60,
         points: 5,
         answers: answers,
@@ -249,7 +249,7 @@ describe('questionCreate', () => {
 
     test('Question string is greater than 50 characters in length', () => {
       const question = {
-        question: invlalidQuestionString2,
+        question: invlalidQuestion2,
         duration: 60,
         points: 5,
         answers: answers,

@@ -6,6 +6,7 @@ import {
   getData,
   setData,
   getQuiz,
+  getUniqueID,
   getUser
 } from './dataStore';
 
@@ -76,8 +77,7 @@ function adminQuizCreate(token: number, name: string, description: string):
 
   // Returning and altering data
   const timestamp = Math.floor(Date.now() / 1000);
-  const randomId = Math.floor(Math.random() * 1000000) + 1;
-  const quizId = timestamp * randomId % 100000000;
+  const quizId = getUniqueID(getData());
 
   createdQuizzes.push({
     quizId: quizId,
@@ -132,6 +132,7 @@ function adminQuizRemove(token: number, quizId: number):
 function adminQuizInfo(token: number, quizId: number):
   QuizDetailed | ErrorObject {
   // Ensuring the login session is valid
+
   const user = getUser(token, getData());
   if (!user) return { error: 'No such token' };
 
@@ -170,13 +171,9 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
   if (!user) return { error: 'Invalid user ID' };
 
   // Check if the name contains invalid, non-alphanumeric characters
-  if (!/^[a-zA-Z0-9\s]+$/.test(name)) {
-    return { error: 'Name contains invalid characters.' };
-  }
-
-  // Check if the name length is within the specified limits
-  if (name.length < 3 || name.length > 30) {
-    return { error: 'Name must be between 3 and 30 characters long' };
+  const invalidName = /[^a-zA-Z0-9 ']/.test(name);
+  if (invalidName || name.length < 3 || name.length > 30) {
+    return { error: 'Invalid Name' };
   }
 
   const quiz = getQuiz(quizId, getData().quizzes);
@@ -267,6 +264,41 @@ function adminQuizTransfer(token: number, quizId: number,
 }
 
 // last edit: 18/10/2023 by Zhejun Gu
+/** adminQuizTrash
+  * View the quizzes that are currently in the trash for the logged in user
+  *
+  * @param { number } token - The authUserId for the user
+  *
+  * @returns { QuizList } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+function adminQuizTrash(token: number):
+  ErrorObject | QuizList {
+  // Check if authUserId is a positive integer
+  const user = getUser(token, getData());
+  if (!user) return { error: 'Invalid user ID' };
+
+  // Gathering quizzes
+  const allQuizzes = getData().quizzes;
+  const removedQuizzes = [];
+
+  // Looping through quizzes in dataStore
+  for (const quiz of allQuizzes) {
+    if (quiz.authId === user.authUserId && quiz.in_trash === true) {
+      // If it belongs to the relevant user, it needs to be returned
+      removedQuizzes.push({
+        quizId: quiz.quizId,
+        name: quiz.name
+      });
+    }
+  }
+
+  // Return QuizList of removedQuizzes
+  return { quizzes: removedQuizzes };
+}
+
+// last edit: 25/10/2023 by Alya
+
 export {
   adminQuizList,
   adminQuizInfo,
@@ -274,5 +306,7 @@ export {
   adminQuizRemove,
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
-  adminQuizTransfer
+  adminQuizTransfer,
+  adminQuizTrash,
+
 };
