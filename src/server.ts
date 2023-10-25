@@ -222,6 +222,41 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   });
 });
 
+/* // adminQuestionMove
+app.put('v1/admin/quiz/:quizid/question/:questionid/move',
+  (req: Request, res: Response) => {
+    let { token, newPosition } = req.body;
+    const question = req.params.questionid;
+    const quiz = req.params.quizid;
+
+    token = parseInt(token);
+    const quesId = parseInt(question);
+    const quizId = parseInt(quiz);
+
+    const response = adminQuizQuesMove(token, newPosition, quesId, quizId);
+    if ('is invalid' in response) return res.status(400).json(response);
+    if ('Token' in response) return res.status(401).json(response);
+    if ('Does not match' in response) return res.status(403).json(response);
+    res.json(response);
+  });
+
+// adminQuestionDuplicate
+app.post('v1/admin/quiz/:quizid/question/:questionid/duplicate',
+  (req: Request, res: Response) => {
+    let { token } = req.body;
+    const question = req.params.questionid;
+    const quiz = req.params.quizid;
+
+    token = parseInt(token);
+    const quesId = parseInt(question);
+    const quizId = parseInt(quiz);
+
+    const response = adminQuizQuesDup(token, quesId, quizId);
+    if ('is invalid' in response) return res.status(400).json(response);
+    if ('Token' in response) return res.status(401).json(response);
+    if ('Does not match' in response) return res.status(403).json(response);
+  }); */
+
 // ====================================================================
 //  ======================== OTHER FUNCTIONS =========================
 // ====================================================================

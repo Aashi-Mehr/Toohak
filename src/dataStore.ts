@@ -69,6 +69,7 @@ interface Answer {
 
 interface Question {
   questionId: number,
+  position: number,
   question: string,
   duration: number,
   points: number,
@@ -242,4 +243,5 @@ export {
   Datastore,
   QuestionBody,
   QuestionId,
+  Answer
 };

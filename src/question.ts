@@ -69,7 +69,7 @@ export function adminQuestionCreate(token: number, quizId: number, questionBody:
     const randomInt = Math.floor(Math.random() * 7);
     answers.push({
       answerId: answerId,
-      answer: answer.string,
+      answer: answer.answer,
       colour: COLOUR[randomInt],
       correct: answer.correct
     });
@@ -79,6 +79,7 @@ export function adminQuestionCreate(token: number, quizId: number, questionBody:
 
   const newQuestion: Question = {
     questionId: questionId,
+    position: quiz.questions.length,
     question: questionBody.question,
     duration: questionBody.duration,
     points: questionBody.points,
