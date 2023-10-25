@@ -259,9 +259,9 @@ function adminQuizTrash(token: number):
   }
 
   // Quizzes list
-  return { 
-    quizId: quiz.quizId,
-    name: quiz.name
+  return {
+    quizId: removedQuizzes.quizId,
+    name: removedQuizzes.name
   };
 }
 
