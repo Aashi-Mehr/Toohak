@@ -171,7 +171,6 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
 
   // Check if the name contains invalid, non-alphanumeric characters
   const invalidName = /[^a-zA-Z0-9 ']/.test(name);
-  console.log('The name ' + name + ' is invalid: ', invalidName);
   if (invalidName || name.length < 3 || name.length > 30) {
     return { error: 'Invalid Name' };
   }
