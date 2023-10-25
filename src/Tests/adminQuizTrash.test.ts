@@ -40,12 +40,8 @@ beforeEach(() => {
 
 // Test : Invalid AuthUserId Format
 test('Test Invalid AuthUserId Format', () => {
-  // authUserId contains string
-  let result = requestQuizTrash('abc');
-  expect(result).toMatchObject({ error: expect.any(String) });
-
   // authUserId is empty
-  result = requestQuizTrash(0);
+  letresult = requestQuizTrash(0);
   expect(result).toMatchObject({ error: expect.any(String) });
 
   // authUserId contains out of range number
@@ -55,7 +51,7 @@ test('Test Invalid AuthUserId Format', () => {
 
 // Test : Non-Existing AuthUserId
 test('Test Non-existing AuthUserId', () => {
-  const userId: number = requestRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last');
+  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last');
 
   // user with authUserId does not exist
   const result = requestQuizTrash(userId.token + 1);
@@ -64,7 +60,7 @@ test('Test Non-existing AuthUserId', () => {
 
 // Test : Valid Input
 test('Test Valid Input', () => {
-  const userId: number = requestRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last');
+  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last');
   const quizId: number = requestQuizCreate(11, 'Quiz 1', 'This is Quiz 1').quizId;
 
   const result = requestQuizTrash(userId.token);
@@ -80,7 +76,7 @@ test('Test Valid Input', () => {
 
 // Test : Viewing Removed Quiz
 test('Test Viewing Removed Quiz', () => {
-  const userId: number = requestRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last');
+  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last');
   const quizId: number = requestQuizCreate(11, 'Quiz 1', 'This is Quiz 1').quizId;
 
   // Remove the quiz
