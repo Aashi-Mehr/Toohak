@@ -256,12 +256,7 @@ function adminQuizTrash(token: number):
       });
     }
   }
-
-  // Quizzes list
-  // return {
-  //   quizId: removedQuizzes.quizId,
-  //   name: removedQuizzes.name
-  // };
+  // Return removedQuizzes array by QuizList interface
   return { quizzes: removedQuizzes };
 }
 
