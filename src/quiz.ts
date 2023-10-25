@@ -4,6 +4,7 @@ import {
   QuizId,
   QuizList,
   getData,
+  setData,
   getQuiz,
   getUniqueID,
   getUser
@@ -171,7 +172,6 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
 
   // Check if the name contains invalid, non-alphanumeric characters
   const invalidName = /[^a-zA-Z0-9 ']/.test(name);
-  console.log('The name ' + name + ' is invalid: ', invalidName);
   if (invalidName || name.length < 3 || name.length > 30) {
     return { error: 'Invalid Name' };
   }
@@ -205,7 +205,7 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
   * @returns { ErrorObject } - If the details given are invalid
   */
 function adminQuizDescriptionUpdate(token: number, quizId: number,
-  description: any): ErrorObject | Record<string, never> {
+  description: string): ErrorObject | Record<string, never> {
   if (description.length > 100) return { error: 'Descrption too long' };
 
   const quiz = getQuiz(quizId, getData().quizzes);
@@ -225,12 +225,88 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
   return { error: 'Quiz not owned by user' };
 }
 
+/** adminQuizTransfer
+  * Transfer a quiz from one user to another user
+  *
+  * @param { number } token - The authUserId for the user
+  * @param { number } quizId - The quizId of the quiz
+  * @param { string } userEmail - the email of the new user
+  *
+  * @returns { Record<string, never> } - If the inputs are valid
+  * @returns { ErrorObject } - If the inputs are invalid
+  */
+function adminQuizTransfer(token: number, quizId: number,
+  userEmail: string): ErrorObject | Record<string, never> {
+  const data = getData();
+  // Checking if the user exists
+  const user = getUser(token, data);
+  if (!user) return { error: 'Invalid user ID' };
+
+  const quiz = getQuiz(quizId, data.quizzes);
+  if (!quiz) return { error: 'Quiz is not owned by user' };
+
+  if (quiz.authId !== user.authUserId) return { error: 'Quiz is not owned by user' };
+
+  const newUser = data.users.find(user => user.email === userEmail);
+  if (!newUser) {
+    return { error: 'userEmail is not a real user' };
+  } else if (user.email === userEmail) {
+    return { error: 'userEmail is the current logged in user' };
+  } else if (data.quizzes.some(quiz2 => quiz2.authId === newUser.authUserId && quiz2.name === quiz.name)) {
+    return { error: 'Quiz ID refers to a quiz that has a name that is already used by the target user' };
+  }
+
+  quiz.authId = newUser.authUserId;
+
+  setData(data);
+
+  return {};
+}
+
 // last edit: 18/10/2023 by Zhejun Gu
+/** adminQuizTrash
+  * View the quizzes that are currently in the trash for the logged in user
+  *
+  * @param { number } token - The authUserId for the user
+  *
+  * @returns { QuizList } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+function adminQuizTrash(token: number):
+  ErrorObject | QuizList {
+  // Check if authUserId is a positive integer
+  const user = getUser(token, getData());
+  if (!user) return { error: 'Invalid user ID' };
+
+  // Gathering quizzes
+  const allQuizzes = getData().quizzes;
+  const removedQuizzes = [];
+
+  // Looping through quizzes in dataStore
+  for (const quiz of allQuizzes) {
+    if (quiz.authId === user.authUserId && quiz.in_trash === true) {
+      // If it belongs to the relevant user, it needs to be returned
+      removedQuizzes.push({
+        quizId: quiz.quizId,
+        name: quiz.name
+      });
+    }
+  }
+
+  // Return QuizList of removedQuizzes
+  return { quizzes: removedQuizzes };
+}
+
+// last edit: 25/10/2023 by Alya
+
 export {
   adminQuizList,
   adminQuizInfo,
   adminQuizCreate,
   adminQuizRemove,
   adminQuizNameUpdate,
-  adminQuizDescriptionUpdate
+  adminQuizDescriptionUpdate,
+  adminQuizTransfer,
+  adminQuizTrash,
+
 };

@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 
-import data from './data.json';
+import data from '../data.json';
 
 import {
   adminAuthLogin,
@@ -17,7 +17,7 @@ import {
   adminUserDetails,
   adminAuthLogout,
   adminUserDetailsEdit,
-  adminUserPasswordEdit
+  adminUserPasswordEdit,
 } from './auth';
 
 import {
@@ -29,14 +29,16 @@ import {
   // adminQuizRemove,
   // adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
+  adminQuizTransfer,
   adminQuizRemove,
-  adminQuizNameUpdate
+  adminQuizNameUpdate,
+  adminQuizTrash,
 } from './quiz';
 
 import {
   adminQuestionCreate,
   adminQuestionMove,
-  adminQuestionDuplicate
+  adminQuestionDuplicate,
 } from './question';
 
 import { clear } from './other.js';
@@ -62,7 +64,7 @@ const HOST: string = process.env.IP || 'localhost';
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
 function backupData(req: Request, res: Response, response: any) {
-  fs.writeFile('./data.json', JSON.stringify(getData()), (err) => {
+  fs.writeFile('data.json', JSON.stringify(getData()), (err) => {
     if (err) return res.status(404).json(response);
   });
 }
@@ -109,6 +111,8 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// =========================== ITERATION 2 ============================
+
 // adminAuthLogout
 app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
   const token = parseInt(req.body.token);
@@ -134,7 +138,7 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
   backupData(req, res, response);
 });
 
-// adminUserPasswordsEdit
+// adminUserPasswordEdit
 app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   const { token, oldPassword, newPassword } = req.body;
   const response = adminUserPasswordEdit(parseInt(token), oldPassword,
@@ -172,6 +176,15 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   backupData(req, res, response);
 });
 
+// adminQuizTrash
+app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizTrash(token);
+
+  if ('error' in response) return res.status(401).json(response);
+  res.json(response);
+});
+
 // adminQuizRemove
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
@@ -180,6 +193,17 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
 
   res.json(response);
   backupData(req, res, response);
+});
+
+// adminQuizInfo
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  const quizId = req.params.quizid;
+  const response = adminQuizInfo(token, parseInt(quizId));
+
+  if ('No such quiz' in response) return res.status(400).json(response);
+  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  res.json(response);
 });
 
 // adminQuizNameUpdate
@@ -213,14 +237,17 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   backupData(req, res, response);
 });
 
-// adminQuizInfo
-app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
-  const quizId = req.params.quizid;
-  const response = adminQuizInfo(token, parseInt(quizId));
+// adminQuizTransfer
+app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  let { token, userEmail } = req.body;
+  token = parseInt(token);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizTransfer(token, quizId, userEmail);
 
-  if ('No such quiz' in response) return res.status(400).json(response);
+  if (token === '') return res.status(401).json(response);
   if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  if ('error' in response) return res.status(400).json(response);
+
   res.json(response);
 });
 

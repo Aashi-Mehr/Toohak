@@ -7,7 +7,7 @@
     Zhejun Gu (z5351573)
 
   Edited on:
-    24/10/2023
+    25/10/2023
   */
 
 import request from 'sync-request-curl';
@@ -27,38 +27,20 @@ interface Token {
   token: number
 }
 
+import { QuestionId } from '../dataStore';
+
 /// ////////////////////////////////////////////////////////////////////////////
 /// ////////////////////////// Wrapper Functions ///////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 
 // POST REGISTER Define wrapper function
-function requestRegister(email: string, password: string, nameFirst: string,
-  nameLast: string): Token {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/auth/register',
-    {
-      json: {
-        email: email,
-        password: password,
-        nameFirst: nameFirst,
-        nameLast: nameLast
-      }
-    }
-  );
-
-  const result = JSON.parse(res.body.toString());
-
-  if ('error' in result) return { token: -1 };
-  else return result;
-}
+import { requestRegister } from './testHelper';
 
 // QUIZ CREATE Define wrapper function
 import { requestQuizCreate } from './testHelper';
 
 // QUESTION CREATE Define wrapper function
 import { requestQuestionCreate } from './testHelper';
-/* import { QuestionId } from '../dataStore'; */
 
 // QUESTION MOVE Define wrapper function
 function requestQuesMove(token: number | string, newPosition: number,
@@ -76,7 +58,7 @@ function requestQuesMove(token: number | string, newPosition: number,
   return JSON.parse(res.body.toString());
 }
 
-/* // QUESTION Duplicate Define wrapper function
+// QUESTION Duplicate Define wrapper function
 function requestQuesDup(token: number, quizid: number,
   questionid: number): QuestionId | ErrorObject {
   const res = request(
@@ -89,7 +71,7 @@ function requestQuesDup(token: number, quizid: number,
     }
   );
   return JSON.parse(res.body.toString());
-} */
+}
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
@@ -193,7 +175,7 @@ describe('adminQuesMove', () => {
   });
 });
 
-/* // Test function : adminQuesDup
+// Test function : adminQuesDup
 describe('adminQuesDup', () => {
   let userId1: Token;
   let userId2: Token;
@@ -203,7 +185,7 @@ describe('adminQuesDup', () => {
 
   test('INVALID INPUT: invalid quesId or token, valid token but not match', () => {
     userId1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last');
-    userId2 = requestRegister('first.last2@gmail.com', 'DABc4231', 'first2', 'last2');
+    userId2 = requestRegister('first.last2@gmail.com', 'DABc4231', 'firstt', 'lastt');
     quizId = requestQuizCreate(userId1.token, 'first last', 'first quiz').quizId;
 
     quesId1 = requestQuestionCreate(userId1.token,
@@ -225,7 +207,7 @@ describe('adminQuesDup', () => {
       }
     ).questionId;
 
-    quesId2 = requestQuestionCreate(userId2.token,
+    quesId2 = requestQuestionCreate(userId1.token,
       quizId,
       {
         question: 'Why is moon of the Earth bright in the sky?',
@@ -274,6 +256,6 @@ describe('adminQuesDup', () => {
     ).questionId;
 
     const result = requestQuesDup(userId1.token, quizId, quesId2);
-    expect(result).toMatchObject(expect.any(Number));
+    expect(result).toMatchObject({ questionId: expect.any(Number) });
   });
-}); */
+});
