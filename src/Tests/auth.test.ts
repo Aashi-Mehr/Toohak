@@ -2,7 +2,6 @@ import {
   Token,
   ErrorObject,
   Details,
-  getData
 } from '../dataStore';
 
 import {
@@ -130,15 +129,23 @@ describe('adminAuthRegister', () => {
   });
 
   test('VALID Registrations: Multiple Users', () => {
-    result = requestRegister('first.last1@gmail.com', 'Val1dPassword',
-      'firstName', 'lastName');
-    result = requestRegister('first.last2@gmail.com', 'Val1dPassword',
-      'firstName', 'lastName');
-    result = requestRegister('first.last3@gmail.com', 'Val1dPassword',
-      'firstName', 'lastName');
-    result = requestRegister('first.last4@gmail.com', 'Val1dPassword',
-      'firstName', 'lastName');
-    expect(getData().users.length).toStrictEqual(4);
+    requestRegister('first1@gmail.com', 'Val1dPassword', 'first', 'last');
+    requestRegister('first2@gmail.com', 'Val1dPassword', 'first', 'last');
+    requestRegister('first3@gmail.com', 'Val1dPassword', 'first', 'last');
+    requestRegister('first4@gmail.com', 'Val1dPassword', 'first', 'last');
+
+    expect(requestLogin('first1@gmail.com', 'Val1dPassword')).toMatchObject({
+      token: expect.any(Number)
+    });
+    expect(requestLogin('first2@gmail.com', 'Val1dPassword')).toMatchObject({
+      token: expect.any(Number)
+    });
+    expect(requestLogin('first3@gmail.com', 'Val1dPassword')).toMatchObject({
+      token: expect.any(Number)
+    });
+    expect(requestLogin('first4@gmail.com', 'Val1dPassword')).toMatchObject({
+      token: expect.any(Number)
+    });
   });
 });
 
@@ -415,7 +422,7 @@ describe('adminAuthLogout', () => {
     result = requestLogout(token);
     expect(Object.keys(result).length).toStrictEqual(0);
 
-    let info = requestDetails(token);
+    const info = requestDetails(token);
     expect(info).toMatchObject({ error: expect.any(String) });
   });
 
@@ -426,7 +433,7 @@ describe('adminAuthLogout', () => {
     result = requestLogout(token);
     expect(Object.keys(result).length).toStrictEqual(0);
 
-    let info = requestDetails(token);
+    const info = requestDetails(token);
     expect(info).toMatchObject({ error: expect.any(String) });
   });
 
@@ -437,7 +444,7 @@ describe('adminAuthLogout', () => {
     result = requestLogout(token);
     expect(Object.keys(result).length).toStrictEqual(0);
 
-    let info = requestDetails(token);
+    const info = requestDetails(token);
     expect(info).toMatchObject({ error: expect.any(String) });
   });
 

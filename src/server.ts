@@ -24,10 +24,6 @@ import {
   adminQuizList,
   adminQuizInfo,
   adminQuizCreate,
-  // Uncomment the functions that you need (Lint gives an error if it's not in a
-  // comment :/)
-  // adminQuizRemove,
-  // adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
   adminQuizTransfer,
   adminQuizRemove,
