@@ -196,6 +196,22 @@ export function requestQuizDescriptionUpdate(token: number | string,
   return JSON.parse(res.body.toString());
 }
 
+export function requestQuizNameUpdate(token: number, quizId: number,
+  name: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/name',
+    {
+      json: {
+        token: token,
+        name: name,
+      }
+    }
+  );
+
+  return JSON.parse(res.body.toString());
+}
+
 // QUIZ REMOVE Define wrapper function
 export function requestQuizRemove(token: number, quizId: number):
   ErrorObject | Record<string, never> {

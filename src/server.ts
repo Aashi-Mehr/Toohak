@@ -28,7 +28,9 @@ import {
   // comment :/)
   // adminQuizRemove,
   // adminQuizNameUpdate,
-  adminQuizDescriptionUpdate
+  adminQuizDescriptionUpdate,
+  adminQuizRemove,
+  adminQuizNameUpdate
 } from './quiz';
 
 import {
@@ -149,6 +151,15 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
 //  ========================= QUIZ FUNCTIONS =========================
 // ====================================================================
 
+// adminQuizList
+app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizList(token);
+
+  if ('error' in response) return res.status(401).json(response);
+  res.json(response);
+});
+
 // adminQuizCreate
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const { token, name, description } = req.body;
@@ -159,24 +170,29 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   backupData(req, res, response);
 });
 
-// adminQuizList
-app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+// adminQuizRemove
+app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
-  const response = adminQuizList(token);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizRemove(token, quizId);
 
-  if ('error' in response) return res.status(401).json(response);
   res.json(response);
+  backupData(req, res, response);
 });
 
-// adminQuizInfo
-app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
-  const quizId = req.params.quizid;
-  const response = adminQuizInfo(token, parseInt(quizId));
+// adminQuizNameUpdate
+app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
+  const { token, name } = req.body;
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizNameUpdate(parseInt(token), quizId, name);
 
-  if ('No such quiz' in response) return res.status(400).json(response);
-  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  if ('Quiz is not owned by user' in response) {
+    return res.status(403).json(response);
+  }
+  if ('error' in response) return res.status(400).json(response);
+
   res.json(response);
+  backupData(req, res, response);
 });
 
 // adminQuizDescriptionUpdate
@@ -193,6 +209,17 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 
   res.json(response);
   backupData(req, res, response);
+});
+
+// adminQuizInfo
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  const quizId = req.params.quizid;
+  const response = adminQuizInfo(token, parseInt(quizId));
+
+  if ('No such quiz' in response) return res.status(400).json(response);
+  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  res.json(response);
 });
 
 // ====================================================================
@@ -257,5 +284,7 @@ const server = app.listen(PORT, HOST, () => {
 
 // For coverage, handle Ctrl+C gracefully
 process.on('SIGINT', () => {
+  backupData(null, null, null);
+  console.log('Final data should be:', getData());
   server.close(() => console.log('Shutting down server gracefully.'));
 });
