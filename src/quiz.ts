@@ -256,7 +256,8 @@ function adminQuizTrash(token: number):
       });
     }
   }
-  // Return removedQuizzes array by QuizList interface
+
+  // Return QuizList of removedQuizzes
   return { quizzes: removedQuizzes };
 }
 
