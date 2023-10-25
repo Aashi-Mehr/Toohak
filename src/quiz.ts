@@ -245,7 +245,7 @@ function adminQuizTrash(token: number):
 
   // Gathering quizzes
   const allQuizzes = getData().quizzes;
-  const removedQuizzes = [];
+  const removedQuizzes: QuizBrief[] = [];
 
   // Looping through quizzes in dataStore
   for (const quiz of allQuizzes) {
@@ -259,10 +259,11 @@ function adminQuizTrash(token: number):
   }
 
   // Quizzes list
-  return {
-    quizId: removedQuizzes.quizId,
-    name: removedQuizzes.name
-  };
+  // return {
+  //   quizId: removedQuizzes.quizId,
+  //   name: removedQuizzes.name
+  // };
+  return { removedQuizzes };
 }
 
 // last edit: 25/10/2023 by Alya
