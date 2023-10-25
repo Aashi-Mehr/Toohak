@@ -94,11 +94,11 @@ function requestQuesMove(token: number | string, newPosition: number,
   return JSON.parse(res.body.toString());
 }
 
-// QUESTION MOVE Define wrapper function
+// QUESTION Duplicate Define wrapper function
 function requestQuesDup(token: number | string, quesId: number,
   quizId: number): number | ErrorObject {
   const res = request(
-    'PUT',
+    'POST',
         `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}/duplicate`,
         {
           json: {
