@@ -56,24 +56,7 @@ function requestRegister(email: string, password: string, nameFirst: string,
 }
 
 // QUIZ CREATE Define wrapper function
-function requestQuiz(token: number | string, name: string, description: any):
-      QuizId {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/quiz',
-    {
-      json: {
-        token: token,
-        name: name,
-        description: description
-      }
-    }
-  );
-
-  const result = JSON.parse(res.body.toString());
-
-  if ('error' in result) { return { quizId: -1 }; } else { return result; }
-}
+import { requestQuizCreate } from './testHelper';
 
 // QUESTION CREATE Define wrapper function
 import { requestQuestionCreate } from './testHelper';
@@ -134,7 +117,7 @@ describe('adminQuesMove', () => {
 
   test('INVALID INPUT: invalid quesId, newPosition or is current postion', () => {
     userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last');
-    quizId = requestQuiz(userId.token, 'first last', 'first quiz').quizId;
+    quizId = requestQuizCreate(userId.token, 'first last', 'first quiz').quizId;
     quesId1 = requestQuestionCreate(userId.token,
       quizId,
       {
@@ -178,7 +161,7 @@ describe('adminQuesMove', () => {
 
   test('VALID INPUT', () => {
     userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last');
-    quizId = requestQuiz(userId.token, 'first last', 'first quiz').quizId;
+    quizId = requestQuizCreate(userId.token, 'first last', 'first quiz').quizId;
     quesId2 = requestQuestionCreate(userId.token,
       quizId,
       {
@@ -210,7 +193,7 @@ describe('adminQuesDup', () => {
   test('INVALID INPUT: invalid quesId or token, valid token but not match', () => {
     userId1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last');
     userId2 = requestRegister('first.last2@gmail.com', 'DABc4231', 'first2', 'last2');
-    quizId = requestQuiz(userId1.token, 'first last', 'first quiz').quizId;
+    quizId = requestQuizCreate(userId1.token, 'first last', 'first quiz').quizId;
 
     quesId1 = requestQuestionCreate(userId1.token,
       quizId,
@@ -253,7 +236,7 @@ describe('adminQuesDup', () => {
 
   test('VALID INPUT', () => {
     userId1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last');
-    quizId = requestQuiz(userId1.token, 'first last', 'first quiz').quizId;
+    quizId = requestQuizCreate(userId1.token, 'first last', 'first quiz').quizId;
     quesId1 = requestQuestionCreate(userId1.token,
       quizId,
       {
