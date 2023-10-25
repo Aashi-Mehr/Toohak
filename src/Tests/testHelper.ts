@@ -84,9 +84,11 @@ export function requestDetails(token: number): Details | ErrorObject {
 export function requestLogout(token: number): ErrorObject | Record<string, never> {
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/auth/logout?token=' + token,
+    SERVER_URL + '/v1/admin/auth/logout',
     {
-      json: { }
+      json: {
+        token: token,
+      }
     }
   );
 
@@ -98,9 +100,10 @@ export function requestDetailsEdit(token: number, email: string, nameFirst: stri
   nameLast: string): ErrorObject | Record<string, never> {
   const res = request(
     'PUT',
-    SERVER_URL + '/v1/admin/user/details?token=' + token,
+    SERVER_URL + '/v1/admin/user/details',
     {
       json: {
+        token: token,
         email: email,
         nameFirst: nameFirst,
         nameLast: nameLast
@@ -116,9 +119,10 @@ export function requestPasswordEdit(token: number, oldPass: string, newPass: str
   ErrorObject | Record<string, never> {
   const res = request(
     'PUT',
-    SERVER_URL + '/v1/admin/user/password?token=' + token,
+    SERVER_URL + '/v1/admin/user/password',
     {
       json: {
+        token: token,
         oldPassword: oldPass,
         newPassword: newPass
       }
@@ -133,9 +137,10 @@ export function requestQuizCreate(token: number, name: string,
   description: any): QuizId {
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/quiz?token=' + token,
+    SERVER_URL + '/v1/admin/quiz',
     {
       json: {
+        token: token,
         name: name,
         description: description
       }
@@ -179,10 +184,27 @@ export function requestQuizDescriptionUpdate(token: number | string,
   quizId: number, description: string) {
   const res = request(
     'PUT',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '/description?token=' + token,
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/description',
     {
       json: {
+        token: token,
         description: description,
+      }
+    }
+  );
+
+  return JSON.parse(res.body.toString());
+}
+
+export function requestQuizNameUpdate(token: number, quizId: number,
+  name: string) {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/name',
+    {
+      json: {
+        token: token,
+        name: name,
       }
     }
   );
@@ -207,9 +229,10 @@ export function requestQuestionCreate(token: number | string,
   quizId: number, questionBody: QuestionBody): QuestionId {
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '/question?token=' + token,
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/question',
     {
       json: {
+        token: token,
         questionBody: questionBody,
       }
     }

@@ -106,11 +106,7 @@ interface Datastore {
 }
 
 // INTERFACE Datastore
-let data: Datastore = {
-  users: [],
-  quizzes: [],
-  sessions: []
-};
+let data: Datastore;
 
 // DATASTORE FUNCTIONS
 /** getData
