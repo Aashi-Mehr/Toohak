@@ -258,7 +258,7 @@ function adminQuizTrash(token: number):
   }
 
   // Quizzes list
-  return { quizzes: removedQuizzes };
+  return { removedQuizzes };
 }
 
 // last edit: 25/10/2023 by Alya
