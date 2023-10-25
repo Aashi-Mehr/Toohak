@@ -60,7 +60,6 @@ const HOST: string = process.env.IP || 'localhost';
 function backupData(req: Request, res: Response, response: any) {
   fs.writeFile('./data.json', JSON.stringify(getData()), (err) => {
     if (err) return res.status(404).json(response);
-    else console.log('Successfully wrote:', getData());
   });
 }
 
