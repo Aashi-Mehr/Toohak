@@ -171,7 +171,6 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
 
   // Check if the name contains invalid, non-alphanumeric characters
   const invalidName = /[^a-zA-Z0-9 ']/.test(name);
-  console.log('The name ' + name + ' is invalid: ', invalidName);
   if (invalidName || name.length < 3 || name.length > 30) {
     return { error: 'Invalid Name' };
   }
@@ -225,12 +224,46 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
   return { error: 'Quiz not owned by user' };
 }
 
-// last edit: 18/10/2023 by Zhejun Gu
+/** adminQuizTrash
+  * View the quizzes that are currently in the trash for the logged in user
+  *
+  * @param { number } token - The authUserId for the user
+  *
+  * @returns { QuizList } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+function adminQuizTrash(token: number):
+  ErrorObject | QuizList {
+  // Check if authUserId is a positive integer
+  const user = getUser(token, getData());
+  if (!user) return { error: 'Invalid user ID' };
+
+  // Gathering quizzes
+  const allQuizzes = getData().quizzes;
+  const removedQuizzes = [];
+
+  // Looping through quizzes in dataStore
+  for (const quiz of allQuizzes) {
+    if (quiz.authId === user.authUserId && quiz.in_trash === true) {
+      // If it belongs to the relevant user, it needs to be returned
+      removedQuizzes.push({
+        quizId: quiz.quizId,
+        name: quiz.name
+      });
+    }
+  }
+
+  // Return QuizList of removedQuizzes
+  return { quizzes: removedQuizzes };
+}
+
+// last edit: 25/10/2023 by Alya
 export {
   adminQuizList,
   adminQuizInfo,
   adminQuizCreate,
   adminQuizRemove,
   adminQuizNameUpdate,
-  adminQuizDescriptionUpdate
+  adminQuizDescriptionUpdate,
+  adminQuizTrash
 };
