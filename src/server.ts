@@ -34,7 +34,9 @@ import {
 } from './quiz';
 
 import {
-  adminQuestionCreate
+  adminQuestionCreate,
+  adminQuestionMove,
+  adminQuestionDuplicate
 } from './question';
 
 import { clear } from './other.js';
@@ -240,6 +242,42 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   res.json(response);
   backupData(req, res, response);
 });
+
+// adminQuestionMove
+app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
+  (req: Request, res: Response) => {
+    let { token, newPosition } = req.body;
+    const question = req.params.questionid;
+    const quiz = req.params.quizid;
+
+    token = parseInt(token);
+    const quesId = parseInt(question);
+    const quizId = parseInt(quiz);
+
+    const response = adminQuestionMove(token, newPosition, quesId, quizId);
+    if ('is invalid' in response) return res.status(400).json(response);
+    if ('Token' in response) return res.status(401).json(response);
+    if ('Does not match' in response) return res.status(403).json(response);
+    res.json(response);
+  });
+
+// adminQuestionDuplicate
+app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
+  (req: Request, res: Response) => {
+    const { token } = req.body;
+    const quiz = req.params.quizid;
+    const question = req.params.questionid;
+
+    const token1 = parseInt(token);
+    const quesId = parseInt(question);
+    const quizId = parseInt(quiz);
+
+    const response = adminQuestionDuplicate(token1, quesId, quizId);
+    if ('is invalid' in response) return res.status(400).json(response);
+    if ('Token' in response) return res.status(401).json(response);
+    if ('Does not match' in response) return res.status(403).json(response);
+    res.json(response);
+  });
 
 // ====================================================================
 //  ======================== OTHER FUNCTIONS =========================

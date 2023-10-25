@@ -1,1 +1,1 @@
-{"users":[{"authUserId":10001311,"nameFirst":"John","nameLast":"Doe","name":"John Doe","email":"user@gmail.com","password":"password1","successful_log_time":0,"failed_password_num":0,"prev_passwords":["password1"]}],"quizzes":[{"quizId":10001996,"authId":10001311,"name":"Updated Quiz Name","description":"Description","timeCreated":1698226030,"timeLastEdited":1698226030,"in_trash":false,"questions":[]}],"sessions":[{"token":10002379,"authUserId":10001311,"is_valid":true}]}
+{"users":[],"quizzes":[],"sessions":[]}
