@@ -17,7 +17,7 @@ import {
   requestQuizRemove,
   requestQuizCreate
 } from './testHelper';
-import { Token } from './dataStore';
+import { Token } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
 
@@ -62,7 +62,7 @@ test('Test Non-existing AuthUserId', () => {
 // Test : Valid Input
 test('Test Valid Input', () => {
   const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last');
-  const quizId: number = requestQuizCreate(11, 'Quiz 1', 'This is Quiz 1').quizId;
+  const quizId: number = requestQuizCreate(userId.token, 'Quiz1', 'This is Quiz 1').quizId;
 
   const result = requestQuizTrash(userId.token);
   expect(result).toMatchObject({
@@ -78,7 +78,7 @@ test('Test Valid Input', () => {
 // Test : Viewing Removed Quiz
 test('Test Viewing Removed Quiz', () => {
   const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last');
-  const quizId: number = requestQuizCreate(11, 'Quiz 1', 'This is Quiz 1').quizId;
+  const quizId: number = requestQuizCreate(userId.token, 'Quiz 1', 'This is Quiz 1').quizId;
 
   // Remove the quiz
   requestQuizRemove(userId.token, quizId);
