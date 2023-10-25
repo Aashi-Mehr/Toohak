@@ -246,18 +246,19 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
 // adminQuestionDuplicate
 app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
   (req: Request, res: Response) => {
-    let { token } = req.body;
+    const { token } = req.body;
     const quiz = req.params.quizid;
     const question = req.params.questionid;
 
-    token = parseInt(token);
+    const token1 = parseInt(token);
     const quesId = parseInt(question);
     const quizId = parseInt(quiz);
 
-    const response = adminQuestionDuplicate(token, quesId, quizId);
+    const response = adminQuestionDuplicate(token1, quesId, quizId);
     if ('is invalid' in response) return res.status(400).json(response);
     if ('Token' in response) return res.status(401).json(response);
     if ('Does not match' in response) return res.status(403).json(response);
+    res.json(response);
   });
 
 // ====================================================================

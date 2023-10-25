@@ -77,13 +77,15 @@ function requestQuesMove(token: number | string, newPosition: number,
 }
 
 /* // QUESTION Duplicate Define wrapper function
-function requestQuesDup(token: number | string, quizid: number,
+function requestQuesDup(token: number, quizid: number,
   questionid: number): QuestionId | ErrorObject {
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/quiz/' + quizid + '/question/' + questionid + '/duplicate?token=' + token,
+    `${SERVER_URL}/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`,
     {
-      json: { }
+      json: {
+        token: token
+      }
     }
   );
   return JSON.parse(res.body.toString());
@@ -125,6 +127,10 @@ describe('adminQuesMove', () => {
           {
             answer: 'Prince Charles',
             correct: true
+          },
+          {
+            answer: 'Lovely Joe',
+            correct: false
           }
         ]
       }
@@ -137,6 +143,10 @@ describe('adminQuesMove', () => {
         duration: 3,
         points: 5,
         answers: [
+          {
+            answer: 'It reflects sun light',
+            correct: true
+          },
           {
             answer: 'It is self luminous',
             correct: false
@@ -169,6 +179,10 @@ describe('adminQuesMove', () => {
           {
             answer: 'Prince Charles',
             correct: true
+          },
+          {
+            answer: 'Lovely Joe',
+            correct: false
           }
         ]
       }
@@ -202,18 +216,26 @@ describe('adminQuesDup', () => {
           {
             answer: 'Prince Charles',
             correct: true
+          },
+          {
+            answer: 'Lovely Joe',
+            correct: false
           }
         ]
       }
     ).questionId;
 
-    quesId2 = requestQuestionCreate(userId1.token,
+    quesId2 = requestQuestionCreate(userId2.token,
       quizId,
       {
         question: 'Why is moon of the Earth bright in the sky?',
         duration: 3,
         points: 5,
         answers: [
+          {
+            answer: 'It reflects sun light',
+            correct: true
+          },
           {
             answer: 'It is self luminous',
             correct: false
@@ -222,17 +244,17 @@ describe('adminQuesDup', () => {
       }
     ).questionId;
 
-    const result1 = requestQuesDup(userId1.token, quesId1 + quesId2, quizId);
-    const result3 = requestQuesDup(userId2.token, quesId1, quizId);
+    const result1 = requestQuesDup(userId1.token, quizId, (quesId1 + 1));
+    const result3 = requestQuesDup(userId2.token, quizId, quesId1);
 
     expect(result1).toMatchObject({ error: expect.any(String) });
     expect(result3).toMatchObject({ error: expect.any(String) });
   });
 
   test('VALID INPUT', () => {
-    userId1 = requestRegister('first.last3@gmail.com', 'BaCd2134', 'first', 'last');
-    quizId = requestQuizCreate(userId1.token, 'first last', 'Third quiz').quizId;
-    quesId1 = requestQuestionCreate(userId1.token,
+    userId1 = requestRegister('first.last3@gmail.com', 'BaCd2134', 'firs', 'las');
+    quizId = requestQuizCreate(userId1.token, 'firs las', 'Third quiz').quizId;
+    quesId2 = requestQuestionCreate(userId1.token,
       quizId,
       {
         question: 'Who is the Monarch of England?',
@@ -242,12 +264,16 @@ describe('adminQuesDup', () => {
           {
             answer: 'Prince Charles',
             correct: true
+          },
+          {
+            answer: 'Lovely Joe',
+            correct: false
           }
         ]
       }
     ).questionId;
 
-    const result = requestQuesDup(userId1.token, quizId, quesId1);
+    const result = requestQuesDup(userId1.token, quizId, quesId2);
     expect(result).toMatchObject(expect.any(Number));
   });
-}) */
+}); */

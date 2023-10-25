@@ -167,7 +167,7 @@ export function adminQuestionDuplicate(token: number, quesId: number,
   // Get data from database
   const data = getData();
   const quiz = getQuiz(quizId, getData().quizzes);
-  const user = getSession(token, getData().sessions);
+  /* const session = getSession(token, getData().sessions); */
 
   // Get the question asked for duplicating
   let currQues;
@@ -179,12 +179,19 @@ export function adminQuestionDuplicate(token: number, quesId: number,
     }
   }
 
+  let currUser;
+  for (const user of data.sessions) {
+    if (user.token === token) {
+      currUser = user;
+    }
+  }
+
   // Error check
   if (!quiz) return { error: 'Quiz ID is invalid' };
   if (findQues === false) return { error: 'Ques ID is invalid' };
   if (token === undefined) return { error: 'Token empty' };
-  if (quiz.authId !== token) { return { error: 'Does not match the given quiz' }; }
-  if (user.is_valid === false) return { error: 'Token is not valid' };
+  if (currUser.is_valid === false) return { error: 'Token is not valid' };
+  if (quiz.authId !== currUser.authUserId) return { error: 'Does not match the given quiz' };
 
   // Calculate the duplicated question position
   const newQuesPos = currQues.position + 1;
