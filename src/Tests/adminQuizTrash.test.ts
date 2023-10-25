@@ -16,7 +16,7 @@ import {
   requestQuizTrash,
   requestQuizRemove,
   requestQuizCreate
-} from './testHelp';
+} from './testHelper';
 
 const SERVER_URL = `${url}:${port}`;
 

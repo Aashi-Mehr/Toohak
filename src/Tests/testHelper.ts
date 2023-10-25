@@ -228,7 +228,7 @@ export function requestQuizTrash(token: number): QuizList | ErrorObject {
       }
     }
   );
-//   return JSON.parse(res.body.toString());
+  // return JSON.parse(res.body.toString());
   const result = JSON.parse(res.body as string);
 
   if ('error' in result) { return { error: 'error' }; } else { return result; }
