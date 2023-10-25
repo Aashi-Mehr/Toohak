@@ -32,7 +32,9 @@ import {
 } from './quiz';
 
 import {
-  adminQuestionCreate
+  adminQuestionCreate,
+  adminQuestionMove,
+  adminQuestionDuplicate
 } from './question';
 
 import { clear } from './other.js';
@@ -209,7 +211,8 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 // adminQuestionCreate
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { questionBody } = req.body;
-  const token = parseInt(req.query.token as string); const quizId = parseInt(req.params.quizid);
+  const token = parseInt(req.query.token as string);
+  const quizId = parseInt(req.params.quizid);
   const response = adminQuestionCreate(token, quizId, questionBody);
 
   if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
@@ -221,6 +224,42 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
     if (err) return res.status(404).json(response);
   });
 });
+
+// adminQuestionMove
+app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
+  (req: Request, res: Response) => {
+    let { token, newPosition } = req.body;
+    const question = req.params.questionid;
+    const quiz = req.params.quizid;
+
+    token = parseInt(token);
+    const quesId = parseInt(question);
+    const quizId = parseInt(quiz);
+
+    const response = adminQuestionMove(token, newPosition, quesId, quizId);
+    if ('is invalid' in response) return res.status(400).json(response);
+    if ('Token' in response) return res.status(401).json(response);
+    if ('Does not match' in response) return res.status(403).json(response);
+    res.json(response);
+  });
+
+// adminQuestionDuplicate
+app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
+  (req: Request, res: Response) => {
+    const { token } = req.body;
+    const quiz = req.params.quizid;
+    const question = req.params.questionid;
+
+    const token1 = parseInt(token);
+    const quesId = parseInt(question);
+    const quizId = parseInt(quiz);
+
+    const response = adminQuestionDuplicate(token1, quesId, quizId);
+    if ('is invalid' in response) return res.status(400).json(response);
+    if ('Token' in response) return res.status(401).json(response);
+    if ('Does not match' in response) return res.status(403).json(response);
+    res.json(response);
+  });
 
 // ====================================================================
 //  ======================== OTHER FUNCTIONS =========================
