@@ -202,6 +202,16 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   });
 });
 
+// adminQuizTrash
+app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  console.log('is this error');
+  const response = adminQuizTrash(token);
+
+  if ('error' in response) return res.status(401).json(response);
+  res.json(response);
+});
+
 // ====================================================================
 //  ========================= QUESTION FUNCTIONS ======================
 // ====================================================================
