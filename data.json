@@ -1,1 +1,1 @@
-{"users":[],"quizzes":[],"sessions":[]}
+{"users":[{"authUserId":10008751,"nameFirst":"first","nameLast":"last","name":"first last","email":"first.last3@gmail.com","password":"BaCd2134","successful_log_time":0,"failed_password_num":0,"prev_passwords":["BaCd2134"]}],"quizzes":[{"quizId":46346513,"authId":10008751,"name":"first last","description":"Third quiz","timeCreated":1698211557,"timeLastEdited":1698211557,"in_trash":false,"questions":[]}],"sessions":[{"token":10006699,"authUserId":10008751,"is_valid":true}]}

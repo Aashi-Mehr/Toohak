@@ -233,7 +233,7 @@ describe('adminQuesDup', () => {
     expect(result3).toMatchObject({ error: expect.any(String) });
   });
 
-  /* test('VALID INPUT', () => {
+  test('VALID INPUT', () => {
     userId1 = requestRegister('first.last3@gmail.com', 'BaCd2134', 'first', 'last');
     quizId = requestQuizCreate(userId1.token, 'first last', 'Third quiz').quizId;
     quesId1 = requestQuestionCreate(userId1.token,
@@ -253,5 +253,5 @@ describe('adminQuesDup', () => {
 
     const result = requestQuesDup(userId1.token, quizId, quesId1);
     expect(result).toMatchObject(expect.any(Number));
-  }); */
+  });
 });
