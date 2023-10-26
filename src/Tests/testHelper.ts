@@ -267,3 +267,34 @@ export function requestQuizTrash(token: number): QuizList | ErrorObject {
 
   if ('error' in result) { return { error: 'error' }; } else { return result; }
 }
+
+// QUESTION MOVE Define wrapper function
+export function requestQuesMove(token: number | string, newPosition: number,
+  quesId: number, quizId: number): ErrorObject | Record<string, never> {
+  const res = request(
+    'PUT',
+    `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}/move`,
+    {
+      json: {
+        token: token,
+        newPosition: newPosition
+      }
+    }
+  );
+  return JSON.parse(res.body.toString());
+}
+
+// QUESTION Duplicate Define wrapper function
+export function requestQuesDup(token: number, quizid: number,
+  questionid: number): QuestionId | ErrorObject {
+  const res = request(
+    'POST',
+    `${SERVER_URL}/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`,
+    {
+      json: {
+        token: token
+      }
+    }
+  );
+  return JSON.parse(res.body.toString());
+}
