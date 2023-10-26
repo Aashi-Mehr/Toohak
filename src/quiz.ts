@@ -69,8 +69,8 @@ function adminQuizCreate(token: number, name: string, description: string):
   // Error checking: In used quiz name
   const createdQuizzes = getData().quizzes;
   for (const quiz of createdQuizzes) {
-    if (quiz.authId === user.authUserId && quiz.name === name
-        && quiz.in_trash === false) {
+    if (quiz.authId === user.authUserId && quiz.name === name &&
+        quiz.in_trash === false) {
       return { error: 'Quiz Name Is Already Used' };
     }
   }

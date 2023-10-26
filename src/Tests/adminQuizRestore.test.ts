@@ -33,8 +33,7 @@ test('Test Restored Quiz Name', () => {
 
   // Restore the quiz with same name
   const result = requestQuizRestore(userId.token, quizId);
-  expect(result).toHaveProperty( 'error' );
-
+  expect(result).toHaveProperty('error');
 });
 
 // Test 400 : Quiz ID refers to a quiz thats not in trash
@@ -123,5 +122,5 @@ test('Perfect Case', () => {
 
   // Restore the quiz with invalid userId
   const result = requestQuizRestore(userId.token, quizId);
-  expect(result).not.toHaveProperty( 'error' );
+  expect(result).not.toHaveProperty('error');
 });
