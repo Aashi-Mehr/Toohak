@@ -17,7 +17,7 @@ import {
   adminUserDetails,
   adminAuthLogout,
   adminUserDetailsEdit,
-  adminUserPasswordEdit
+  adminUserPasswordEdit,
 } from './auth';
 
 import {
@@ -25,6 +25,7 @@ import {
   adminQuizInfo,
   adminQuizCreate,
   adminQuizDescriptionUpdate,
+  adminQuizTransfer,
   adminQuizRemove,
   adminQuizNameUpdate,
   adminQuizTrash,
@@ -34,7 +35,7 @@ import {
 import {
   adminQuestionCreate,
   adminQuestionMove,
-  adminQuestionDuplicate
+  adminQuestionDuplicate,
 } from './question';
 
 import { clear } from './other.js';
@@ -103,7 +104,7 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
   const response = adminUserDetails(token);
 
-  if ('error' in response) return res.status(400).json(response);
+  if ('error' in response) return res.status(401).json(response);
   res.json(response);
 });
 
@@ -167,7 +168,11 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const { token, name, description } = req.body;
   const response = adminQuizCreate(parseInt(token), name, description);
 
-  if ('error' in response) return res.status(400).json(response);
+  if ('error' in response) {
+    if (response.error.includes('Token')) return res.status(401).json(response);
+    return res.status(400).json(response);
+  }
+
   res.json(response);
   backupData(req, res, response);
 });
@@ -187,18 +192,25 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const response = adminQuizRemove(token, quizId);
 
+  if ('error' in response) {
+    if (response.error.includes('Token')) return res.status(401).json(response);
+    return res.status(403).json(response);
+  }
+
   res.json(response);
   backupData(req, res, response);
 });
 
 // adminQuizInfo
 app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
   const token = parseInt(req.query.token as string);
-  const quizId = req.params.quizid;
-  const response = adminQuizInfo(token, parseInt(quizId));
+  const response = adminQuizInfo(token, quizId);
 
-  if ('No such quiz' in response) return res.status(400).json(response);
-  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
+  if ('error' in response) {
+    if (response.error.includes('Token')) return res.status(401).json(response);
+    return res.status(403).json(response);
+  }
   res.json(response);
 });
 
@@ -208,10 +220,12 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const response = adminQuizNameUpdate(parseInt(token), quizId, name);
 
-  if ('Quiz is not owned by user' in response) {
-    return res.status(403).json(response);
+  if ('error' in response) {
+    if (response.error.includes('Token')) return res.status(401).json(response);
+    else if (response.error.includes('not an owner')) {
+      return res.status(403).json(response);
+    } else return res.status(400).json(response);
   }
-  if ('error' in response) return res.status(400).json(response);
 
   res.json(response);
   backupData(req, res, response);
@@ -224,10 +238,30 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   const response = adminQuizDescriptionUpdate(parseInt(token), quizId,
     description);
 
-  if ('Quiz is not owned by user' in response) {
-    return res.status(403).json(response);
+  if ('error' in response) {
+    if (response.error.includes('Token')) return res.status(401).json(response);
+    else if (response.error.includes('not an owner')) {
+      return res.status(403).json(response);
+    } else return res.status(400).json(response);
   }
-  if ('error' in response) return res.status(400).json(response);
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizTransfer
+app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  let { token, userEmail } = req.body;
+  token = parseInt(token);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizTransfer(token, quizId, userEmail);
+
+  if ('error' in response) {
+    if (response.error.includes('Token')) return res.status(401).json(response);
+    else if (response.error.includes('not an owner')) {
+      return res.status(403).json(response);
+    } else return res.status(400).json(response);
+  }
 
   res.json(response);
   backupData(req, res, response);
@@ -237,7 +271,7 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   const token = parseInt(req.body.token);
   const quizId = parseInt(req.params.quizid);
-  const response = adminQuizRestore(parseInt(token), quizId);
+  const response = adminQuizRestore(token, quizId);
 
   if ('error' in response) return res.status(403).json(response);
   if ('error' in response) return res.status(400).json(response);
@@ -256,31 +290,41 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const response = adminQuestionCreate(parseInt(token), quizId, questionBody);
 
-  if ('Quiz is not owned by user' in response) {
-    return res.status(403).json(response);
+  if ('error' in response) {
+    if (response.error.includes('Token')) return res.status(401).json(response);
+    else if (response.error.includes('not an owner')) {
+      return res.status(403).json(response);
+    } else return res.status(400).json(response);
   }
-  if ('error' in response) return res.status(400).json(response);
 
   res.json(response);
   backupData(req, res, response);
 });
 
+// UpdateQuizQuestion ///////////////////////////////////////////////////////////////////////////////
+// DeleteQuizQuestion ///////////////////////////////////////////////////////////////////////////////
+
 // adminQuestionMove
 app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
   (req: Request, res: Response) => {
     let { token, newPosition } = req.body;
-    const question = req.params.questionid;
-    const quiz = req.params.quizid;
+    const quesId = parseInt(req.params.questionid);
+    const quizId = parseInt(req.params.quizid);
 
     token = parseInt(token);
-    const quesId = parseInt(question);
-    const quizId = parseInt(quiz);
+    newPosition = parseInt(newPosition);
 
     const response = adminQuestionMove(token, newPosition, quesId, quizId);
-    if ('is invalid' in response) return res.status(400).json(response);
-    if ('Token' in response) return res.status(401).json(response);
-    if ('Does not match' in response) return res.status(403).json(response);
+
+    if ('error' in response) {
+      if (response.error.includes('Token')) return res.status(401).json(response);
+      else if (response.error.includes('not an owner')) {
+        return res.status(403).json(response);
+      } else return res.status(400).json(response);
+    }
+
     res.json(response);
+    backupData(req, res, response);
   });
 
 // adminQuestionDuplicate
@@ -295,10 +339,16 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
     const quizId = parseInt(quiz);
 
     const response = adminQuestionDuplicate(token1, quesId, quizId);
-    if ('is invalid' in response) return res.status(400).json(response);
-    if ('Token' in response) return res.status(401).json(response);
-    if ('Does not match' in response) return res.status(403).json(response);
+
+    if ('error' in response) {
+      if (response.error.includes('Token')) return res.status(401).json(response);
+      else if (response.error.includes('not an owner')) {
+        return res.status(403).json(response);
+      } else return res.status(400).json(response);
+    }
+
     res.json(response);
+    backupData(req, res, response);
   });
 
 // ====================================================================
@@ -338,13 +388,18 @@ const server = app.listen(PORT, HOST, () => {
   console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
 
   // On start, import all data from data.json and set it to data in dataStore
-  setData(data);
-  console.log('Data has been set to:', getData());
+  if (data) setData(data);
+  else {
+    setData({
+      users: [],
+      quizzes: [],
+      sessions: []
+    });
+  }
 });
 
 // For coverage, handle Ctrl+C gracefully
 process.on('SIGINT', () => {
   backupData(null, null, null);
-  console.log('Final data should be:', getData());
   server.close(() => console.log('Shutting down server gracefully.'));
 });

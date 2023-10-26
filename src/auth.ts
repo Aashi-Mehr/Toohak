@@ -129,8 +129,9 @@ export function adminAuthRegister(email: string, password: string,
   */
 export function adminUserDetailsEdit(token: number, email: string,
   nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
-  // ERROR CHECKING
+  // Get user details
   const user = getUser(token, getData());
+  // If the token is invalid, return error
   if (!user) {
     return {
       error: 'Token is empty or invalid (does not refer to ' +
@@ -138,9 +139,12 @@ export function adminUserDetailsEdit(token: number, email: string,
     };
   }
 
+  // Get user details
   const users = getData().users;
+  // Removing 'user' from user details
   getData().users.splice(users.indexOf(user), 1);
 
+  // Checking the validity in user details
   const valid = detailsCheck(email, user.password, nameFirst, nameLast);
   if ('error' in valid) {
     users.push(user);
@@ -172,21 +176,34 @@ export function adminUserPasswordEdit(token: number, oldPass: string,
   // ERROR CHECKING
   // Ensuring the user is valid
   const user = getUser(token, getData());
-  if (!user) return { error: 'Invalid token' };
+  // Return error message if token is invalid
+  if (!user) {
+    return {
+      error: 'Token is empty or invalid (does not refer to ' +
+    'valid logged in user session)'
+    };
+  }
+  // Return error message if the password entered does not match old password
   if (user.password !== oldPass) return { error: 'Incorrect password' };
 
   // Password needs to have letters and numbers, greater than 8 characters
   const hasLetter = /[a-zA-Z]/.test(newPass);
   const hasNumber = /\d/.test(newPass);
 
+  // Return error if password does not contain letters
   if (hasLetter === false) return { error: 'Password needs letters' };
+  // Return error if password does not contain numbers
   if (hasNumber === false) return { error: 'Password needs numbers' };
+  // Return error if password is less than 8 characters
   if (newPass.length < 8) return { error: 'Password is too short' };
 
+  // Loop through previous password and return error if the new password
+  // is the same as the old password
   for (const pass of user.prev_passwords) {
     if (newPass === pass) return { error: 'Cannot reuse old password' };
   }
 
+  // Push newPass into user details and set newPass to password
   user.prev_passwords.push(newPass);
   user.password = newPass;
 
@@ -206,6 +223,7 @@ export function adminAuthLogin(email: string, password: string):
   Token | ErrorObject {
   const users = getData().users;
 
+  // Loop through users
   for (const user of users) {
     // If the password is incorrect, but the email is correct, then attempts
     // need to be increased
@@ -216,7 +234,7 @@ export function adminAuthLogin(email: string, password: string):
       user.failed_password_num = 0;
       user.successful_log_time++;
 
-      // The sessions needs to be added
+      // Adding new session
       const token: number = getUniqueID(getData());
       getData().sessions.push({
         token: token,
@@ -245,6 +263,7 @@ export function adminAuthLogin(email: string, password: string):
 export function adminUserDetails(token: number): Details | ErrorObject {
   // Finds the user using the token, undefined is returned if not found
   const user = getUser(token, getData());
+  // Return error if token is invalid
   if (!user) return { error: 'Invalid token' };
 
   // Return the user's details
@@ -272,13 +291,16 @@ export function adminAuthLogout(token: number):
   ErrorObject | Record<string, never> {
   // Finds the user using the token, undefined is returned if not found
   const session = getSession(token, getData().sessions);
+  // If session is not valid or exist
   if (!session) {
+    // Return error message when token is empty or invalid
     return {
       error: 'Token is empty or invalid (does not refer ' +
     'to valid logged in user session)'
     };
   }
 
+  // Set the validity of session to be false
   session.is_valid = false;
   return { };
 }
