@@ -177,8 +177,13 @@ export function adminUserPasswordEdit(token: number, oldPass: string,
   // Ensuring the user is valid
   const user = getUser(token, getData());
   // Return error message if token is invalid
-  if (!user) return { error: 'Invalid token' };
-  // Return error message if the password entered does not match the old password,
+  if (!user) {
+    return {
+      error: 'Token is empty or invalid (does not refer to ' +
+    'valid logged in user session)'
+    };
+  }
+  // Return error message if the password entered does not match old password
   if (user.password !== oldPass) return { error: 'Incorrect password' };
 
   // Password needs to have letters and numbers, greater than 8 characters

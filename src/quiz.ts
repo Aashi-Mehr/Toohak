@@ -1,13 +1,13 @@
 import {
   ErrorObject,
-  QuizDetailed,
   QuizId,
   QuizList,
   getData,
   setData,
   getQuiz,
   getUniqueID,
-  getUser
+  getUser,
+  QuizInfo
 } from './dataStore';
 
 /** adminQuizList
@@ -55,6 +55,14 @@ function adminQuizList(token: number): QuizList | ErrorObject {
 function adminQuizCreate(token: number, name: string, description: string):
   QuizId | ErrorObject {
   // Error checking
+  const user = getUser(token, getData());
+  if (!user) {
+    return {
+      error: 'Token is empty or invalid (does not refer to ' +
+    ' valid logged in user session)'
+    };
+  }
+
   const invalidName = /[^a-zA-Z0-9 ']/.test(name);
   if (invalidName || name.length < 3 || name.length > 30) {
     return { error: 'Invalid Name' };
@@ -63,9 +71,6 @@ function adminQuizCreate(token: number, name: string, description: string):
   if (description.length > 100) {
     return { error: 'Invalid Description' };
   }
-
-  const user = getUser(token, getData());
-  if (!user) return { error: 'Invalid user ID' };
 
   // Error checking: In used quiz name
   const createdQuizzes = getData().quizzes;
@@ -106,7 +111,12 @@ function adminQuizRemove(token: number, quizId: number):
   ErrorObject | Record<string, never> {
   // Check if authUserId is a positive integer
   const user = getUser(token, getData());
-  if (!user) return { error: 'Invalid user ID' };
+  if (!user) {
+    return {
+      error: 'Token is empty or invalid (does not refer to ' +
+    'valid logged in user session)'
+    };
+  }
 
   const quiz = getQuiz(quizId, getData().quizzes);
   if (!quiz) return { error: 'Quiz ID is invalid' };
@@ -126,19 +136,29 @@ function adminQuizRemove(token: number, quizId: number):
   * @param { number } token - The authUserId for the user
   * @param { number } quizId - The quizId of the quiz
   *
-  * @returns { QuizDetailed } - If the details given are valid
+  * @returns { QuizInfo } - If the details given are valid
   * @returns { ErrorObject } - If the details given are invalid
   */
 function adminQuizInfo(token: number, quizId: number):
-  QuizDetailed | ErrorObject {
+  QuizInfo | ErrorObject {
   // Ensuring the login session is valid
 
   const user = getUser(token, getData());
-  if (!user) return { error: 'No such token' };
+  if (!user) {
+    return {
+      error: 'Token is empty or invalid (does not refer to ' +
+    'valid logged in user session)'
+    };
+  }
 
   // Gathering the quiz
   const quiz = getQuiz(quizId, getData().quizzes);
   if (!quiz) return { error: 'No such quiz' };
+
+  let duration = 0;
+  for (const question of quiz.questions) {
+    duration += question.duration;
+  }
 
   if (quiz.authId === user.authUserId && quiz.in_trash === false) {
     // If it's the quiz that's being searched for, return it
@@ -147,7 +167,10 @@ function adminQuizInfo(token: number, quizId: number):
       name: quiz.name,
       timeCreated: quiz.timeCreated,
       timeLastEdited: quiz.timeLastEdited,
-      description: quiz.description
+      description: quiz.description,
+      numQuestions: quiz.questions.length,
+      questions: quiz.questions,
+      duration: duration
     };
   }
 
@@ -168,7 +191,22 @@ function adminQuizInfo(token: number, quizId: number):
 function adminQuizNameUpdate(token: number, quizId: number, name: string):
   ErrorObject | Record<string, never> {
   const user = getUser(token, getData());
-  if (!user) return { error: 'Invalid user ID' };
+  if (!user) {
+    return {
+      error: 'Token is empty or invalid (does not refer to ' +
+    'valid logged in user session)'
+    };
+  }
+
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz) return { error: 'Quiz ID is invalid' };
+
+  if (user.authUserId !== quiz.authId) {
+    return {
+      error: 'Valid token is ' +
+    'provided, but user is not an owner of this quiz'
+    };
+  }
 
   // Check if the name contains invalid, non-alphanumeric characters
   const invalidName = /[^a-zA-Z0-9 ']/.test(name);
@@ -176,22 +214,19 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
     return { error: 'Invalid Name' };
   }
 
-  const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: 'Quiz ID is invalid' };
-
   for (const otherQuiz of getData().quizzes) {
     if (name === otherQuiz.name && quizId !== otherQuiz.quizId) {
       return { error: 'Name is already in use' };
     }
   }
 
-  if (quiz.authId === user.authUserId && quiz.in_trash === false) {
+  if (quiz.in_trash === false) {
     quiz.name = name;
     quiz.timeLastEdited = Math.floor(Date.now() / 1000);
     return { };
   }
 
-  return { error: 'Quiz is not owned by user' };
+  return { error: 'Quiz ID is invalid' };
 }
 
 /** adminQuizDescriptionUpdate
@@ -206,15 +241,27 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
   */
 function adminQuizDescriptionUpdate(token: number, quizId: number,
   description: string): ErrorObject | Record<string, never> {
-  if (description.length > 100) return { error: 'Descrption too long' };
-
   const quiz = getQuiz(quizId, getData().quizzes);
   if (!quiz) return { error: "QuizId doesn't exist" };
 
   const user = getUser(token, getData());
-  if (!user) return { error: 'Invaild token' };
+  if (!user) {
+    return {
+      error: 'Token is empty or invalid (does not refer to ' +
+    'valid logged in user session)'
+    };
+  }
 
-  if (user.authUserId === quiz.authId && quiz.in_trash === false) {
+  if (user.authUserId !== quiz.authId) {
+    return {
+      error: 'Valid token is ' +
+    'provided, but user is not an owner of this quiz'
+    };
+  }
+
+  if (description.length > 100) return { error: 'Descrption too long' };
+
+  if (quiz.in_trash === false) {
     quiz.description = description;
     quiz.timeLastEdited = Math.floor(Date.now() / 1000);
 
@@ -222,7 +269,7 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
   }
 
   // Exit with an error message if the quiz not correct
-  return { error: 'Quiz not owned by user' };
+  return { error: "QuizId doesn't exist" };
 }
 
 /** adminQuizTransfer
@@ -240,12 +287,17 @@ function adminQuizTransfer(token: number, quizId: number,
   const data = getData();
   // Checking if the user exists
   const user = getUser(token, data);
-  if (!user) return { error: 'Invalid user ID' };
+  if (!user) return { error: 'Token is empty or invalid' };
 
   const quiz = getQuiz(quizId, data.quizzes);
   if (!quiz) return { error: 'Quiz is not owned by user' };
 
-  if (quiz.authId !== user.authUserId) return { error: 'Quiz is not owned by user' };
+  if (quiz.authId !== user.authUserId) {
+    return {
+      error: 'Valid token is ' +
+    'provided, but user is not an owner of this quiz'
+    };
+  }
 
   const newUser = data.users.find(user => user.email === userEmail);
   if (!newUser) {
@@ -276,7 +328,12 @@ function adminQuizTrash(token: number):
   ErrorObject | QuizList {
   // Check if authUserId is a positive integer
   const user = getUser(token, getData());
-  if (!user) return { error: 'Invalid user ID' };
+  if (!user) {
+    return {
+      error: 'Token is empty or invalid (does not refer to ' +
+    ' valid logged in user session)'
+    };
+  }
 
   // Gathering quizzes
   const allQuizzes = getData().quizzes;
