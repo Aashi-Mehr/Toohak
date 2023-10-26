@@ -376,7 +376,7 @@ describe('questionCreate', () => {
         quizId1,
         questionBody
       ).questionId;
-      
+
       const result = requestQuizInfo(token1, quizId1);
 
       expect(result.questions[0].questionId).toStrictEqual(questionId);

@@ -237,7 +237,7 @@ export function requestQuestionCreate(token: number | string,
       }
     }
   );
-  
+
   return JSON.parse(res.body.toString());
 }
 

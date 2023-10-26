@@ -272,8 +272,6 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
 
 // adminQuestionCreate
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
-  console.log('THIS IS RUNNING');
-
   const { token, questionBody } = req.body;
   const quizId = parseInt(req.params.quizid);
   const response = adminQuestionCreate(parseInt(token), quizId, questionBody);
@@ -303,7 +301,6 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
     newPosition = parseInt(newPosition);
 
     const response = adminQuestionMove(token, newPosition, quesId, quizId);
-    console.log(response);
 
     if ('error' in response) {
       if (response.error.includes('Token')) return res.status(401).json(response);

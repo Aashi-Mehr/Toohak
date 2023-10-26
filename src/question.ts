@@ -26,7 +26,7 @@ const COLOUR = ['red', 'blue', 'green', 'yellow', 'purple', 'brown', 'orange'];
 export function adminQuestionCreate(token: number, quizId: number,
   questionBody: QuestionBody): QuestionId | ErrorObject {
   const data = getData();
-  
+
   // Checking if the user exists
   const user = getUser(token, data);
   if (!user) {
@@ -105,8 +105,6 @@ export function adminQuestionCreate(token: number, quizId: number,
     });
   }
 
-  console.log(answers);
-
   const questionId = getUniqueID(data);
 
   const newQuestion: Question = {
@@ -122,8 +120,6 @@ export function adminQuestionCreate(token: number, quizId: number,
 
   quiz.questions.push(newQuestion);
   setData(data);
-
-  console.log(quiz);
 
   return { questionId: questionId };
 }
@@ -162,9 +158,11 @@ export function adminQuestionMove(token: number, newPosition: number,
   // Get the question asked for moving
   let currQues: Question;
   let currPos: number;
-  for (const question of quiz.questions) if (question.questionId === quesId) {
-    currQues = question;
-    currPos = quiz.questions.indexOf(currQues);
+  for (const question of quiz.questions) {
+    if (question.questionId === quesId) {
+      currQues = question;
+      currPos = quiz.questions.indexOf(currQues);
+    }
   }
 
   // Error check
@@ -174,7 +172,7 @@ export function adminQuestionMove(token: number, newPosition: number,
   }
 
   // Get the question at the new position
-  let swithedQues = quiz.questions[newPosition];
+  const swithedQues = quiz.questions[newPosition];
 
   // Switch the position of two questions
   quiz.questions[currPos] = swithedQues;
@@ -229,8 +227,8 @@ export function adminQuestionDuplicate(token: number, quesId: number,
 
   // Error check
   if (findQues === false) return { error: 'Ques ID is invalid' };
-  
-  let newId = getUniqueID(getData());
+
+  const newId = getUniqueID(getData());
   quiz.questions.push(currQues);
   quiz.questions[quiz.questions.length - 1].questionId = newId;
 

@@ -160,8 +160,6 @@ function adminQuizInfo(token: number, quizId: number):
     duration += question.duration;
   }
 
-  console.log(quiz.questions);
-
   if (quiz.authId === user.authUserId && quiz.in_trash === false) {
     // If it's the quiz that's being searched for, return it
     return {
