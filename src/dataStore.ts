@@ -50,16 +50,6 @@ interface QuizBrief {
   name: string
 }
 
-interface QuizDetailed {
-  quizId: number,
-  name: string,
-  timeCreated: number,
-  timeLastEdited: number,
-  description: string
-}
-
-interface QuizList { quizzes: QuizBrief[] }
-
 interface Answer {
   answerId: number,
   answer: string,
@@ -69,12 +59,24 @@ interface Answer {
 
 interface Question {
   questionId: number,
-  position: number,
   question: string,
   duration: number,
   points: number,
-  answer: Answer[],
+  answers: Answer[],
 }
+
+interface QuizInfo {
+  quizId: number,
+  name: string,
+  timeCreated: number,
+  timeLastEdited: number,
+  description: string,
+  numQuestions: number,
+  questions: Question[],
+  duration: number
+}
+
+interface QuizList { quizzes: QuizBrief[] }
 
 interface QuizAdd {
   quizId: number,
@@ -230,7 +232,7 @@ export {
   UserAdd,
   QuizId,
   QuizBrief,
-  QuizDetailed,
+  QuizInfo,
   QuizList,
   Question,
   QuizAdd,

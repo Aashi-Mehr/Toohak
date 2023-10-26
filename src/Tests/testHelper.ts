@@ -4,7 +4,7 @@ import { port, url } from '../config.json';
 import {
   Token,
   QuizId,
-  QuizDetailed,
+  QuizInfo,
   QuestionBody,
   QuestionId,
   ErrorObject,
@@ -156,7 +156,7 @@ export function requestQuizCreate(token: number, name: string,
 
 // GET QUIZ INFO Define wrapper function
 export function requestQuizInfo(token: number | string, quizId: number):
-  QuizDetailed {
+  QuizInfo {
   const res = request(
     'GET',
     SERVER_URL + '/v1/admin/quiz/' + quizId + '?token=' + token,
@@ -240,9 +240,23 @@ export function requestQuestionCreate(token: number | string,
       }
     }
   );
+
   return JSON.parse(res.body.toString());
 }
 
+export function requestQuizTransfer(token: number | string, quizId: number, userEmail: string) {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/transfer',
+    {
+      json: {
+        token: token,
+        userEmail: userEmail,
+      }
+    }
+  );
+  return JSON.parse(res.body.toString());
+}
 // GET QUIZ TRASH Define wrapper function
 export function requestQuizTrash(token: number): QuizList | ErrorObject {
   const res = request(
@@ -267,6 +281,37 @@ export function requestQuizRestore(token: number, quizId: number):
     {
       json: {
         token: token,
+      }
+    }
+  );
+  return JSON.parse(res.body.toString());
+}
+
+// QUESTION MOVE Define wrapper function
+export function requestQuesMove(token: number | string, newPosition: number,
+  quesId: number, quizId: number): ErrorObject | Record<string, never> {
+  const res = request(
+    'PUT',
+    `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}/move`,
+    {
+      json: {
+        token: token,
+        newPosition: newPosition
+      }
+    }
+  );
+  return JSON.parse(res.body.toString());
+}
+
+// QUESTION Duplicate Define wrapper function
+export function requestQuesDup(token: number, quizid: number,
+  questionid: number): QuestionId | ErrorObject {
+  const res = request(
+    'POST',
+    `${SERVER_URL}/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`,
+    {
+      json: {
+        token: token
       }
     }
   );

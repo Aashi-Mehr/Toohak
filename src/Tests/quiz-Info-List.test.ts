@@ -17,15 +17,15 @@ import {
   ErrorObject,
   Token,
   QuizList,
-  QuizDetailed
+  QuizInfo
 } from '../dataStore';
 
 import {
   requestRegister,
   requestQuizCreate,
   requestQuizList,
-  // requestQuizRemove,
-  requestQuizInfo
+  requestQuizInfo,
+  requestQuizRemove
 } from './testHelper';
 
 const SERVER_URL = `${url}:${port}`;
@@ -48,9 +48,9 @@ beforeEach(() => {
 
 // Test function : adminQuizList
 describe('adminQuizList', () => {
-  /* let userId: token; */
+  let userId: Token;
   let quiz: QuizList | ErrorObject;
-  /* let quizId: number; */
+  let quizId: number;
 
   test('INVALID User Id: Type of string or negative number', () => {
     quiz = requestQuizList('123321');
@@ -61,13 +61,13 @@ describe('adminQuizList', () => {
   });
 
   test('INVALID User Id: Not in the data base', () => {
-    /* userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first',
-      'last'); */
+    userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first',
+      'last');
     quiz = requestQuizList(11);
     expect(quiz).toMatchObject({ error: expect.any(String) });
   });
 
-  /* test('VALID 1 Quiz', () => {
+  test('VALID 1 Quiz', () => {
     userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first',
       'last');
     quizId = requestQuizCreate(userId.token, 'first last', '').quizId;
@@ -93,11 +93,11 @@ describe('adminQuizList', () => {
     expect(quiz).toMatchObject({
       quizzes: [
         {
-          quizId: quizId1,
+          quizId: quizId1.quizId,
           name: 'first last1',
         },
         {
-          quizId: quizId2,
+          quizId: quizId2.quizId,
           name: 'first last2',
         }
       ]
@@ -108,17 +108,17 @@ describe('adminQuizList', () => {
     userId = requestRegister('1531_user1@gmail.com', 'C123321c', 'first',
       'last');
     quizId = requestQuizCreate(userId.token, 'first last1', '').quizId;
-    requestRemove(userId.token, quizId);
+    requestQuizRemove(userId.token, quizId);
 
     const result = requestQuizList(userId.token);
     expect(result).toMatchObject({ quizzes: [] });
-  }); */
+  });
 });
 
 // Test function : adminQuizInfo
 describe('adminQuizInfo', () => {
   let userId: Token;
-  let quiz: QuizDetailed | ErrorObject;
+  let quiz: QuizInfo | ErrorObject;
   let quizId: number;
 
   test('INVALID User Id: Not a number or out of range number', () => {
@@ -161,6 +161,9 @@ describe('adminQuizInfo', () => {
       timeCreated: expect.any(Number),
       timeLastEdited: expect.any(Number),
       description: expect.any(String),
+      numQuestions: 0,
+      questions: [],
+      duration: 0
     });
   });
 
@@ -169,8 +172,22 @@ describe('adminQuizInfo', () => {
     quizId = requestQuizCreate(userId.token, 'first last', '').quizId;
 
     quiz = requestQuizInfo(userId.token, quizId);
-    expect(quiz.timeCreated.toString()).toMatch(/^\d{10}$/);
-    expect(quiz.timeLastEdited.toString()).toMatch(/^\d{10}$/);
+    expect(quiz).toMatchObject({
+      quizId: quizId,
+      name: 'first last',
+      timeCreated: expect.any(Number),
+      timeLastEdited: expect.any(Number),
+      description: expect.any(String),
+      numQuestions: 0,
+      questions: [],
+      duration: 0
+    });
+
+    // This will always be true if the above expect-test passes
+    if ('timeCreated' in quiz && 'timeLastEdited' in quiz) {
+      expect(quiz.timeCreated.toString()).toMatch(/^\d{10}$/);
+      expect(quiz.timeLastEdited.toString()).toMatch(/^\d{10}$/);
+    }
   });
 
   test('Test quizId invalid error, cannot read', () => {
