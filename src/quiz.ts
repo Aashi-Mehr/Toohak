@@ -423,27 +423,26 @@ function adminQuizEmptyTrash(token: number, quizId: number[]):
   if (!user) return { error: 'Invalid user ID' };
 
   // Check if quizId is valid
-  const quiz = getData().quizzes;
-  
+  const allQuizzes = getData().quizzes;
+
   // Iterate through the array of quizIds
-  for (const quizId of quizIds) {
+  for (const quizID of quizId) {
     // Finding matching quizId
-    const index = quizzes.findIndex((quiz) => quiz.quizId === quizId);
+    const index = allQuizzes.findIndex((quiz) => quiz.quizId === quizID);
     // Error 401 & 403: If index returns -1, quiz is not owned by user
     if (index === -1) {
-      return { error: 'Quiz is not owned by the user'};
+      return { error: 'Quiz is not owned by the user' };
     }
 
     // Looping through the quizzes owned by user
-    const quiz = quizzes[index];
+    const quiz = allQuizzes[index];
     // Looping through quizzes to find quiz that is in trash
-    if(user.authUserId === quiz.authId && quiz.in_trash === true) {
+    if (user.authUserId === quiz.authId && quiz.in_trash === true) {
       // Remove the quiz from the data permanently
-      quizzes.splice(index, 1);
-
+      allQuizzes.splice(index, 1);
     } else {
       // Error 403: Return an error for quizzes that are not in trash
-      return { error: 'One or more quizzes are not in the trash'};
+      return { error: 'One or more quizzes are not in the trash' };
     }
   }
   // Return an error if the quiz is not in the trash
