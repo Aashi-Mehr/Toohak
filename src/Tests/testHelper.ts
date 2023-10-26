@@ -284,7 +284,7 @@ export function requestQuizRestore(token: number, quizId: number):
       }
     }
   );
-  
+
   return JSON.parse(res.body.toString());
 }
 
