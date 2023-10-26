@@ -302,7 +302,7 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
 // adminQuizEmptyTrash
 app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
-  const quizId = parse(req.query.quizId);
+  const quizId = JSON.parse(req.query.quizIds);
   const response = adminQuizEmptyTrash(token, quizId);
 
   if ('error' in response) {
