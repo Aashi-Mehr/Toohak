@@ -307,10 +307,9 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
 
   if ('error' in response) {
     if (response.error.includes('not in trash')) return res.status(400).json(response);
-  } else if (response.error.includes('user ID')) return res.status(401).json(response);
-  else {
-    return res.status(403).json(response);
-  }
+    else if (response.error.includes('user ID')) return res.status(401).json(response);
+    else return res.status(403).json(response);
+}
 
   res.json(response);
 });
