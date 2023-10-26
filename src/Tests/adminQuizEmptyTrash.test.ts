@@ -1,4 +1,3 @@
-
 // Test for adminQuizEmptyTrash
 import { Token } from '../dataStore';
 import {
