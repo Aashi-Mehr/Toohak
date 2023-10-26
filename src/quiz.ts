@@ -406,7 +406,49 @@ function adminQuizRestore(token: number, quizId: number):
   return { error: 'Quiz is not in trash' };
 }
 
-// last edit: 25/10/2023 by Alya
+/** adminQuizEmptyTrash
+  * Permanently delete specific quizzes currently in the trash
+  *
+  * @param { number } token - The authUserId for the user
+  * @param { number } quizId - The quizId for the quiz
+  *
+  * @returns { Record<string, never>  } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+function adminQuizEmptyTrash(token: number, quizId: number[]):
+  ErrorObject | Record<string, never> {
+  // Check if authUserId is valid
+  const user = getUser(token, getData());
+  // Error 401: Invalid token
+  if (!user) return { error: 'Invalid user ID' };
+
+  // Check if quizId is valid
+  const quiz = getData().quizzes;
+  
+  // Iterate through the array of quizIds
+  for (const quizId of quizIds) {
+    // Finding matching quizId
+    const index = quizzes.findIndex((quiz) => quiz.quizId === quizId);
+    // Error 401 & 403: If index returns -1, quiz is not owned by user
+    if (index === -1) {
+      return { error: 'Quiz is not owned by the user'};
+    }
+
+    // Looping through the quizzes owned by user
+    const quiz = quizzes[index];
+    // Looping through quizzes to find quiz that is in trash
+    if(user.authUserId === quiz.authId && quiz.in_trash === true) {
+      // Remove the quiz from the data permanently
+      quizzes.splice(index, 1);
+
+    } else {
+      // Error 403: Return an error for quizzes that are not in trash
+      return { error: 'One or more quizzes are not in the trash'};
+    }
+  }
+  // Return an error if the quiz is not in the trash
+  return {};
+}
 
 export {
   adminQuizList,
@@ -417,6 +459,7 @@ export {
   adminQuizDescriptionUpdate,
   adminQuizTransfer,
   adminQuizTrash,
-  adminQuizRestore
+  adminQuizRestore,
+  adminQuizEmptyTrash
 
 };

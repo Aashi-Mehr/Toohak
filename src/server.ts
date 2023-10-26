@@ -29,7 +29,8 @@ import {
   adminQuizRemove,
   adminQuizNameUpdate,
   adminQuizTrash,
-  adminQuizRestore
+  adminQuizRestore,
+  adminQuizEmptyTrash
 } from './quiz';
 
 import {
@@ -297,6 +298,19 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
 
   res.json(response);
 });
+
+// adminQuizEmptyTrash
+app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
+  const { token, quizId } = req.body;
+  const response = adminQuizEmptyTrash(parseInt(token), [quizId]);
+
+  if ('error' in response) return res.status(400).json(response);
+  if ('error' in response) return res.status(401).json(response);
+  if ('error' in response) return res.status(403).json(response);
+
+  res.json(response);
+});
+
 
 // ====================================================================
 //  ========================= QUESTION FUNCTIONS ======================
