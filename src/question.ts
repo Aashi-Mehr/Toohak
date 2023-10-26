@@ -185,6 +185,39 @@ export function adminQuestionMove(token: number, newPosition: number,
   return { };
 }
 
+/** updateQuestion
+  * Updates the given question with new values
+  *
+  * @param { number } token - The authUserId for the user
+  * @param { number } quizId - The quizId contain moved question
+  * @param { number } quesId - The quesId of the question being moved
+  * @param { Question } questionBody - The new details of the question
+  *
+  * @returns { Record<string, never> } - If the question is successfully updated
+  * @returns { ErrorObject } - If any input error exists
+  */
+export function updateQuestion(token: number, quizId: number, quesId: number,
+  questionBody: Question): ErrorObject | Record<string, never> {
+  // Write the function
+  return { };
+}
+
+/** deleteQuestion
+  * Deletes the question from the quiz
+  *
+  * @param { number } token - The authUserId for the user
+  * @param { number } quizId - The quizId contain moved question
+  * @param { number } quesId - The quesId of the question being moved
+  *
+  * @returns { Record<string, never> } - If the question is successfully deleted
+  * @returns { ErrorObject } - If any input error exists
+  */
+export function deleteQuestion(token: number, quizId: number, quesId: number):
+  ErrorObject | Record<string, never> {
+  // Write the function
+  return { };
+}
+
 /** adminQuesDup
   * Duplicate the given quiz question
   *
