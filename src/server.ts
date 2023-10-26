@@ -267,6 +267,24 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   backupData(req, res, response);
 });
 
+// adminQuizTransfer
+app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  let { token, userEmail } = req.body;
+  token = parseInt(token);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizTransfer(token, quizId, userEmail);
+
+  if ('error' in response) {
+    if (response.error.includes('Token')) return res.status(401).json(response);
+    else if (response.error.includes('not an owner')) {
+      return res.status(403).json(response);
+    } else return res.status(400).json(response);
+  }
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
 // adminQuizRestore
 app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   const token = parseInt(req.body.token);

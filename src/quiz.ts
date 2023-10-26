@@ -262,6 +262,14 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
 
   if (description.length > 100) return { error: 'Descrption too long' };
 
+  if (user.authUserId !== quiz.authId) {
+    return {
+      error: 'Valid token is ' +
+    'provided, but user is not an owner of this quiz'
+    };
+  }
+
+  if (description.length > 100) return { error: 'Descrption too long' };
   if (quiz.in_trash === false) {
     quiz.description = description;
     quiz.timeLastEdited = Math.floor(Date.now() / 1000);
@@ -410,4 +418,5 @@ export {
   adminQuizTransfer,
   adminQuizTrash,
   adminQuizRestore
+
 };
