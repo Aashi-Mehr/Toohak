@@ -323,7 +323,7 @@ export function requestQuizEmptyTrash(token: number, quizId: number[]):
   ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
-    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId + ']?token=' + token,
+    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId + ']&token=' + token,
     {
       qs: { }
     }
