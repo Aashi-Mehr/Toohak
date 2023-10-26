@@ -424,6 +424,7 @@ function adminQuizEmptyTrash(token: number, quizId: number[]):
 
   // Check if quizId is valid
   const allQuizzes = getData().quizzes;
+  console.log('This is all quizzes', allQuizzes);
 
   // Iterate through the array of quizIds
   for (const quizID of quizId) {
@@ -436,6 +437,7 @@ function adminQuizEmptyTrash(token: number, quizId: number[]):
 
     // Looping through the quizzes owned by user
     const quiz = allQuizzes[index];
+    console.log('these are quizzes owned by user', allQuizzes[index]);
     // Looping through quizzes to find quiz that is in trash
     if (user.authUserId === quiz.authId && quiz.in_trash === true) {
       // Remove the quiz from the data permanently
