@@ -4,7 +4,7 @@ import { port, url } from '../config.json';
 import {
   Token,
   QuizId,
-  QuizDetailed,
+  QuizInfo,
   QuestionBody,
   QuestionId,
   ErrorObject,
@@ -154,7 +154,7 @@ export function requestQuizCreate(token: number, name: string,
 }
 
 export function requestQuizInfo(token: number | string, quizId: number):
-  QuizDetailed {
+  QuizInfo {
   const res = request(
     'GET',
     SERVER_URL + '/v1/admin/quiz/' + quizId + '?token=' + token,

@@ -181,6 +181,20 @@ app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// adminQuizInfo
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizInfo(token, quizId);
+  console.log(quizId, token, response);
+
+  if ('error' in response) {
+    if (response.error.includes('token')) return res.status(401).json(response);
+    return res.status(403).json(response);
+  }
+  res.json(response);
+});
+
 // adminQuizRemove
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
@@ -189,17 +203,6 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
 
   res.json(response);
   backupData(req, res, response);
-});
-
-// adminQuizInfo
-app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
-  const quizId = req.params.quizid;
-  const response = adminQuizInfo(token, parseInt(quizId));
-
-  if ('No such quiz' in response) return res.status(400).json(response);
-  if ('Quiz is not owned by user' in response) { return res.status(403).json(response); }
-  res.json(response);
 });
 
 // adminQuizNameUpdate
@@ -339,7 +342,14 @@ const server = app.listen(PORT, HOST, () => {
   console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
 
   // On start, import all data from data.json and set it to data in dataStore
-  setData(data);
+  if (data) setData(data);
+  else {
+    setData({
+      users: [],
+      quizzes: [],
+      sessions: []
+    });
+  }
   console.log('Data has been set to:', getData());
 });
 

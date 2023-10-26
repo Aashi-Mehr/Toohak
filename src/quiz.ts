@@ -1,13 +1,13 @@
 import {
   ErrorObject,
-  QuizDetailed,
   QuizId,
   QuizList,
   getData,
   setData,
   getQuiz,
   getUniqueID,
-  getUser
+  getUser,
+  QuizInfo
 } from './dataStore';
 
 /** adminQuizList
@@ -126,11 +126,11 @@ function adminQuizRemove(token: number, quizId: number):
   * @param { number } token - The authUserId for the user
   * @param { number } quizId - The quizId of the quiz
   *
-  * @returns { QuizDetailed } - If the details given are valid
+  * @returns { QuizInfo } - If the details given are valid
   * @returns { ErrorObject } - If the details given are invalid
   */
 function adminQuizInfo(token: number, quizId: number):
-  QuizDetailed | ErrorObject {
+  QuizInfo | ErrorObject {
   // Ensuring the login session is valid
 
   const user = getUser(token, getData());
@@ -140,6 +140,11 @@ function adminQuizInfo(token: number, quizId: number):
   const quiz = getQuiz(quizId, getData().quizzes);
   if (!quiz) return { error: 'No such quiz' };
 
+  let duration = 0;
+  for (const question of quiz.questions) {
+    duration += question.duration;
+  }
+
   if (quiz.authId === user.authUserId && quiz.in_trash === false) {
     // If it's the quiz that's being searched for, return it
     return {
@@ -147,7 +152,10 @@ function adminQuizInfo(token: number, quizId: number):
       name: quiz.name,
       timeCreated: quiz.timeCreated,
       timeLastEdited: quiz.timeLastEdited,
-      description: quiz.description
+      description: quiz.description,
+      numQuestions: quiz.questions.length,
+      questions: quiz.questions,
+      duration: duration
     };
   }
 
