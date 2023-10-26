@@ -108,7 +108,6 @@ export function adminQuestionCreate(token: number, quizId: number,
 
   const newQuestion: Question = {
     questionId: questionId,
-    position: quiz.questions.length,
     question: questionBody.question,
     duration: questionBody.duration,
     points: questionBody.points,
@@ -158,40 +157,30 @@ export function adminQuestionMove(token: number, newPosition: number,
 
   // Get the question asked for moving
   let currQues: Question;
-  let findQues = false;
-  for (const question of quiz.questions) {
-    if (question.questionId === quesId) {
-      findQues = true;
-      currQues = question;
-    }
+  let currPos: number;
+  for (const question of quiz.questions) if (question.questionId === quesId) {
+    currQues = question;
+    currPos = quiz.questions.indexOf(currQues);
   }
 
   // Error check
-  if (findQues === false) return { error: 'Ques ID is invalid' };
+  if (!currQues) return { error: 'Ques ID is invalid' };
   if (newPosition < 0 || newPosition > quiz.questions.length) {
     return { error: 'New Postion is invalid' };
   }
-  if (token === undefined) return { error: 'Token Empty' };
-  if (quiz.authId !== token) return { error: 'Does not match given quiz' };
 
   // Get the question at the new position
-  let swithedQues;
-  for (const question of quiz.questions) {
-    if (question.position === newPosition) {
-      swithedQues = question;
-    }
-  }
+  let swithedQues = quiz.questions[newPosition];
 
   // Switch the position of two questions
-  const tempPos = currQues.position;
-  currQues.position = newPosition;
-  swithedQues.position = tempPos;
+  quiz.questions[currPos] = swithedQues;
+  quiz.questions[newPosition] = currQues;
 
   // Update time last edit
   quiz.timeLastEdited = Math.floor(Date.now() / 1000);
 
-  // Successful movement, return {}
-  return {};
+  // Successful movement, return { }
+  return { };
 }
 
 /** adminQuesDup
@@ -236,36 +225,14 @@ export function adminQuestionDuplicate(token: number, quesId: number,
 
   // Error check
   if (findQues === false) return { error: 'Ques ID is invalid' };
-  if (token === undefined) return { error: 'Token Empty' };
-
-  // Calculate the duplicated question position
-  const newQuesPos = currQues.position + 1;
-
-  // Move all questions that is after the current question right once
-  for (const question of quiz.questions) {
-    if (question.position > currQues.position) {
-      question.position++;
-    }
-  }
-
-  // Create a new question using the newQuesPosition
-  // Put the newQuestion after the immidiate question
-  const newQuestionId = getUniqueID(getData());
-  const newQuestion: Question = {
-    questionId: newQuestionId,
-    position: newQuesPos,
-    question: currQues.question,
-    duration: currQues.duration,
-    points: currQues.points,
-    answer: currQues.answer,
-  };
-
-  // Push newQuestion into data base
-  quiz.questions.push(newQuestion);
+  
+  let newId = getUniqueID(getData());
+  quiz.questions.push(currQues);
+  quiz.questions[quiz.questions.length - 1].questionId = newId;
 
   // Update time last edit
   quiz.timeLastEdited = Math.floor(Date.now() / 1000);
 
   // Return newQuestionId
-  return { questionId: newQuestionId };
+  return { questionId: newId };
 }

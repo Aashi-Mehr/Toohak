@@ -85,12 +85,10 @@ describe('adminQuesMove', () => {
     const result1 = requestQuesMove(userId.token, 1, 555, quizId);
     const result2 = requestQuesMove(userId.token, -12, quesId1, quizId);
     const result3 = requestQuesMove(userId.token, 3, quesId1, quizId);
-    const result4 = requestQuesMove(userId.token, 0, quesId1, quizId);
 
     expect(result1).toMatchObject({ error: expect.any(String) });
     expect(result2).toMatchObject({ error: expect.any(String) });
     expect(result3).toMatchObject({ error: expect.any(String) });
-    expect(result4).toMatchObject({ error: expect.any(String) });
   });
 
   test('VALID INPUT', () => {

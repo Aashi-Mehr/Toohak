@@ -263,6 +263,7 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   }
 
   res.json(response);
+  backupData(req, res, response);
 });
 
 // ====================================================================
@@ -293,14 +294,14 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
 app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
   (req: Request, res: Response) => {
     let { token, newPosition } = req.body;
-    const question = req.params.questionid;
-    const quiz = req.params.quizid;
+    const quesId = parseInt(req.params.questionid);
+    const quizId = parseInt(req.params.quizid);
 
     token = parseInt(token);
-    const quesId = parseInt(question);
-    const quizId = parseInt(quiz);
+    newPosition = parseInt(newPosition);
 
     const response = adminQuestionMove(token, newPosition, quesId, quizId);
+    console.log(response);
 
     if ('error' in response) {
       if (response.error.includes('Token')) return res.status(401).json(response);
@@ -310,6 +311,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
     }
 
     res.json(response);
+    backupData(req, res, response);
   });
 
 // adminQuestionDuplicate
@@ -333,6 +335,7 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
     }
 
     res.json(response);
+    backupData(req, res, response);
   });
 
 // ====================================================================

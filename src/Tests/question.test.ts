@@ -3,7 +3,8 @@ import {
   requestRegister,
   requestQuizCreate,
   // requestQuizInfo,
-  requestQuestionCreate
+  requestQuestionCreate,
+  requestQuizInfo
 } from './testHelper';
 
 /// ////////////////////////////////////////////////////////////////////////////
@@ -369,32 +370,36 @@ describe('questionCreate', () => {
       const result2 = requestQuestionCreate(token1, quizId1, questionBody2);
       expect(result).not.toMatchObject(result2);
     });
-    /*
-test('successfully create the question with correct infos', () => {
-const questionId = requestQuestionCreate(token1, quizId1, questionBody).questionId;
-const result = requestQuizInfo(token1, quizId1);
-expect(result.questions[0]).toMatchObject({
-questionId: questionId,
-question: questionString,
-duration: 60,
-points: 5,
-answers: [
-{
-answerId: expect.any(Number),
-answer: "Nobody Knows",
-correct: true,
-colour: expect.any(String)
 
-},
-{
-answerId: expect.any(Number),
-answer: "Onebody Knows",
-correct: false,
-colour: expect.any(String)
-}
-]
-});
-});
-*/
+    test('successfully create the question with correct infos', () => {
+      const questionId = requestQuestionCreate(
+        token1,
+        quizId1,
+        questionBody
+      ).questionId;
+      
+      const result = requestQuizInfo(token1, quizId1);
+      
+      expect(result.questions[0]).toMatchObject({
+        questionId: questionId,
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: [
+          {
+            answerId: expect.any(Number),
+            answer: "Nobody Knows",
+            correct: true,
+            colour: expect.any(String)
+          },
+          {
+            answerId: expect.any(Number),
+            answer: "Onebody Knows",
+            correct: false,
+            colour: expect.any(String)
+          }
+        ]
+      });
+    });
   });
 });
