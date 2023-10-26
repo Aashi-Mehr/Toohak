@@ -75,7 +75,8 @@ function adminQuizCreate(token: number, name: string, description: string):
   // Error checking: In used quiz name
   const createdQuizzes = getData().quizzes;
   for (const quiz of createdQuizzes) {
-    if (quiz.authId === user.authUserId && quiz.name === name) {
+    if (quiz.authId === user.authUserId && quiz.name === name &&
+        quiz.in_trash === false) {
       return { error: 'Quiz Name Is Already Used' };
     }
   }
@@ -261,6 +262,14 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
 
   if (description.length > 100) return { error: 'Descrption too long' };
 
+  if (user.authUserId !== quiz.authId) {
+    return {
+      error: 'Valid token is ' +
+    'provided, but user is not an owner of this quiz'
+    };
+  }
+
+  if (description.length > 100) return { error: 'Descrption too long' };
   if (quiz.in_trash === false) {
     quiz.description = description;
     quiz.timeLastEdited = Math.floor(Date.now() / 1000);
@@ -354,7 +363,91 @@ function adminQuizTrash(token: number):
   return { quizzes: removedQuizzes };
 }
 
-// last edit: 25/10/2023 by Alya
+/** adminQuizRestore
+  * Restore a particular quiz from the trash back to an active quiz.
+  *
+  * @param { number } token - The authUserId for the user
+  * @param { number } quizId - The quizId for the quiz
+  *
+  * @returns { Record<string, never>  } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+function adminQuizRestore(token: number, quizId: number):
+  ErrorObject | Record<string, any> {
+  // Check if authUserId is valid
+  const user = getUser(token, getData());
+  if (!user) return { error: 'Invalid user ID' };
+
+  // Check if quizId is valid
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz) return { error: 'Quiz is not owned by user' };
+
+  // Loop through quizzes to check for existingQuizzes
+  const existingQuizzes = getData().quizzes;
+  for (const activeQuiz of existingQuizzes) {
+    if (activeQuiz.name === quiz.name &&
+      activeQuiz.authId === user.authUserId &&
+      activeQuiz.in_trash === false) {
+      // Return error if quiz name of the restored quiz is already used
+      // by another active quiz or quiz is not in trash
+      return { error: 'Quiz name is used by an active quiz' };
+    }
+  }
+
+  // Looping through to match authUserId and quizId
+  // Checking if the quiz is in trash
+  if (user.authUserId === quiz.authId && quiz.in_trash === true) {
+    quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+    quiz.in_trash = false;
+
+    return { };
+  }
+
+  return { error: 'Quiz is not in trash' };
+}
+
+/** adminQuizEmptyTrash
+  * Permanently delete specific quizzes currently in the trash
+  *
+  * @param { number } token - The authUserId for the user
+  * @param { number } quizId - The quizId for the quiz
+  *
+  * @returns { Record<string, never>  } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+function adminQuizEmptyTrash(token: number, quizId: number[]):
+  ErrorObject | Record<string, never> {
+  // Check if authUserId is valid
+  const user = getUser(token, getData());
+  // Error 401: Invalid token
+  if (!user) return { error: 'Invalid user ID' };
+
+  // Check if quizId is valid
+  const allQuizzes = getData().quizzes;
+
+  // Iterate through the array of quizIds
+  for (const quizID of quizId) {
+    // Finding matching quizId
+    const index = allQuizzes.findIndex((quiz) => quiz.quizId === quizID);
+    // Error 401 & 403: If index returns -1, quiz is not owned by user
+    if (index === -1) {
+      return { error: 'Quiz is not owned by the user' };
+    }
+
+    // Looping through the quizzes owned by user
+    const quiz = allQuizzes[index];
+    // Looping through quizzes to find quiz that is in trash
+    if (user.authUserId === quiz.authId && quiz.in_trash === true) {
+      // Remove the quiz from the data permanently
+      allQuizzes.splice(index, 1);
+    } else {
+      // Error 403: Return an error for quizzes that are not in trash
+      return { error: 'One or more quizzes are not in the trash' };
+    }
+  }
+  // Return an error if the quiz is not in the trash
+  return {};
+}
 
 export {
   adminQuizList,
@@ -365,5 +458,7 @@ export {
   adminQuizDescriptionUpdate,
   adminQuizTransfer,
   adminQuizTrash,
+  adminQuizRestore,
+  adminQuizEmptyTrash
 
 };
