@@ -292,10 +292,11 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const response = adminQuizRestore(token, quizId);
 
-  if ('error' in response) return res.status(403).json(response);
-  if ('error' in response) return res.status(400).json(response);
-  if ('error' in response) return res.status(401).json(response);
-
+  if ('error' in response) {
+    if (response.error.includes('user ID')) return res.status(401).json(response);
+    else if (response.error.includes('not owned by user')) return res.status(403).json(response);
+    else return res.status(400).json(response);
+  }
   res.json(response);
 });
 
