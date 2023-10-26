@@ -107,3 +107,20 @@ test('Quiz ID does not owned by user', () => {
   const result = requestQuizRestore(userId2.token, quizId);
   expect(result).toMatchObject({ error: expect.any(String) });
 });
+
+// Test 200 : Perfect Case
+test('Perfect Case', () => {
+  // Register a user
+  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+    'first', 'last');
+    // Create a quiz with userId
+  const quizId: number = requestQuizCreate(userId.token, 'Quiz 1',
+    'This is Quiz 1').quizId;
+
+  // Remove the quiz
+  requestQuizRemove(userId.token, quizId);
+
+  // Restore the quiz with invalid userId
+  const result = requestQuizRestore(userId.token, quizId);
+  expect(result).toMatchObject({ error: expect.any(String) });
+})

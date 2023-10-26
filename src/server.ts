@@ -237,7 +237,7 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   const token = parseInt(req.body.token);
   const quizId = parseInt(req.params.quizid);
-  const response = adminQuizRestore(token, quizId);
+  const response = adminQuizRestore(parseInt(token), quizId);
 
   if ('error' in response) return res.status(403).json(response);
   if ('error' in response) return res.status(400).json(response);
@@ -245,7 +245,7 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   res.json(response);
 
   res.json(response);
-  backupData(req, res, response);
+  // backupData(req, res, response);
 });
 
 // ====================================================================
