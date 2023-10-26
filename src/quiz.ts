@@ -417,10 +417,12 @@ function adminQuizRestore(token: number, quizId: number):
   */
 function adminQuizEmptyTrash(token: number, quizId: number[]):
   ErrorObject | Record<string, never> {
+  console.log('are you running?');
   // Check if authUserId is valid
   const user = getUser(token, getData());
   // Error 401: Invalid token
   if (!user) return { error: 'Invalid user ID' };
+  console.log('user', user);
 
   // Check if quizId is valid
   const allQuizzes = getData().quizzes;
