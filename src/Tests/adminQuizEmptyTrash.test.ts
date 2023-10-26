@@ -127,7 +127,7 @@ test('Perfect Case 1', () => {
 
   // Restoring the quiz from user 1 using userId of user 2
   const result = requestQuizEmptyTrash(userId.token, [quizId1]);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(Object.keys(result).length).toStrictEqual(0);
 });
 
 test('Perfect Case 2', () => {
@@ -147,5 +147,5 @@ test('Perfect Case 2', () => {
 
   // Restoring the quiz from user 1 using userId of user 2
   const result = requestQuizEmptyTrash(userId.token, [quizId1, quizId2]);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(Object.keys(result).length).toStrictEqual(0);
 });
