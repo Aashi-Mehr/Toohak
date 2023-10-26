@@ -1,1 +1,1 @@
-{"users":[],"quizzes":[],"sessions":[]}
+{"users":[{"authUserId":10007138,"nameFirst":"first","nameLast":"last","name":"first last","email":"validEmail@gmail.com","password":"Val1dPassword","successful_log_time":0,"failed_password_num":0,"prev_passwords":["Val1dPassword"]}],"quizzes":[{"quizId":10001530,"authId":10007138,"name":"Quiz 1","description":"This is Quiz 1","timeCreated":1698305944,"timeLastEdited":1698305944,"in_trash":true,"questions":[]}],"sessions":[{"token":10003777,"authUserId":10007138,"is_valid":true}]}

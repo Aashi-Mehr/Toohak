@@ -26,6 +26,7 @@ const COLOUR = ['red', 'blue', 'green', 'yellow', 'purple', 'brown', 'orange'];
 export function adminQuestionCreate(token: number, quizId: number,
   questionBody: QuestionBody): QuestionId | ErrorObject {
   const data = getData();
+  
   // Checking if the user exists
   const user = getUser(token, data);
   if (!user) {
@@ -104,6 +105,8 @@ export function adminQuestionCreate(token: number, quizId: number,
     });
   }
 
+  console.log(answers);
+
   const questionId = getUniqueID(data);
 
   const newQuestion: Question = {
@@ -111,15 +114,16 @@ export function adminQuestionCreate(token: number, quizId: number,
     question: questionBody.question,
     duration: questionBody.duration,
     points: questionBody.points,
-    answer: answers,
+    answers: answers,
   };
 
   const timestamp = Math.floor(Date.now() / 1000);
   quiz.timeLastEdited = timestamp;
 
   quiz.questions.push(newQuestion);
-
   setData(data);
+
+  console.log(quiz);
 
   return { questionId: questionId };
 }

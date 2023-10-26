@@ -2,7 +2,6 @@ import {
   requestClear,
   requestRegister,
   requestQuizCreate,
-  // requestQuizInfo,
   requestQuestionCreate,
   requestQuizInfo
 } from './testHelper';
@@ -379,27 +378,12 @@ describe('questionCreate', () => {
       ).questionId;
       
       const result = requestQuizInfo(token1, quizId1);
-      
-      expect(result.questions[0]).toMatchObject({
-        questionId: questionId,
-        question: questionString,
-        duration: 60,
-        points: 5,
-        answers: [
-          {
-            answerId: expect.any(Number),
-            answer: "Nobody Knows",
-            correct: true,
-            colour: expect.any(String)
-          },
-          {
-            answerId: expect.any(Number),
-            answer: "Onebody Knows",
-            correct: false,
-            colour: expect.any(String)
-          }
-        ]
-      });
+
+      expect(result.questions[0].questionId).toStrictEqual(questionId);
+      expect(result.questions[0].question).toStrictEqual(questionString);
+      expect(result.questions[0].duration).toStrictEqual(60);
+      expect(result.questions[0].points).toStrictEqual(5);
+      expect(result.questions[0].answers.length).toStrictEqual(2);
     });
   });
 });

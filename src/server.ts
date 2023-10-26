@@ -272,6 +272,8 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
 
 // adminQuestionCreate
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
+  console.log('THIS IS RUNNING');
+
   const { token, questionBody } = req.body;
   const quizId = parseInt(req.params.quizid);
   const response = adminQuestionCreate(parseInt(token), quizId, questionBody);

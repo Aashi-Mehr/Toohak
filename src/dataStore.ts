@@ -62,7 +62,7 @@ interface Question {
   question: string,
   duration: number,
   points: number,
-  answer: Answer[],
+  answers: Answer[],
 }
 
 interface QuizInfo {
