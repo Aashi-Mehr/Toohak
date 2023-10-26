@@ -69,7 +69,8 @@ function adminQuizCreate(token: number, name: string, description: string):
   // Error checking: In used quiz name
   const createdQuizzes = getData().quizzes;
   for (const quiz of createdQuizzes) {
-    if (quiz.authId === user.authUserId && quiz.name === name) {
+    if (quiz.authId === user.authUserId && quiz.name === name
+        && quiz.in_trash === false) {
       return { error: 'Quiz Name Is Already Used' };
     }
   }
@@ -267,7 +268,7 @@ function adminQuizTrash(token: number):
   * @returns { ErrorObject } - If the details given are invalid
   */
 function adminQuizRestore(token: number, quizId: number):
-  ErrorObject | Record<string, never> {
+  ErrorObject | Record<string, any> {
   // Check if authUserId is valid
   const user = getUser(token, getData());
   if (!user) return { error: 'Invalid user ID' };
@@ -283,8 +284,7 @@ function adminQuizRestore(token: number, quizId: number):
       activeQuiz.authId === user.authUserId &&
       activeQuiz.in_trash === false) {
       // Return error if quiz name of the restored quiz is already used
-      // by another active quiz or
-      // quiz is not in trash
+      // by another active quiz or quiz is not in trash
       return { error: 'Quiz name is used by an active quiz' };
     }
   }

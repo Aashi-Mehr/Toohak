@@ -242,10 +242,8 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   if ('error' in response) return res.status(403).json(response);
   if ('error' in response) return res.status(400).json(response);
   if ('error' in response) return res.status(401).json(response);
+  
   res.json(response);
-
-  res.json(response);
-  // backupData(req, res, response);
 });
 
 // ====================================================================
