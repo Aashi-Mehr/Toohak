@@ -317,3 +317,16 @@ export function requestQuesDup(token: number, quizid: number,
   );
   return JSON.parse(res.body.toString());
 }
+
+// DELETE EMPTY TRASH Define Wrapper Function
+export function requestQuizEmptyTrash(token: number, quizId: number[]):
+  ErrorObject | Record<string, never> {
+  const res = request(
+    'DELETE',
+    SERVER_URL + '/v1/admin/quiz/trash/empty',
+    {
+      qs: { }
+    }
+  );
+  return JSON.parse(res.body.toString());
+}
