@@ -9,7 +9,7 @@ import {
   QuestionId,
   ErrorObject,
   Details,
-  QuizList
+  QuizList,
 } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
@@ -315,6 +315,37 @@ export function requestQuesDup(token: number, quizid: number,
       }
     }
   );
+  return JSON.parse(res.body.toString());
+}
+
+// QUESTION Update Define wrapper function
+export function requestQuesUpdate(token: number, quizId: number, quesId: number,
+  questionBody: QuestionBody): ErrorObject | Record<string, never> {
+  const res = request(
+    'PUT',
+    `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}`,
+    {
+      json: {
+        token: token,
+        questionBody: questionBody
+      }
+    }
+  );
+
+  return JSON.parse(res.body.toString());
+}
+
+// QUESTION Update Define wrapper function
+export function requestQuesDelete(token: number, quizId: number, quesId: number):
+  ErrorObject | Record<string, never> {
+  const res = request(
+    'DELETE',
+    `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}?token=${token}`,
+    {
+      qs: { }
+    }
+  );
+
   return JSON.parse(res.body.toString());
 }
 
