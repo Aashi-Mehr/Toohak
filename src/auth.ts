@@ -97,7 +97,7 @@ export function adminAuthRegister(email: string, password: string,
     name: nameFirst + ' ' + nameLast,
     email: email,
     password: password,
-    successful_log_time: 0,
+    successful_log_time: 1,
     failed_password_num: 0,
     prev_passwords: [password]
   });
