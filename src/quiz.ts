@@ -77,17 +77,19 @@ function adminQuizCreate(token: number, name: string, description: string):
   if (description.length > 100) return { error: desc400 };
 
   // Error checking: In used quiz name
-  const createdQuizzes = getData().quizzes;
-  for (const quiz of createdQuizzes) {
-    if (quiz.authId === user.authUserId && quiz.name === name &&
-        quiz.in_trash === false) return { error: nameUsed400 };
+  let userQuizzes = adminQuizList(token);
+  if ('quizzes' in userQuizzes) {
+    let quizzes = userQuizzes.quizzes;
+    for (const quiz of quizzes) {
+      if (quiz.name === name) return { error: nameUsed400 };
+    }
   }
 
   // Returning and altering data
   const timestamp = Math.floor(Date.now() / 1000);
   const quizId = getUniqueID(getData());
 
-  createdQuizzes.push({
+  getData().quizzes.push({
     quizId: quizId,
     authId: user.authUserId,
     name: name,
