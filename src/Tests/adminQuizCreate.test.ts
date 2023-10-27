@@ -203,7 +203,7 @@ describe('VALID Details', () => {
   });
 
   test('Reusing the name of a deleted quiz', () => {
-    let quizId = requestQuizCreate(authId, 'quizName1', '').quizId;
+    const quizId = requestQuizCreate(authId, 'quizName1', '').quizId;
     requestQuizRemove(authId, quizId);
 
     // Name is already used by the current logged in user for another quiz

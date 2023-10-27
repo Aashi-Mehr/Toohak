@@ -77,9 +77,9 @@ function adminQuizCreate(token: number, name: string, description: string):
   if (description.length > 100) return { error: desc400 };
 
   // Error checking: In used quiz name
-  let userQuizzes = adminQuizList(token);
+  const userQuizzes = adminQuizList(token);
   if ('quizzes' in userQuizzes) {
-    let quizzes = userQuizzes.quizzes;
+    const quizzes = userQuizzes.quizzes;
     for (const quiz of quizzes) {
       if (quiz.name === name) return { error: nameUsed400 };
     }

@@ -20,9 +20,9 @@ beforeEach(() => {
 // Test 401 : Invalid AuthUserId Format
 test('Test Invalid AuthUserId Format', () => {
   // authUserId is empty
-  let token = requestRegister('v@gmail.com', 'Val1Pass', 'fir', 'las').token;
-  let quizId1 = requestQuizCreate(token, 'Quiz 1', '').quizId;
-  let quizId2 = requestQuizCreate(token, 'Quiz 2', '').quizId;
+  const token = requestRegister('v@gmail.com', 'Val1Pass', 'fir', 'las').token;
+  const quizId1 = requestQuizCreate(token, 'Quiz 1', '').quizId;
+  const quizId2 = requestQuizCreate(token, 'Quiz 2', '').quizId;
   requestQuizRemove(token, quizId1);
   requestQuizRemove(token, quizId2);
 
