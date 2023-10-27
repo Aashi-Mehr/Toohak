@@ -7,6 +7,15 @@ import {
   Details,
   getUniqueID,
   Token,
+  emailUsed400,
+  emailValid400,
+  userChar400,
+  passLen400,
+  passChar400,
+  passInv400,
+  oldPass400,
+  newPass400,
+  token401
 } from './dataStore';
 
 /** adminDetailsCheck
@@ -30,42 +39,28 @@ function detailsCheck(email: string, password: string,
   const hasLetter = /[a-zA-Z]/.test(password);
   const hasNumber = /\d/.test(password);
 
-  if (hasLetter === false || hasNumber === false) {
-    return {
-      error: 'Password does not contain at least one number and at ' +
-      'least one letter'
-    };
-  }
-  if (password.length < 8) {
-    return { error: 'Password is less than 8 characters' };
-  }
+  if (hasLetter === false || hasNumber === false) return { error: passChar400 };
+  if (password.length < 8) return { error: passLen400 };
 
   // Name can only consist of letters, spaces and hyphens
   const invalidnameFirst = /[^a-zA-Z -']/.test(nameFirst);
   const invalidnameLast = /[^a-zA-Z -']/.test(nameLast);
 
   if (invalidnameFirst === true || invalidnameLast === true) {
-    return {
-      error: 'Name contains characters other than lowercase letters, ' +
-      'uppercase letters, spaces, hyphens, or apostrophes'
-    };
+    return { error: userChar400 };
   }
   if (nameFirst.length < 2 || nameFirst.length > 20 ||
-      nameLast.length < 2 || nameLast.length > 20) {
-    return { error: 'Name is less than 2 or more than 20 characters' };
-  }
+      nameLast.length < 2 || nameLast.length > 20) return { error: userChar400 };
 
   // Email needs to be valid
   const validator = require('validator');
   if (!validator.isEmail(email)) {
-    return { error: 'Email does not satisfy validator' };
+    return { error: emailValid400 };
   }
 
   // Email cannot be duplicated
   for (const user of users) {
-    if (user.email === email) {
-      return { error: 'Email is currently used by another user' };
-    }
+    if (user.email === email) return { error: emailUsed400 };
   }
 
   // No errors, hence details are valid
@@ -132,12 +127,7 @@ export function adminUserDetailsEdit(token: number, email: string,
   // Get user details
   const user = getUser(token, getData());
   // If the token is invalid, return error
-  if (!user) {
-    return {
-      error: 'Token is empty or invalid (does not refer to ' +
-    'valid logged in user session)'
-    };
-  }
+  if (!user) return { error: token401 };
 
   // Get user details
   const users = getData().users;
@@ -177,30 +167,23 @@ export function adminUserPasswordEdit(token: number, oldPass: string,
   // Ensuring the user is valid
   const user = getUser(token, getData());
   // Return error message if token is invalid
-  if (!user) {
-    return {
-      error: 'Token is empty or invalid (does not refer to ' +
-    'valid logged in user session)'
-    };
-  }
+  if (!user) return { error: token401 };
   // Return error message if the password entered does not match old password
-  if (user.password !== oldPass) return { error: 'Incorrect password' };
+  if (user.password !== oldPass) return { error: oldPass400 };
 
   // Password needs to have letters and numbers, greater than 8 characters
   const hasLetter = /[a-zA-Z]/.test(newPass);
   const hasNumber = /\d/.test(newPass);
 
   // Return error if password does not contain letters
-  if (hasLetter === false) return { error: 'Password needs letters' };
-  // Return error if password does not contain numbers
-  if (hasNumber === false) return { error: 'Password needs numbers' };
+  if (hasLetter === false || hasNumber === false) return { error: passChar400 };
   // Return error if password is less than 8 characters
-  if (newPass.length < 8) return { error: 'Password is too short' };
+  if (newPass.length < 8) return { error: passLen400 };
 
   // Loop through previous password and return error if the new password
   // is the same as the old password
   for (const pass of user.prev_passwords) {
-    if (newPass === pass) return { error: 'Cannot reuse old password' };
+    if (newPass === pass) return { error: newPass400 };
   }
 
   // Push newPass into user details and set newPass to password
@@ -249,7 +232,7 @@ export function adminAuthLogin(email: string, password: string):
 
   // If all of the above code ran, but the token wasn't returned, then the
   // details were incorrect
-  return { error: 'Email or password is incorrect' };
+  return { error: passInv400 };
 }
 
 /** adminUserDetails
@@ -264,7 +247,7 @@ export function adminUserDetails(token: number): Details | ErrorObject {
   // Finds the user using the token, undefined is returned if not found
   const user = getUser(token, getData());
   // Return error if token is invalid
-  if (!user) return { error: 'Invalid token' };
+  if (!user) return { error: token401 };
 
   // Return the user's details
   return {
@@ -291,14 +274,9 @@ export function adminAuthLogout(token: number):
   ErrorObject | Record<string, never> {
   // Finds the user using the token, undefined is returned if not found
   const session = getSession(token, getData().sessions);
+
   // If session is not valid or exist
-  if (!session) {
-    // Return error message when token is empty or invalid
-    return {
-      error: 'Token is empty or invalid (does not refer ' +
-    'to valid logged in user session)'
-    };
-  }
+  if (!session) return { error: token401 };
 
   // Set the validity of session to be false
   session.is_valid = false;
