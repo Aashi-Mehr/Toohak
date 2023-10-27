@@ -41,7 +41,7 @@ import {
   deleteQuestion,
 } from './question';
 
-import { clear } from './other.js';
+import { clear } from './other';
 import { getData, setData, token401, unauth403 } from './dataStore';
 
 // Set up web app
