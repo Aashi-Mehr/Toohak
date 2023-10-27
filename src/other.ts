@@ -16,14 +16,12 @@
 // Reset state of the application back to the start
 import { setData } from './dataStore';
 
-function clear() {
-  const emptyData = {
+function clear(): Record<string, never> {
+  setData({
     users: [],
     quizzes: [],
     sessions: []
-  };
-
-  setData(emptyData);
+  });
 
   return { };
 }
