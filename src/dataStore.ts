@@ -239,6 +239,7 @@ export {
   SessionAdd,
   Token,
   Datastore,
+  AnswerBody,
   QuestionBody,
   QuestionId,
   Answer
