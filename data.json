@@ -1,1 +1,5 @@
-{"users":[{"authUserId":10007123,"nameFirst":"fir","nameLast":"las","name":"fir las","email":"am@gmail.com","password":"Vl1dPass","successful_log_time":0,"failed_password_num":0,"prev_passwords":["Vl1dPass"]}],"quizzes":[{"quizId":10003472,"authId":10007123,"name":"New Quiz 1","description":"","timeCreated":1698332279,"timeLastEdited":1698332279,"in_trash":false,"questions":[{"questionId":10002108,"question":"What is the first letter of the alphabet?","duration":10,"points":5,"answers":[{"answerId":10002573,"answer":"a","colour":"green","correct":true},{"answerId":10004118,"answer":"b","colour":"brown","correct":false}]}]}],"sessions":[{"token":10007453,"authUserId":10007123,"is_valid":true}]}
+{
+    "users": [],
+    "quizzes": [],
+    "sessions": []
+}

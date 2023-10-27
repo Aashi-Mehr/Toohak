@@ -29,6 +29,8 @@ import {
   adminQuizRemove,
   adminQuizNameUpdate,
   adminQuizTrash,
+  adminQuizRestore,
+  adminQuizEmptyTrash
 } from './quiz';
 
 import {
@@ -266,6 +268,53 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
 
   res.json(response);
   backupData(req, res, response);
+});
+
+// adminQuizTransfer
+app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  let { token, userEmail } = req.body;
+  token = parseInt(token);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizTransfer(token, quizId, userEmail);
+
+  if ('error' in response) {
+    if (response.error.includes('Token')) return res.status(401).json(response);
+    else if (response.error.includes('not an owner')) {
+      return res.status(403).json(response);
+    } else return res.status(400).json(response);
+  }
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizRestore
+app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
+  const token = parseInt(req.body.token);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizRestore(token, quizId);
+
+  if ('error' in response) {
+    if (response.error.includes('user ID')) return res.status(401).json(response);
+    else if (response.error.includes('not owned by user')) return res.status(403).json(response);
+    else return res.status(400).json(response);
+  }
+  res.json(response);
+});
+
+// adminQuizEmptyTrash
+app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  const quizId = JSON.parse(req.query.quizIds);
+  const response = adminQuizEmptyTrash(token, quizId);
+
+  if ('error' in response) {
+    if (response.error.includes('not in trash')) return res.status(400).json(response);
+    else if (response.error.includes('user ID')) return res.status(401).json(response);
+    else return res.status(403).json(response);
+  }
+
+  res.json(response);
 });
 
 // ====================================================================
