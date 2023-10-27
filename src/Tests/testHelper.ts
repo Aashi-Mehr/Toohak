@@ -341,11 +341,9 @@ export function requestQuesDelete(token: number, quizId: number, quesId: number)
   ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
-    `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}`,
+    `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}?token=${token}`,
     {
-      json: {
-        token: token
-      }
+      qs: { }
     }
   );
   

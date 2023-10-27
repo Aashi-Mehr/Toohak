@@ -296,8 +296,36 @@ export function updateQuestion(token: number, quizId: number, quesId: number,
   */
 export function deleteQuestion(token: number, quizId: number, quesId: number):
   ErrorObject | Record<string, never> {
-  // Write the function
-  return { };
+  // Error Checking
+  // Check if the user is valid
+  const user = getUser(token, getData());
+  if (!user) {
+    return {
+      error: 'Token is empty or invalid (does not refer to ' +
+             'valid logged in user session)'
+    };
+  }
+
+  // Check if the quiz exists
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz) return { error: 'Invalid quiz ID' };
+
+  // Checking that the user owns the quiz
+  if (quiz.authId !== user.authUserId) {
+    return {
+      error: 'Valid token is provided, but user is unauthorised'
+    };
+  }
+
+  // Check if the question exists within the quiz
+  for (let ques of quiz.questions) {
+    if (ques.questionId === quesId) {
+      quiz.questions.splice(quiz.questions.indexOf(ques), 1);
+      return { };
+    }
+  }
+  
+  return { error: 'Question Id is invalid within this quiz' };
 }
 
 /** adminQuesDup
@@ -307,7 +335,7 @@ export function deleteQuestion(token: number, quizId: number, quesId: number):
   * @param { number } quizId - The quizId contain moved question
   * @param { number } quesId - The quesId of the question being moved
   *
-  * @returns { newQuestionId } - If the question exists and is successfully duplicated
+  * @returns { newQuestionId } - If the question is successfully duplicated
   * @returns { ErrorObject } - If any input error exists
   */
 export function adminQuestionDuplicate(token: number, quesId: number,

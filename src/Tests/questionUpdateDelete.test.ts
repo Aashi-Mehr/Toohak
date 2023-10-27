@@ -380,7 +380,6 @@ describe('adminQuizQuestionUpdate', () => {
 	test('Duplicating, then updating', () => {
 		// Duplicating, then updating
 		let question2 = requestQuesDup(token1, quizId1, questionId1);
-		console.log(questionId1, question2);
 
 		if ('questionId' in question2) {
 			let questionId2 = question2.questionId;
@@ -389,7 +388,6 @@ describe('adminQuizQuestionUpdate', () => {
 			expect(Object.keys(result).length).toStrictEqual(0);
 	
 			let info = requestQuizInfo(token1, quizId1);
-			console.log(info);
 			expect(info).toMatchObject({
 				quizId: quizId1,
 				name: 'New Quiz 1',
@@ -448,7 +446,7 @@ describe('adminQuizQuestionUpdate', () => {
 	});
 });
 
-/*describe('adminQuizQuestionDelete', () => {
+describe('adminQuizQuestionDelete', () => {
 	// Error Checking
 
 	test('Question Id does not refer to a valid question', () => {
@@ -527,7 +525,7 @@ describe('adminQuizQuestionUpdate', () => {
 
 	test('Duplicating, then deleting a question', () => {
 		// Duplicating, then deleting a question
-		let question2 = requestQuesDup(token1, quizId1, questionId1);
+		requestQuesDup(token1, quizId1, questionId1);
 		result = requestQuesDelete(token1, quizId1, questionId1);
 		expect(Object.keys(result).length).toStrictEqual(0);
 
@@ -570,4 +568,4 @@ describe('adminQuizQuestionUpdate', () => {
 			duration: 0
 		});
 	});
-});*/
+});
