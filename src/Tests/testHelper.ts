@@ -10,7 +10,6 @@ import {
   ErrorObject,
   Details,
   QuizList,
-  Question
 } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
@@ -346,7 +345,7 @@ export function requestQuesDelete(token: number, quizId: number, quesId: number)
       qs: { }
     }
   );
-  
+
   return JSON.parse(res.body.toString());
 }
 

@@ -221,7 +221,7 @@ export function updateQuestion(token: number, quizId: number, quesId: number,
 
   // Check if the question exists within the quiz
   let question: Question;
-  for (let ques of quiz.questions) {
+  for (const ques of quiz.questions) {
     if (ques.questionId === quesId) question = ques;
   }
   if (!question) return { error: 'Question Id is invalid within this quiz' };
@@ -243,7 +243,7 @@ export function updateQuestion(token: number, quizId: number, quesId: number,
 
   // Sum of the question durations in the quiz exceeds 3 minutes
   let durationSum = questionBody.duration;
-  for (let ques of quiz.questions) {
+  for (const ques of quiz.questions) {
     if (ques.questionId !== quesId) durationSum += ques.duration;
   }
   if (durationSum > 180) return { error: 'The total duration is too long' };
@@ -257,7 +257,7 @@ export function updateQuestion(token: number, quizId: number, quesId: number,
   // 30 characters long
   // There are no correct answers
   let correct = false;
-  for (let answer of questionBody.answers) {
+  for (const answer of questionBody.answers) {
     if (answer.correct === true) correct = true;
     if (answer.answer.length < 1 || answer.answer.length > 30) {
       return { error: 'Answers are too long/short' };
@@ -267,8 +267,8 @@ export function updateQuestion(token: number, quizId: number, quesId: number,
 
   // Any answer strings are duplicates of one another (within the same question)
   for (let i = 0; i < questionBody.answers.length; i++) {
-    let isEqual = (an: Answer) => an.answer === questionBody.answers[i].answer;
-    let firstInstance = questionBody.answers.findIndex(isEqual);
+    const isEqual = (an: Answer) => an.answer === questionBody.answers[i].answer;
+    const firstInstance = questionBody.answers.findIndex(isEqual);
     if (firstInstance !== i) return { error: 'Answers are duplicated' };
   }
 
@@ -318,13 +318,13 @@ export function deleteQuestion(token: number, quizId: number, quesId: number):
   }
 
   // Check if the question exists within the quiz
-  for (let ques of quiz.questions) {
+  for (const ques of quiz.questions) {
     if (ques.questionId === quesId) {
       quiz.questions.splice(quiz.questions.indexOf(ques), 1);
       return { };
     }
   }
-  
+
   return { error: 'Question Id is invalid within this quiz' };
 }
 

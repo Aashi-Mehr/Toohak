@@ -338,45 +338,44 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   backupData(req, res, response);
 });
 
-
 // adminQuizUpdateQuestion
 app.put('/v1/admin/quiz/:quizid/question/:questionid',
   (req: Request, res: Response) => {
-  const questionId = parseInt(req.params.questionid);
-  const quizId = parseInt(req.params.quizid);
-  let { token, questionBody } = req.body;
-  token = parseInt(token);
+    const questionId = parseInt(req.params.questionid);
+    const quizId = parseInt(req.params.quizid);
+    let { token, questionBody } = req.body;
+    token = parseInt(token);
 
-  const response = updateQuestion(token, quizId, questionId, questionBody);
+    const response = updateQuestion(token, quizId, questionId, questionBody);
 
-  if ('error' in response) {
-    if (response.error.includes('Token')) return res.status(401).json(response);
-    else if (response.error.includes('not an owner')) {
-      return res.status(403).json(response);
-    } else return res.status(400).json(response);
-  }
+    if ('error' in response) {
+      if (response.error.includes('Token')) return res.status(401).json(response);
+      else if (response.error.includes('not an owner')) {
+        return res.status(403).json(response);
+      } else return res.status(400).json(response);
+    }
 
-  res.json(response);
-});
+    res.json(response);
+  });
 
 // adminQuizDeleteQuestion
 app.delete('/v1/admin/quiz/:quizid/question/:questionid',
   (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
-  const quizId = parseInt(req.params.quizid);
-  const questionId = parseInt(req.params.questionid);
+    const token = parseInt(req.query.token as string);
+    const quizId = parseInt(req.params.quizid);
+    const questionId = parseInt(req.params.questionid);
 
-  const response = deleteQuestion(token, quizId, questionId);
+    const response = deleteQuestion(token, quizId, questionId);
 
-  if ('error' in response) {
-    if (response.error.includes('Token')) return res.status(401).json(response);
-    else if (response.error.includes('not an owner')) {
-      return res.status(403).json(response);
-    } else return res.status(400).json(response);
-  }
+    if ('error' in response) {
+      if (response.error.includes('Token')) return res.status(401).json(response);
+      else if (response.error.includes('not an owner')) {
+        return res.status(403).json(response);
+      } else return res.status(400).json(response);
+    }
 
-  res.json(response);
-});
+    res.json(response);
+  });
 
 // adminQuestionMove
 app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
