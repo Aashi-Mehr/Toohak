@@ -248,7 +248,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last1@gmail.com',
-        numSuccessfulLogins: 0,
+        numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
@@ -266,7 +266,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last2@gmail.com',
-        numSuccessfulLogins: 0,
+        numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
@@ -284,7 +284,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last3@gmail.com',
-        numSuccessfulLogins: 0,
+        numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
@@ -302,7 +302,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last4@gmail.com',
-        numSuccessfulLogins: 0,
+        numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
@@ -320,7 +320,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last1@gmail.com',
-        numSuccessfulLogins: 1,
+        numSuccessfulLogins: 2,
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
@@ -339,7 +339,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last1@gmail.com',
-        numSuccessfulLogins: 1,
+        numSuccessfulLogins: 2,
         numFailedPasswordsSinceLastLogin: 1,
       }
     });
@@ -359,7 +359,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last1@gmail.com',
-        numSuccessfulLogins: 1,
+        numSuccessfulLogins: 2,
         numFailedPasswordsSinceLastLogin: 2,
       }
     });
@@ -381,7 +381,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last1@gmail.com',
-        numSuccessfulLogins: 2,
+        numSuccessfulLogins: 3,
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
