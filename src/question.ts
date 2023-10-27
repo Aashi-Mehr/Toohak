@@ -198,7 +198,89 @@ export function adminQuestionMove(token: number, newPosition: number,
   */
 export function updateQuestion(token: number, quizId: number, quesId: number,
   questionBody: Question): ErrorObject | Record<string, never> {
-  // Write the function
+  // Error Checking
+  // Check if the user is valid
+  const user = getUser(token, getData());
+  if (!user) {
+    return {
+      error: 'Token is empty or invalid (does not refer to ' +
+             'valid logged in user session)'
+    };
+  }
+
+  // Check if the quiz exists
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz) return { error: 'Invalid quiz ID' };
+
+  // Checking that the user owns the quiz
+  if (quiz.authId !== user.authUserId) {
+    return {
+      error: 'Valid token is provided, but user is unauthorised'
+    };
+  }
+
+  // Check if the question exists within the quiz
+  let question: Question;
+  for (let ques of quiz.questions) {
+    if (ques.questionId === quesId) question = ques;
+  }
+  if (!question) return { error: 'Question Id is invalid within this quiz' };
+
+  // Question is not within 5 and 50 characters in length
+  if (questionBody.question.length < 5 || questionBody.question.length > 50) {
+    return { error: 'Invalid question length' };
+  }
+
+  // The question has more than 6 answers or less than 2 answers
+  if (questionBody.answers.length < 2 || questionBody.answers.length > 6) {
+    return { error: 'Invalid number of answers' };
+  }
+
+  // The question duration is not a positive number
+  if (questionBody.duration <= 0) {
+    return { error: 'The question duration is not a positive number' };
+  }
+
+  // Sum of the question durations in the quiz exceeds 3 minutes
+  let durationSum = questionBody.duration;
+  for (let ques of quiz.questions) {
+    if (ques.questionId !== quesId) durationSum += ques.duration;
+  }
+  if (durationSum > 180) return { error: 'The total duration is too long' };
+
+  // The points awarded for the question are less than 1 or greater than 10
+  if (questionBody.points < 1 || questionBody.points > 10) {
+    return { error: 'Points are invalid' };
+  }
+
+  // The length of any answer is shorter than 1 character long, or longer than
+  // 30 characters long
+  // There are no correct answers
+  let correct = false;
+  for (let answer of questionBody.answers) {
+    if (answer.correct === true) correct = true;
+    if (answer.answer.length < 1 || answer.answer.length > 30) {
+      return { error: 'Answers are too long/short' };
+    }
+  }
+  if (!correct) return { error: 'No correct answer' };
+
+  // Any answer strings are duplicates of one another (within the same question)
+  for (let i = 0; i < questionBody.answers.length; i++) {
+    let isEqual = (an: Answer) => an.answer === questionBody.answers[i].answer;
+    let firstInstance = questionBody.answers.findIndex(isEqual);
+    if (firstInstance !== i) return { error: 'Answers are duplicated' };
+  }
+
+  // No errors occur, so update the question
+  question.question = questionBody.question;
+  question.duration = questionBody.duration;
+  question.points = questionBody.points;
+  question.answers = questionBody.answers;
+
+  // Update the last edited time for the quiz
+  quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+
   return { };
 }
 
@@ -230,10 +312,11 @@ export function deleteQuestion(token: number, quizId: number, quesId: number):
   */
 export function adminQuestionDuplicate(token: number, quesId: number,
   quizId: number): QuestionId | ErrorObject {
-  // Get data from database
+  // Get data from database, ensure the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
   if (!quiz) return { error: 'Quiz ID is invalid' };
 
+  // Ensuring the user exists with a valid token
   const user = getUser(token, getData());
   if (!user) {
     return {
@@ -242,28 +325,28 @@ export function adminQuestionDuplicate(token: number, quesId: number,
     };
   }
 
+  // Ensuring the user owns the quiz
   if (user.authUserId !== quiz.authId) {
     return {
       error: 'Valid token is provided, but user is not an owner of this quiz'
     };
   }
 
-  // Get the question asked for moving
+  // Get the question asked for moving, esnuring it exists
   let currQues: Question;
-  let findQues = false;
   for (const question of quiz.questions) {
-    if (question.questionId === quesId) {
-      findQues = true;
-      currQues = question;
-    }
+    if (question.questionId === quesId) currQues = question;
   }
-
-  // Error check
-  if (findQues === false) return { error: 'Ques ID is invalid' };
+  if (!currQues) return { error: 'Ques ID is invalid' };
 
   const newId = getUniqueID(getData());
-  quiz.questions.push(currQues);
-  quiz.questions[quiz.questions.length - 1].questionId = newId;
+  quiz.questions.push({
+    questionId: newId,
+    question: currQues.question,
+    duration: currQues.duration,
+    points: currQues.points,
+    answers: currQues.answers
+  });
 
   // Update time last edit
   quiz.timeLastEdited = Math.floor(Date.now() / 1000);

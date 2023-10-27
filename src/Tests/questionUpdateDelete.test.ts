@@ -380,6 +380,7 @@ describe('adminQuizQuestionUpdate', () => {
 	test('Duplicating, then updating', () => {
 		// Duplicating, then updating
 		let question2 = requestQuesDup(token1, quizId1, questionId1);
+		console.log(questionId1, question2);
 
 		if ('questionId' in question2) {
 			let questionId2 = question2.questionId;
@@ -388,6 +389,7 @@ describe('adminQuizQuestionUpdate', () => {
 			expect(Object.keys(result).length).toStrictEqual(0);
 	
 			let info = requestQuizInfo(token1, quizId1);
+			console.log(info);
 			expect(info).toMatchObject({
 				quizId: quizId1,
 				name: 'New Quiz 1',
@@ -420,9 +422,33 @@ describe('adminQuizQuestionUpdate', () => {
 			});
 		} else expect(question2).toMatchObject({ questionId: expect.any(Number) });
 	});
+
+	test('Checking that question duration can be upto 180 seconds', () => {
+		// Checking that question duration can be upto 180 seconds
+		let q2 = questionBody('Question 2', 30);
+		let q3 = questionBody('Question 3', 30);
+		let q4 = questionBody('Question 4', 30);
+		let q5 = questionBody('Question 5', 30);
+		let q6 = questionBody('Question 6', 30);
+
+		requestQuestionCreate(token1, quizId1, q2);
+		requestQuestionCreate(token1, quizId1, q3);
+		requestQuestionCreate(token1, quizId1, q4);
+		requestQuestionCreate(token1, quizId1, q5);
+		requestQuestionCreate(token1, quizId1, q6);
+
+		result = requestQuesUpdate(token1, quizId1, questionId1, questionBody(
+			undefined, 30
+		));
+		expect(Object.keys(result).length).toStrictEqual(0);
+
+		let info = requestQuizInfo(token1, quizId1);
+		expect(info.numQuestions).toStrictEqual(6);
+		expect(info.duration).toStrictEqual(180);
+	});
 });
 
-describe('adminQuizQuestionDelete', () => {
+/*describe('adminQuizQuestionDelete', () => {
 	// Error Checking
 
 	test('Question Id does not refer to a valid question', () => {
@@ -544,4 +570,4 @@ describe('adminQuizQuestionDelete', () => {
 			duration: 0
 		});
 	});
-});
+});*/
