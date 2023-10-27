@@ -28,8 +28,8 @@ export function requestClear() {
 }
 
 // POST REGISTER Define wrapper function
-export function requestRegister(email: string, password: string, nameFirst: string,
-  nameLast: string): Token {
+export function requestRegister(email: string, password: string,
+  nameFirst: string, nameLast: string): Token {
   const res = request(
     'POST',
     SERVER_URL + '/v1/admin/auth/register',
@@ -82,7 +82,8 @@ export function requestDetails(token: number): Details | ErrorObject {
 }
 
 // POST LOGOUT Define wrapper function
-export function requestLogout(token: number): ErrorObject | Record<string, never> {
+export function requestLogout(token: number):
+  ErrorObject | Record<string, never> {
   const res = request(
     'POST',
     SERVER_URL + '/v1/admin/auth/logout',
@@ -97,8 +98,8 @@ export function requestLogout(token: number): ErrorObject | Record<string, never
 }
 
 // PUT EDIT DETAILS Define wrapper function
-export function requestDetailsEdit(token: number, email: string, nameFirst: string,
-  nameLast: string): ErrorObject | Record<string, never> {
+export function requestDetailsEdit(token: number, email: string,
+  nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
   const res = request(
     'PUT',
     SERVER_URL + '/v1/admin/user/details',
@@ -116,8 +117,8 @@ export function requestDetailsEdit(token: number, email: string, nameFirst: stri
 }
 
 // PUT EDIT PASSWORD Define wrapper function
-export function requestPasswordEdit(token: number, oldPass: string, newPass: string):
-  ErrorObject | Record<string, never> {
+export function requestPasswordEdit(token: number, oldPass: string,
+  newPass: string): ErrorObject | Record<string, never> {
   const res = request(
     'PUT',
     SERVER_URL + '/v1/admin/user/password',
@@ -168,7 +169,8 @@ export function requestQuizInfo(token: number | string, quizId: number):
 }
 
 // GET QUIZ LIST Define wrapper function
-export function requestQuizList(token: number | string): QuizList | ErrorObject {
+export function requestQuizList(token: number | string):
+  QuizList | ErrorObject {
   const res = request(
     'GET',
     SERVER_URL + '/v1/admin/quiz/list?token=' + token,
@@ -244,7 +246,8 @@ export function requestQuestionCreate(token: number | string,
   return JSON.parse(res.body.toString());
 }
 
-export function requestQuizTransfer(token: number | string, quizId: number, userEmail: string) {
+export function requestQuizTransfer(token: number | string, quizId: number,
+  userEmail: string) {
   const res = request(
     'POST',
     SERVER_URL + '/v1/admin/quiz/' + quizId + '/transfer',
@@ -336,8 +339,8 @@ export function requestQuesUpdate(token: number, quizId: number, quesId: number,
 }
 
 // QUESTION Update Define wrapper function
-export function requestQuesDelete(token: number, quizId: number, quesId: number):
-  ErrorObject | Record<string, never> {
+export function requestQuesDelete(token: number, quizId: number,
+  quesId: number): ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
     `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}?token=${token}`,
@@ -354,7 +357,8 @@ export function requestQuizEmptyTrash(token: number, quizId: number[]):
   ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
-    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId + ']&token=' + token,
+    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId +
+      ']&token=' + token,
     {
       qs: { }
     }

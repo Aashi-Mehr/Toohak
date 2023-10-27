@@ -296,6 +296,25 @@ describe('questionCreate', () => {
       expect(result).toMatchObject(ERROR);
     });
 
+    test('Sum of the question durations in the quiz will be 181 seconds', () => {
+      // question body has a length of 60 seconds
+      for (let i = 0; i < 3; i++) {
+        const result = requestQuestionCreate(token1, quizId1, questionBody);
+        expect(result).not.toMatchObject(ERROR);
+      }
+
+      const result = requestQuestionCreate(token1, quizId1, {
+        question: 'Who let the dogs out?',
+        duration: 1,
+        points: 10,
+        answers: [
+          { answer: 'who?', correct: false },
+          { answer: 'you?', correct: true }
+        ]
+      });
+      expect(result).toMatchObject(ERROR);
+    });
+
     test('The points awarded for the question are less than 1', () => {
       const result = requestQuestionCreate(token1, quizId1, questionBodyInvalidPoint1);
       expect(result).toMatchObject(ERROR);

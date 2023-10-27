@@ -42,7 +42,7 @@ import {
 } from './question';
 
 import { clear } from './other.js';
-import { getData, setData } from './dataStore';
+import { getData, setData, token401, unauth403 } from './dataStore';
 
 // Set up web app
 const app = express();
@@ -55,7 +55,9 @@ app.use(morgan('dev'));
 // for producing the docs that define the API
 const file = fs.readFileSync(path.join(process.cwd(), 'swagger.yaml'), 'utf8');
 app.get('/', (req: Request, res: Response) => res.redirect('/docs'));
-app.use('/docs', sui.serve, sui.setup(YAML.parse(file), { swaggerOptions: { docExpansion: config.expandDocs ? 'full' : 'list' } }));
+app.use('/docs', sui.serve, sui.setup(YAML.parse(file), {
+  swaggerOptions: { docExpansion: config.expandDocs ? 'full' : 'list' }
+}));
 
 const PORT: number = parseInt(process.env.PORT || config.port);
 const HOST: string = process.env.IP || 'localhost';
@@ -63,6 +65,7 @@ const HOST: string = process.env.IP || 'localhost';
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
+// Used after every put, post, delete routes to keep data.json updated
 function backupData(req: Request, res: Response, response: any) {
   fs.writeFile('data.json', JSON.stringify(getData()), (err) => {
     if (err) return res.status(404).json(response);
@@ -111,8 +114,6 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   res.json(response);
 });
 
-// =========================== ITERATION 2 ============================
-
 // adminAuthLogout
 app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
   const token = parseInt(req.body.token);
@@ -130,7 +131,7 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
     nameFirst, nameLast);
 
   if ('error' in response) {
-    if (response.error.includes('Token')) return res.status(401).json(response);
+    if (response.error === token401) return res.status(401).json(response);
     return res.status(400).json(response);
   }
 
@@ -145,7 +146,7 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
     newPassword);
 
   if ('error' in response) {
-    if (response.error.includes('Token')) return res.status(401).json(response);
+    if (response.error === token401) return res.status(401).json(response);
     return res.status(400).json(response);
   }
 
@@ -172,7 +173,7 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const response = adminQuizCreate(parseInt(token), name, description);
 
   if ('error' in response) {
-    if (response.error.includes('Token')) return res.status(401).json(response);
+    if (response.error === token401) return res.status(401).json(response);
     return res.status(400).json(response);
   }
 
@@ -196,7 +197,7 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const response = adminQuizRemove(token, quizId);
 
   if ('error' in response) {
-    if (response.error.includes('Token')) return res.status(401).json(response);
+    if (response.error === token401) return res.status(401).json(response);
     return res.status(403).json(response);
   }
 
@@ -211,7 +212,7 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const response = adminQuizInfo(token, quizId);
 
   if ('error' in response) {
-    if (response.error.includes('Token')) return res.status(401).json(response);
+    if (response.error === token401) return res.status(401).json(response);
     return res.status(403).json(response);
   }
   res.json(response);
@@ -224,10 +225,9 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   const response = adminQuizNameUpdate(parseInt(token), quizId, name);
 
   if ('error' in response) {
-    if (response.error.includes('Token')) return res.status(401).json(response);
-    else if (response.error.includes('not an owner')) {
-      return res.status(403).json(response);
-    } else return res.status(400).json(response);
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
   }
 
   res.json(response);
@@ -242,10 +242,9 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
     description);
 
   if ('error' in response) {
-    if (response.error.includes('Token')) return res.status(401).json(response);
-    else if (response.error.includes('not an owner')) {
-      return res.status(403).json(response);
-    } else return res.status(400).json(response);
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
   }
 
   res.json(response);
@@ -260,28 +259,9 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   const response = adminQuizTransfer(token, quizId, userEmail);
 
   if ('error' in response) {
-    if (response.error.includes('Token')) return res.status(401).json(response);
-    else if (response.error.includes('not an owner')) {
-      return res.status(403).json(response);
-    } else return res.status(400).json(response);
-  }
-
-  res.json(response);
-  backupData(req, res, response);
-});
-
-// adminQuizTransfer
-app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
-  let { token, userEmail } = req.body;
-  token = parseInt(token);
-  const quizId = parseInt(req.params.quizid);
-  const response = adminQuizTransfer(token, quizId, userEmail);
-
-  if ('error' in response) {
-    if (response.error.includes('Token')) return res.status(401).json(response);
-    else if (response.error.includes('not an owner')) {
-      return res.status(403).json(response);
-    } else return res.status(400).json(response);
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
   }
 
   res.json(response);
@@ -295,11 +275,13 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   const response = adminQuizRestore(token, quizId);
 
   if ('error' in response) {
-    if (response.error.includes('user ID')) return res.status(401).json(response);
-    else if (response.error.includes('not owned by user')) return res.status(403).json(response);
-    else return res.status(400).json(response);
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
   }
+
   res.json(response);
+  backupData(req, res, response);
 });
 
 // adminQuizEmptyTrash
@@ -309,11 +291,13 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   const response = adminQuizEmptyTrash(token, quizId);
 
   if ('error' in response) {
-    if (response.error.includes('not in trash')) return res.status(400).json(response);
-    else if (response.error.includes('user ID')) return res.status(401).json(response);
-    else return res.status(403).json(response);
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
   }
+
   res.json(response);
+  backupData(req, res, response);
 });
 
 // ====================================================================
@@ -327,10 +311,9 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const response = adminQuestionCreate(parseInt(token), quizId, questionBody);
 
   if ('error' in response) {
-    if (response.error.includes('Token')) return res.status(401).json(response);
-    else if (response.error.includes('not an owner')) {
-      return res.status(403).json(response);
-    } else return res.status(400).json(response);
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
   }
 
   res.json(response);
@@ -348,13 +331,13 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid',
     const response = updateQuestion(token, quizId, questionId, questionBody);
 
     if ('error' in response) {
-      if (response.error.includes('Token')) return res.status(401).json(response);
-      else if (response.error.includes('not an owner')) {
-        return res.status(403).json(response);
-      } else return res.status(400).json(response);
+      if (response.error === token401) return res.status(401).json(response);
+      if (response.error === unauth403) return res.status(403).json(response);
+      return res.status(400).json(response);
     }
 
     res.json(response);
+    backupData(req, res, response);
   });
 
 // adminQuizDeleteQuestion
@@ -367,13 +350,13 @@ app.delete('/v1/admin/quiz/:quizid/question/:questionid',
     const response = deleteQuestion(token, quizId, questionId);
 
     if ('error' in response) {
-      if (response.error.includes('Token')) return res.status(401).json(response);
-      else if (response.error.includes('not an owner')) {
-        return res.status(403).json(response);
-      } else return res.status(400).json(response);
+      if (response.error === token401) return res.status(401).json(response);
+      if (response.error === unauth403) return res.status(403).json(response);
+      return res.status(400).json(response);
     }
 
     res.json(response);
+    backupData(req, res, response);
   });
 
 // adminQuestionMove
@@ -389,10 +372,9 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
     const response = adminQuestionMove(token, newPosition, quesId, quizId);
 
     if ('error' in response) {
-      if (response.error.includes('Token')) return res.status(401).json(response);
-      else if (response.error.includes('not an owner')) {
-        return res.status(403).json(response);
-      } else return res.status(400).json(response);
+      if (response.error === token401) return res.status(401).json(response);
+      if (response.error === unauth403) return res.status(403).json(response);
+      return res.status(400).json(response);
     }
 
     res.json(response);
@@ -413,10 +395,9 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
     const response = adminQuestionDuplicate(token1, quesId, quizId);
 
     if ('error' in response) {
-      if (response.error.includes('Token')) return res.status(401).json(response);
-      else if (response.error.includes('not an owner')) {
-        return res.status(403).json(response);
-      } else return res.status(400).json(response);
+      if (response.error === token401) return res.status(401).json(response);
+      if (response.error === unauth403) return res.status(403).json(response);
+      return res.status(400).json(response);
     }
 
     res.json(response);
