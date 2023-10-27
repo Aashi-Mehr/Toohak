@@ -313,7 +313,6 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
     else if (response.error.includes('user ID')) return res.status(401).json(response);
     else return res.status(403).json(response);
   }
-
   res.json(response);
 });
 

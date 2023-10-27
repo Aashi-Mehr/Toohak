@@ -456,9 +456,8 @@ export {
   adminQuizRemove,
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
-  adminQuizTransfer,
   adminQuizTrash,
   adminQuizRestore,
+  adminQuizTransfer,
   adminQuizEmptyTrash
-
 };
