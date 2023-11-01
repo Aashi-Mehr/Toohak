@@ -1,0 +1,366 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>dataStore.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/dataStore.ts</td><td class="">100.00%</td><td class="">80%</td><td class="">310</td><td class="">310</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// ERROR MESSAGES
+// 403 Errors
+const unauth403 = &#x27;Valid token is provided, but user is unauthorised&#x27;;
+
+// 401 Errors
+const token401 = &#x27;Token is empty or invalid (does not refer to valid logged&#x27; +
+  &#x27; in user session)&#x27;;
+
+// 400 Errors
+// Quiz errors
+const nameChar400 = &#x27;Name contains invalid characters. Valid characters are&#x27; +
+  &#x27; alphanumeric and spaces&#x27;;
+const nameLen400 = &#x27;Name is either less than 3 characters long or more than&#x27; +
+  &#x27; 30 characters long&#x27;;
+const nameUsed400 = &#x27;Name is already used by the current logged in user &#x27; +
+  &#x27;for another quiz&#x27;;
+const desc400 = &#x27;Description is more than 100 characters in length &#x27; +
+  &#x27;(note: empty strings are OK)&#x27;;
+const notBin400 = &#x27;Quiz ID refers to a quiz that is not currently in the trash&#x27;;
+const notUser400 = &#x27;userEmail is not a real user&#x27;;
+const currUser400 = &#x27;userEmail is the current logged in user&#x27;;
+
+// Question errors
+const quesLen400 = &#x27;Question is less than 5 or greater than 50 characters&#x27;;
+const ansNum400 = &#x27;The question has more than 6 answers or less than 2 answers&#x27;;
+const quesDur400 = &#x27;The question duration is not a positive number&#x27;;
+const quizDur400 = &#x27;The quiz duration cannot exceed 3 minutes&#x27;;
+const quesPoints400 = &#x27;The points awarded for the question are less than 1 &#x27; +
+  &#x27;or greater than 10&#x27;;
+const ansLen400 = &#x27;The length of an answer is shorter than 1 or longer than 30&#x27;;
+const ansDup400 = &#x27;Answer strings are duplicates of within the question&#x27;;
+const ansInc400 = &#x27;There are no correct answers&#x27;;
+const quesID400 = &#x27;Question Id does not refer to a question within this quiz&#x27;;
+const quesPos400 = &#x27;NewPosition is less than 0, greater than number of &#x27; +
+  &#x27;questions, or current position&#x27;;
+
+// Auth errors
+const emailUsed400 = &#x27;Email address is used by another user&#x27;;
+const emailValid400 = &#x27;Email does not satisfy validator&#x27;;
+const userChar400 = &#x27;Name contains invalid characters or is less than 2 or &#x27; +
+  &#x27;more than 20 characters&#x27;;
+const passLen400 = &#x27;Password is less than 8 characters&#x27;;
+const passChar400 = &#x27;Password needs at least one number and one letter&#x27;;
+const passInv400 = &#x27;Email or password is incorrect&#x27;;
+const oldPass400 = &#x27;Old Password is not the correct old password&#x27;;
+const newPass400 = &#x27;Old Password and New Password match exactly&#x27;;
+
+// INTERFACES Other
+interface ErrorObject { error: string }
+
+// INTERFACES Auth
+interface AuthUserId { authUserId: number }
+
+interface User {
+  userId: number,
+  name: string,
+  email: string,
+  numSuccessfulLogins: number,
+  numFailedPasswordsSinceLastLogin: number
+}
+
+interface Details { user: User }
+
+interface UserAdd {
+  authUserId: number,
+  nameFirst: string,
+  nameLast: string,
+  name: string,
+  email: string,
+  password: string,
+  successful_log_time: number,
+  failed_password_num: number,
+  prev_passwords: string[]
+}
+
+// INTERFACES Question
+interface Answer {
+  answerId: number,
+  answer: string,
+  colour: string,
+  correct: boolean
+}
+
+interface Question {
+  questionId: number,
+  question: string,
+  duration: number,
+  points: number,
+  answers: Answer[],
+}
+
+interface AnswerBody {
+  answer: string,
+  correct: boolean,
+}
+
+interface QuestionBody {
+  question: string,
+  duration: number,
+  points: number,
+  answers: AnswerBody[]
+}
+
+interface QuestionId {
+  questionId: number
+}
+
+// INTERFACES Quiz
+interface QuizId { quizId: number }
+
+interface QuizBrief {
+  quizId: number,
+  name: string
+}
+
+interface QuizInfo {
+  quizId: number,
+  name: string,
+  timeCreated: number,
+  timeLastEdited: number,
+  description: string,
+  numQuestions: number,
+  questions: Question[],
+  duration: number
+}
+
+interface QuizList { quizzes: QuizBrief[] }
+
+interface QuizAdd {
+  quizId: number,
+  authId: number,
+  name: string,
+  description: string,
+  timeCreated: number,
+  timeLastEdited: number,
+  in_trash: boolean,
+  questions: Question[]
+}
+
+// INTERFACE Session
+interface SessionAdd {
+  token: number,
+  authUserId: number,
+  is_valid: boolean,
+}
+
+interface Token {
+  token: number
+}
+
+// INTERFACE Datastore
+interface Datastore {
+  users: UserAdd[],
+  quizzes: QuizAdd[],
+  sessions: SessionAdd[]
+}
+
+// Datastore, initially set in server.ts on startup
+let data: Datastore;
+
+// DATASTORE FUNCTIONS
+/** getData
+  * Access the data
+  *
+  * @returns { Datastore } - All cases
+  */
+function getData(): Datastore { return data; }
+
+/** setData
+  * Reset data to modified date
+  *
+  * @param { Datastore } newData - Data to set
+  */
+function setData(newData: Datastore) { data = newData; }
+
+/** getUser
+  * Loops through all tokens and users to identify the user
+  *
+  * @param { number } token - The session ID for the user
+  *
+  * @returns { UserAdd } - If the token exists and is valid
+  * @returns { undefined } - If the token is invalid
+*/
+function getUser(token: number, allData: Datastore): UserAdd | undefined {
+  for (const sess of allData.sessions) {
+    // Loops through all sessions, until is finds one with given token
+    if (sess.token === token &amp;&amp; sess.is_valid) {
+      for (const user of allData.users) {
+        // Finds the user with the authUserId tied to given session
+        if (user.authUserId === sess.authUserId) {
+          return user;
+        }
+      }
+    }
+  }
+
+  return undefined;
+}
+
+/** getQuiz
+  * Loops through all quizzes to find the quiz with given quizId
+  *
+  * @param { number } quizId - The quizID for the quiz
+  *
+  * @returns { QuizAdd } - If the quiz exists and is valid
+  * @returns { undefined } - If the quizId is invalid
+  */
+function getQuiz(quizId: number, quizzes: QuizAdd[]): QuizAdd | undefined {
+  // Loops through all quizzes until it finds relevant, valid quiz
+  for (const quiz of quizzes) if (quizId === quiz.quizId) return quiz;
+
+  // Invalid / Never existed
+  return undefined;
+}
+
+/** getSession
+  * Loops through all sessions to find the session with given token
+  *
+  * @param { number } token - The token for the session
+  *
+  * @returns { SessionAdd } - If the token exists and is valid
+  * @returns { undefined } - If the token is invalid
+  */
+function getSession(token: number, sessions: SessionAdd[]):
+  SessionAdd | undefined {
+  // Loops through all sessions until it finds relevant, valid session
+  for (const sess of sessions) {
+    if (token === sess.token &amp;&amp; sess.is_valid === true) return sess;
+  }
+
+  // Invalid / Never existed
+  return undefined;
+}
+
+/** getUniqueID
+  * Creates a unique ID (For authUserId, quizId, or token, answer ID, ques ID)
+  *
+  * @returns { number } - All cases
+  */
+function getUniqueID(allData: Datastore): number {
+  // Creates a random 8 (Or greater) digit ID, which hasn&#x27;t been used prior
+  // List of used authUserIds, quizIds, tokens, answerIds, and questionIds
+  const usedIds: number[] = [];
+  const allIds: number[] = [];
+
+  // Adding used authUserIds
+  for (const user of allData.users) usedIds.push(user.authUserId);
+
+  // Adding used tokens
+  for (const sess of allData.sessions) usedIds.push(sess.token);
+
+  // Adding used quizIds
+  for (const quiz of allData.quizzes) {
+    usedIds.push(quiz.quizId);
+
+    // Adding used questionIds
+    for (const question of quiz.questions) {
+      usedIds.push(question.questionId);
+
+      // Adding used answerIds
+      for (const answer of question.answers) usedIds.push(answer.answerId);
+    }
+  }
+
+  // To ensure that the Id is 8 digits (Or greater, but unlikely to be greater)
+  const smallestId = 10000000;
+
+  // So that the code is somewhat efficient, instead of a fully random 8-digit
+  // number, a random 8-digit number with a 10,000 range is produced
+  const increment = 10000;
+
+  // Adding all possible IDs, then removing the ones that have been used
+  // Then picking a random ID from the remaining IDs
+  // The loop will be exitted as soon as there are valid IDs in the allIds list
+  for (let j = 0; allIds.length &lt;= 0; j++) {
+    // All IDs within the range of 10,000
+    const begin = smallestId + j * increment;
+    const end = begin + increment;
+    for (let i = begin; i &lt; end; i++) allIds.push(i);
+
+    // Removing usedIds
+    const len = usedIds.length;
+    for (let i = 0; i &lt; len; i++) {
+      if (allIds.indexOf(usedIds[0]) !== -1) {
+        allIds.splice(allIds.indexOf(usedIds[0]), 1);
+        usedIds.splice(0, 1);
+      }
+    }
+  }
+
+  // Choosing from the valid unused IDs, and returning
+  const randomPos = Math.floor(Math.random() * allIds.length);
+  return allIds[randomPos];
+}
+
+export {
+  getData,
+  setData,
+  getUser,
+  getQuiz,
+  getSession,
+  getUniqueID,
+  ErrorObject,
+  AuthUserId,
+  User,
+  Details,
+  UserAdd,
+  QuizId,
+  QuizBrief,
+  QuizInfo,
+  QuizList,
+  Question,
+  QuizAdd,
+  SessionAdd,
+  Token,
+  Datastore,
+  AnswerBody,
+  QuestionBody,
+  QuestionId,
+  Answer,
+  unauth403,
+  token401,
+  nameChar400,
+  nameLen400,
+  nameUsed400,
+  desc400,
+  notBin400,
+  notUser400,
+  currUser400,
+  quesLen400,
+  ansNum400,
+  quesDur400,
+  quizDur400,
+  quesPoints400,
+  ansLen400,
+  ansDup400,
+  ansInc400,
+  quesID400,
+  quesPos400,
+  emailUsed400,
+  emailValid400,
+  userChar400,
+  passLen400,
+  passChar400,
+  passInv400,
+  oldPass400,
+  newPass400
+};
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Wed, 01 Nov 2023 00:14:18 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,86 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>adminQuizDescriptionUpdate.test.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/Tests/adminQuizDescriptionUpdate.test.ts</td><td class="">87.39%</td><td class="">80%</td><td class="">111</td><td class="">97</td><td class="">14</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">import {
+  requestClear,
+  requestRegister,
+  requestQuizCreate,
+  requestQuizInfo,
+  requestQuizDescriptionUpdate
+} from &#x27;./testHelper&#x27;;
+
+/// ////////////////////////////////////////////////////////////////////////////
+/// //////////////////////////////// Tests /////////////////////////////////////
+/// ////////////////////////////////////////////////////////////////////////////
+const invalidUser = 10000;
+const quizId = 1;
+const description = &#x27;New description&#x27;;
+
+beforeEach(() =&gt; {
+  requestClear();
+});
+
+test(&#x27;token is not a valid user&#x27;, () =&gt; {
+  // token is not invalid, out of range integer
+  const result = requestQuizDescriptionUpdate(invalidUser, quizId, description);
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+test(&#x27;Quiz ID does not refer to a valid quiz&#x27;, () =&gt; {
+  const token1 = requestRegister(&#x27;first.last1@gmail.com&#x27;, &#x27;abcd1234&#x27;, &#x27;first&#x27;,
+    &#x27;last&#x27;).token;
+  const result = requestQuizDescriptionUpdate(token1, quizId, description);
+
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+test(&#x27;Quiz ID does not refer to a quiz that this user owns&#x27;, () =&gt; {
+  const token1 = requestRegister(&#x27;first.last1@gmail.com&#x27;, &#x27;abcd1234&#x27;, &#x27;first&#x27;,
+    &#x27;last&#x27;).token;
+  const token2 = requestRegister(&#x27;first.last2@gmail.com&#x27;, &#x27;abcd1234&#x27;, &#x27;first&#x27;,
+    &#x27;last&#x27;).token;
+  const quizId1 = requestQuizCreate(token2, &#x27;first last&#x27;, &#x27;fist_test&#x27;).quizId;
+
+  const result = requestQuizDescriptionUpdate(token1, quizId1, description);
+
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+test(&#x27;Description is more than 100 characters in length&#x27;, () =&gt; {
+  const token1 = requestRegister(&#x27;first.last1@gmail.com&#x27;, &#x27;abcd1234&#x27;, &#x27;first&#x27;,
+    &#x27;last&#x27;).token;
+  const quizId1 = requestQuizCreate(token1, &#x27;first last&#x27;, &#x27;fist_test&#x27;).quizId;
+  let longDescription = &#x27;&#x27;;
+
+  for (let i = 0; i &lt;= 100; i++) longDescription += &#x27;a&#x27;;
+
+  const result = requestQuizDescriptionUpdate(token1, quizId1, longDescription);
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+describe(&#x27;VALID Tests&#x27;, () =&gt; {
+  test(&#x27;Case 1&#x27;, () =&gt; {
+    const token1 = requestRegister(&#x27;first.last1@gmail.com&#x27;, &#x27;abcd1234&#x27;, &#x27;first&#x27;,
+      &#x27;last&#x27;).token;
+    const quizId1 = requestQuizCreate(token1, &#x27;first last&#x27;, &#x27;fist_test&#x27;).quizId;
+
+    const result = requestQuizDescriptionUpdate(token1, quizId1, description);
+    expect(result).toMatchObject({ });
+    expect(requestQuizInfo(token1, quizId1).description).toMatch(description);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:21,&quot;character&quot;:8,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:22,&quot;character&quot;:9,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:22,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:8,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:9,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:8,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:9,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:8,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:9,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:10,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizDescriptionUpdate.test.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:11,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Wed, 01 Nov 2023 00:14:18 GMT</p>
+    </body>
+  </html>
+  

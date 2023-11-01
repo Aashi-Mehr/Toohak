@@ -1,0 +1,1962 @@
+{
+  "fileCounts": {},
+  "anys": [
+    {
+      "file": "src/auth.ts",
+      "line": 58,
+      "character": 8,
+      "text": "validator",
+      "kind": 1
+    },
+    {
+      "file": "src/auth.ts",
+      "line": 59,
+      "character": 9,
+      "text": "validator",
+      "kind": 1
+    },
+    {
+      "file": "src/auth.ts",
+      "line": 59,
+      "character": 19,
+      "text": "isEmail",
+      "kind": 1
+    },
+    {
+      "file": "src/auth.ts",
+      "line": 60,
+      "character": 11,
+      "text": "err",
+      "kind": 1
+    },
+    {
+      "file": "src/echo.js",
+      "line": 1,
+      "character": 14,
+      "text": "value",
+      "kind": 1
+    },
+    {
+      "file": "src/echo.js",
+      "line": 2,
+      "character": 6,
+      "text": "value",
+      "kind": 1
+    },
+    {
+      "file": "src/echo.js",
+      "line": 2,
+      "character": 12,
+      "text": "echo",
+      "kind": 1
+    },
+    {
+      "file": "src/echo.js",
+      "line": 2,
+      "character": 20,
+      "text": "value",
+      "kind": 1
+    },
+    {
+      "file": "src/echo.js",
+      "line": 2,
+      "character": 26,
+      "text": "echo",
+      "kind": 1
+    },
+    {
+      "file": "src/echo.js",
+      "line": 6,
+      "character": 9,
+      "text": "value",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 68,
+      "character": 49,
+      "text": "response",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 70,
+      "character": 41,
+      "text": "response",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 89,
+      "character": 10,
+      "text": "email",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 89,
+      "character": 17,
+      "text": "password",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 89,
+      "character": 27,
+      "text": "nameFirst",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 89,
+      "character": 38,
+      "text": "nameLast",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 89,
+      "character": 55,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 99,
+      "character": 10,
+      "text": "email",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 99,
+      "character": 17,
+      "text": "password",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 99,
+      "character": 34,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 118,
+      "character": 29,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 118,
+      "character": 34,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 128,
+      "character": 10,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 128,
+      "character": 17,
+      "text": "email",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 128,
+      "character": 24,
+      "text": "nameFirst",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 128,
+      "character": 35,
+      "text": "nameLast",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 128,
+      "character": 52,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 143,
+      "character": 10,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 143,
+      "character": 17,
+      "text": "oldPassword",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 143,
+      "character": 30,
+      "text": "newPassword",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 143,
+      "character": 50,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 171,
+      "character": 10,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 171,
+      "character": 17,
+      "text": "name",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 171,
+      "character": 23,
+      "text": "description",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 171,
+      "character": 43,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 222,
+      "character": 10,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 222,
+      "character": 17,
+      "text": "name",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 222,
+      "character": 30,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 238,
+      "character": 10,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 238,
+      "character": 17,
+      "text": "description",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 238,
+      "character": 37,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 255,
+      "character": 8,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 255,
+      "character": 15,
+      "text": "userEmail",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 255,
+      "character": 33,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 256,
+      "character": 2,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 272,
+      "character": 29,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 272,
+      "character": 34,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 277,
+      "character": 17,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 278,
+      "character": 17,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 289,
+      "character": 8,
+      "text": "quizId",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 308,
+      "character": 10,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 308,
+      "character": 17,
+      "text": "questionBody",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 308,
+      "character": 38,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 327,
+      "character": 10,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 327,
+      "character": 17,
+      "text": "questionBody",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 327,
+      "character": 38,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 328,
+      "character": 4,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 364,
+      "character": 10,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 364,
+      "character": 17,
+      "text": "newPosition",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 364,
+      "character": 37,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 368,
+      "character": 4,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 369,
+      "character": 4,
+      "text": "newPosition",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 386,
+      "character": 12,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/server.ts",
+      "line": 386,
+      "character": 26,
+      "text": "body",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 45,
+      "character": 8,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 47,
+      "character": 17,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 64,
+      "character": 8,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 66,
+      "character": 17,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 138,
+      "character": 2,
+      "text": "description",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 146,
+      "character": 8,
+      "text": "description",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 146,
+      "character": 21,
+      "text": "description",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 151,
+      "character": 8,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 153,
+      "character": 17,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 180,
+      "character": 8,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 182,
+      "character": 17,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 272,
+      "character": 8,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/testHelper.ts",
+      "line": 274,
+      "character": 17,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizCreate.test.ts",
+      "line": 152,
+      "character": 35,
+      "text": "quizId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizCreate.test.ts",
+      "line": 159,
+      "character": 35,
+      "text": "quizId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizCreate.test.ts",
+      "line": 167,
+      "character": 35,
+      "text": "quizId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizCreate.test.ts",
+      "line": 178,
+      "character": 35,
+      "text": "quizId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizCreate.test.ts",
+      "line": 201,
+      "character": 35,
+      "text": "quizId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizCreate.test.ts",
+      "line": 210,
+      "character": 35,
+      "text": "quizId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 21,
+      "character": 8,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 22,
+      "character": 9,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 22,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 28,
+      "character": 8,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 30,
+      "character": 9,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 30,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 40,
+      "character": 8,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 42,
+      "character": 9,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 42,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 53,
+      "character": 8,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 54,
+      "character": 9,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 54,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 63,
+      "character": 10,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizDescriptionUpdate.test.ts",
+      "line": 64,
+      "character": 11,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizEmptyTrash.test.ts",
+      "line": 29,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizEmptyTrash.test.ts",
+      "line": 33,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizEmptyTrash.test.ts",
+      "line": 49,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizEmptyTrash.test.ts",
+      "line": 69,
+      "character": 34,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizEmptyTrash.test.ts",
+      "line": 72,
+      "character": 34,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizEmptyTrash.test.ts",
+      "line": 75,
+      "character": 34,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizEmptyTrash.test.ts",
+      "line": 92,
+      "character": 34,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizEmptyTrash.test.ts",
+      "line": 95,
+      "character": 34,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizEmptyTrash.test.ts",
+      "line": 98,
+      "character": 34,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizEmptyTrash.test.ts",
+      "line": 118,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 21,
+      "character": 36,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 36,
+      "character": 6,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 46,
+      "character": 10,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 47,
+      "character": 11,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 47,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 57,
+      "character": 10,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 59,
+      "character": 11,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 59,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 62,
+      "character": 10,
+      "text": "result2",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 63,
+      "character": 11,
+      "text": "result2",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 63,
+      "character": 36,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 66,
+      "character": 10,
+      "text": "result3",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 68,
+      "character": 11,
+      "text": "result3",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 68,
+      "character": 36,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 72,
+      "character": 10,
+      "text": "result4",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 74,
+      "character": 11,
+      "text": "result4",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 74,
+      "character": 36,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 80,
+      "character": 6,
+      "text": "timeCreated",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 81,
+      "character": 6,
+      "text": "timeLastEdited",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 82,
+      "character": 6,
+      "text": "description",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 99,
+      "character": 10,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 107,
+      "character": 6,
+      "text": "timeCreated",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 108,
+      "character": 6,
+      "text": "timeLastEdited",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRemove-nameUpdate.test.ts",
+      "line": 109,
+      "character": 6,
+      "text": "description",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRestore.test.ts",
+      "line": 50,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRestore.test.ts",
+      "line": 63,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRestore.test.ts",
+      "line": 70,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRestore.test.ts",
+      "line": 74,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRestore.test.ts",
+      "line": 90,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizRestore.test.ts",
+      "line": 107,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 12,
+      "character": 16,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 36,
+      "character": 12,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 37,
+      "character": 13,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 41,
+      "character": 12,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 43,
+      "character": 13,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 49,
+      "character": 12,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 51,
+      "character": 13,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 55,
+      "character": 12,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 56,
+      "character": 13,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 60,
+      "character": 12,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 61,
+      "character": 13,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 66,
+      "character": 12,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 67,
+      "character": 13,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 73,
+      "character": 12,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTransfer.test.ts",
+      "line": 74,
+      "character": 13,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTrash.test.ts",
+      "line": 34,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTrash.test.ts",
+      "line": 38,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/adminQuizTrash.test.ts",
+      "line": 48,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 137,
+      "character": 6,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 140,
+      "character": 6,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 143,
+      "character": 6,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 146,
+      "character": 6,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 199,
+      "character": 35,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 205,
+      "character": 35,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 211,
+      "character": 35,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 217,
+      "character": 35,
+      "text": "token",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 227,
+      "character": 46,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 235,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 247,
+      "character": 8,
+      "text": "userId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 265,
+      "character": 8,
+      "text": "userId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 283,
+      "character": 8,
+      "text": "userId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 301,
+      "character": 8,
+      "text": "userId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 319,
+      "character": 8,
+      "text": "userId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 338,
+      "character": 8,
+      "text": "userId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 358,
+      "character": 8,
+      "text": "userId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 380,
+      "character": 8,
+      "text": "userId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 399,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 405,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 414,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 425,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 436,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 447,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 492,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 498,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 504,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 510,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 515,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 520,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 526,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 532,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 538,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 544,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 592,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 597,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 602,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 607,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 612,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 618,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/auth.test.ts",
+      "line": 625,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/clear.test.ts",
+      "line": 11,
+      "character": 8,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/clear.test.ts",
+      "line": 12,
+      "character": 9,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/clear.test.ts",
+      "line": 22,
+      "character": 8,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/clear.test.ts",
+      "line": 23,
+      "character": 9,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/echo.test.js",
+      "line": 4,
+      "character": 6,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/echo.test.js",
+      "line": 5,
+      "character": 9,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/echo.test.js",
+      "line": 6,
+      "character": 2,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/echo.test.js",
+      "line": 7,
+      "character": 9,
+      "text": "result",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/echo.test.js",
+      "line": 11,
+      "character": 49,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/newecho.test.ts",
+      "line": 22,
+      "character": 10,
+      "text": "bodyObj",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/newecho.test.ts",
+      "line": 24,
+      "character": 11,
+      "text": "bodyObj",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/newecho.test.ts",
+      "line": 24,
+      "character": 19,
+      "text": "value",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/newecho.test.ts",
+      "line": 37,
+      "character": 10,
+      "text": "bodyObj",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/newecho.test.ts",
+      "line": 39,
+      "character": 11,
+      "text": "bodyObj",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/newecho.test.ts",
+      "line": 39,
+      "character": 19,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/question-move-dup.test.ts",
+      "line": 88,
+      "character": 36,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/question-move-dup.test.ts",
+      "line": 89,
+      "character": 36,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/question-move-dup.test.ts",
+      "line": 90,
+      "character": 36,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/question-move-dup.test.ts",
+      "line": 174,
+      "character": 36,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/question-move-dup.test.ts",
+      "line": 175,
+      "character": 36,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/question-move-dup.test.ts",
+      "line": 198,
+      "character": 35,
+      "text": "questionId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/question.test.ts",
+      "line": 12,
+      "character": 16,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/question.test.ts",
+      "line": 382,
+      "character": 37,
+      "text": "questionId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 84,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 93,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 99,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 110,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 121,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 132,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 143,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 151,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 159,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 179,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 187,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 195,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 204,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 213,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 222,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 232,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 243,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 252,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 258,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 264,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 271,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 279,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 292,
+      "character": 6,
+      "text": "timeCreated",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 293,
+      "character": 6,
+      "text": "timeLastEdited",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 321,
+      "character": 6,
+      "text": "timeCreated",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 322,
+      "character": 6,
+      "text": "timeLastEdited",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 350,
+      "character": 6,
+      "text": "timeCreated",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 351,
+      "character": 6,
+      "text": "timeLastEdited",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 393,
+      "character": 8,
+      "text": "timeCreated",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 394,
+      "character": 8,
+      "text": "timeLastEdited",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 420,
+      "character": 45,
+      "text": "questionId",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 454,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 461,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 470,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 476,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 482,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 488,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 495,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 503,
+      "character": 35,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 516,
+      "character": 6,
+      "text": "timeCreated",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 517,
+      "character": 6,
+      "text": "timeLastEdited",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 535,
+      "character": 6,
+      "text": "timeCreated",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 536,
+      "character": 6,
+      "text": "timeLastEdited",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 562,
+      "character": 6,
+      "text": "timeCreated",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/questionUpdateDelete.test.ts",
+      "line": 563,
+      "character": 6,
+      "text": "timeLastEdited",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 56,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 59,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 66,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 125,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 128,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 137,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 141,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 150,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 160,
+      "character": 6,
+      "text": "timeCreated",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 161,
+      "character": 6,
+      "text": "timeLastEdited",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 162,
+      "character": 6,
+      "text": "description",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 177,
+      "character": 6,
+      "text": "timeCreated",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 178,
+      "character": 6,
+      "text": "timeLastEdited",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 179,
+      "character": 6,
+      "text": "description",
+      "kind": 1
+    },
+    {
+      "file": "src/Tests/quiz-Info-List.test.ts",
+      "line": 197,
+      "character": 33,
+      "text": "error",
+      "kind": 1
+    }
+  ],
+  "percentage": 96.22718052738337,
+  "total": 7395,
+  "covered": 7116,
+  "uncovered": 279
+}

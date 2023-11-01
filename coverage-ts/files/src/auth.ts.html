@@ -1,4 +1,17 @@
-// Import functions from files
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>auth.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/auth.ts</td><td class="">98.73%</td><td class="">80%</td><td class="">314</td><td class="">310</td><td class="">4</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Import functions from files
 import {
   getData,
   getUser,
@@ -16,17 +29,17 @@ import {
   oldPass400,
   newPass400,
   token401
-} from './dataStore';
+} from &#x27;./dataStore&#x27;;
 
 /** adminDetailsCheck
   * Checks email, password, and name then returns its validity
   *
   * @param { string } email - The email
-  * @param { string } password - The user's password
-  * @param { string } nameFirst - The user's first name
-  * @param { string } nameLast - The user's last name
+  * @param { string } password - The user&#x27;s password
+  * @param { string } nameFirst - The user&#x27;s first name
+  * @param { string } nameLast - The user&#x27;s last name
   *
-  * @returns { Record<string, never> } - If the deails are valid
+  * @returns { Record&lt;string, never&gt; } - If the deails are valid
   * @returns { ErrorObject } - If the details are invalid
   */
 function detailsCheck(email: string, password: string,
@@ -40,23 +53,27 @@ function detailsCheck(email: string, password: string,
   const hasNumber = /\d/.test(password);
 
   if (hasLetter === false || hasNumber === false) return { error: passChar400 };
-  if (password.length < 8) return { error: passLen400 };
+  if (password.length &lt; 8) return { error: passLen400 };
 
   // Name can only consist of letters, spaces and hyphens
-  const invalidnameFirst = /[^a-zA-Z -']/.test(nameFirst);
-  const invalidnameLast = /[^a-zA-Z -']/.test(nameLast);
+  const invalidnameFirst = /[^a-zA-Z -&#x27;]/.test(nameFirst);
+  const invalidnameLast = /[^a-zA-Z -&#x27;]/.test(nameLast);
 
   if (invalidnameFirst === true || invalidnameLast === true) {
     return { error: userChar400 };
   }
-  if (nameFirst.length < 2 || nameFirst.length > 20 ||
-      nameLast.length < 2 || nameLast.length > 20) {
+  if (nameFirst.length &lt; 2 || nameFirst.length &gt; 20 ||
+      nameLast.length &lt; 2 || nameLast.length &gt; 20) {
     return { error: userChar400 };
   }
 
   // Email needs to be valid
-  let validator = require('validator');
-  if (!validator.isEmail(email)) return { error: emailValid400 };
+  try {
+    let validator = require(&#x27;validator&#x27;);
+    if (!validator.isEmail(email)) return { error: emailValid400 };
+  } catch (err) {
+    return { error: &quot;Validator not found&quot; };
+  }
 
   // Email cannot be duplicated
   for (const user of users) {
@@ -71,9 +88,9 @@ function detailsCheck(email: string, password: string,
   * Checks email, password, and name then adds the user to the database
   *
   * @param { string } email - The email to register
-  * @param { string } password - The user's password
-  * @param { string } nameFirst - The user's first name
-  * @param { string } nameLast - The user's last name
+  * @param { string } password - The user&#x27;s password
+  * @param { string } nameFirst - The user&#x27;s first name
+  * @param { string } nameLast - The user&#x27;s last name
   *
   * @returns { Token } - If the deails are valid
   * @returns { ErrorObject } - If the details are invalid
@@ -81,7 +98,7 @@ function detailsCheck(email: string, password: string,
 export function adminAuthRegister(email: string, password: string,
   nameFirst: string, nameLast: string): Token | ErrorObject {
   const valid = detailsCheck(email, password, nameFirst, nameLast);
-  if ('error' in valid) return valid;
+  if (&#x27;error&#x27; in valid) return valid;
 
   const data = getData();
 
@@ -94,7 +111,7 @@ export function adminAuthRegister(email: string, password: string,
     authUserId: authUserId,
     nameFirst: nameFirst,
     nameLast: nameLast,
-    name: nameFirst + ' ' + nameLast,
+    name: nameFirst + &#x27; &#x27; + nameLast,
     email: email,
     password: password,
     successful_log_time: 1,
@@ -112,18 +129,18 @@ export function adminAuthRegister(email: string, password: string,
 }
 
 /** adminUserDetailsEdit
-  * Checks token, email, and name then changes the user's details
+  * Checks token, email, and name then changes the user&#x27;s details
   *
-  * @param { number } token - The user's token
+  * @param { number } token - The user&#x27;s token
   * @param { string } email - The new email
   * @param { string } nameFirst - The new first name
   * @param { string } nameLast - The new last name
   *
-  * @returns { Record<string, never> } - If the deails are valid
+  * @returns { Record&lt;string, never&gt; } - If the deails are valid
   * @returns { ErrorObject } - If the details are invalid
   */
 export function adminUserDetailsEdit(token: number, email: string,
-  nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
+  nameFirst: string, nameLast: string): ErrorObject | Record&lt;string, never&gt; {
   // Get user details
   const user = getUser(token, getData());
   // If the token is invalid, return error
@@ -131,12 +148,12 @@ export function adminUserDetailsEdit(token: number, email: string,
 
   // Get user details
   const users = getData().users;
-  // Removing 'user' from user details
+  // Removing &#x27;user&#x27; from user details
   getData().users.splice(users.indexOf(user), 1);
 
   // Checking the validity in user details
   const valid = detailsCheck(email, user.password, nameFirst, nameLast);
-  if ('error' in valid) {
+  if (&#x27;error&#x27; in valid) {
     users.push(user);
     return valid;
   }
@@ -145,24 +162,24 @@ export function adminUserDetailsEdit(token: number, email: string,
   user.email = email;
   user.nameFirst = nameFirst;
   user.nameLast = nameLast;
-  user.name = nameFirst + ' ' + nameLast;
+  user.name = nameFirst + &#x27; &#x27; + nameLast;
   users.push(user);
 
   return { };
 }
 
 /** adminUserPasswordEdit
-  * Checks token, email, and name then changes the user's details
+  * Checks token, email, and name then changes the user&#x27;s details
   *
-  * @param { number } token - The user's token
+  * @param { number } token - The user&#x27;s token
   * @param { number } oldPass - The new email
   * @param { number } newPass - The new first name
   *
-  * @returns { Record<string, never> } - If the deails are valid
+  * @returns { Record&lt;string, never&gt; } - If the deails are valid
   * @returns { ErrorObject } - If the details are invalid
   */
 export function adminUserPasswordEdit(token: number, oldPass: string,
-  newPass: string): ErrorObject | Record<string, never> {
+  newPass: string): ErrorObject | Record&lt;string, never&gt; {
   // ERROR CHECKING
   // Ensuring the user is valid
   const user = getUser(token, getData());
@@ -178,7 +195,7 @@ export function adminUserPasswordEdit(token: number, oldPass: string,
   // Return error if password does not contain letters
   if (hasLetter === false || hasNumber === false) return { error: passChar400 };
   // Return error if password is less than 8 characters
-  if (newPass.length < 8) return { error: passLen400 };
+  if (newPass.length &lt; 8) return { error: passLen400 };
 
   // Loop through previous password and return error if the new password
   // is the same as the old password
@@ -196,8 +213,8 @@ export function adminUserPasswordEdit(token: number, oldPass: string,
 /** adminUserLogin
   * Logs the user into the system if the given details are correct
   *
-  * @param { string } email - The user's email
-  * @param { string } password - The user's password
+  * @param { string } email - The user&#x27;s email
+  * @param { string } password - The user&#x27;s password
   *
   * @returns { Token } - If the deails are valid
   * @returns { ErrorObject } - If the details are invalid
@@ -210,9 +227,9 @@ export function adminAuthLogin(email: string, password: string):
   for (const user of users) {
     // If the password is incorrect, but the email is correct, then attempts
     // need to be increased
-    if (user.email === email && user.password !== password) {
+    if (user.email === email &amp;&amp; user.password !== password) {
       user.failed_password_num++;
-    } else if (user.email === email && user.password === password) {
+    } else if (user.email === email &amp;&amp; user.password === password) {
       // Both the password and email are correct, so the user is logged-in
       user.failed_password_num = 0;
       user.successful_log_time++;
@@ -230,15 +247,15 @@ export function adminAuthLogin(email: string, password: string):
     }
   }
 
-  // If all of the above code ran, but the token wasn't returned, then the
+  // If all of the above code ran, but the token wasn&#x27;t returned, then the
   // details were incorrect
   return { error: passInv400 };
 }
 
 /** adminUserDetails
-  * Returns the user's details if their token exists
+  * Returns the user&#x27;s details if their token exists
   *
-  * @param { number } token - The user's session token
+  * @param { number } token - The user&#x27;s session token
   *
   * @returns { Details } - If the token is valid
   * @returns { ErrorObject } - If the token is invalid
@@ -249,7 +266,7 @@ export function adminUserDetails(token: number): Details | ErrorObject {
   // Return error if token is invalid
   if (!user) return { error: token401 };
 
-  // Return the user's details
+  // Return the user&#x27;s details
   return {
     user:
       {
@@ -263,15 +280,15 @@ export function adminUserDetails(token: number): Details | ErrorObject {
 }
 
 /** adminAuthLogout
-  * Returns the user's details if their token exists
+  * Returns the user&#x27;s details if their token exists
   *
-  * @param { number } token - The user's session token
+  * @param { number } token - The user&#x27;s session token
   *
-  * @returns { Record<string, never> } - If the token is valid
+  * @returns { Record&lt;string, never&gt; } - If the token is valid
   * @returns { ErrorObject } - If the token is invalid
   */
 export function adminAuthLogout(token: number):
-  ErrorObject | Record<string, never> {
+  ErrorObject | Record&lt;string, never&gt; {
   // Finds the user using the token, undefined is returned if not found
   const session = getSession(token, getData().sessions);
 
@@ -282,3 +299,8 @@ export function adminAuthLogout(token: number):
   session.is_valid = false;
   return { };
 }
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/auth.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:8,&quot;text&quot;:&quot;validator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/auth.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:9,&quot;text&quot;:&quot;validator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/auth.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:19,&quot;text&quot;:&quot;isEmail&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/auth.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:11,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Wed, 01 Nov 2023 00:14:18 GMT</p>
+    </body>
+  </html>
+  

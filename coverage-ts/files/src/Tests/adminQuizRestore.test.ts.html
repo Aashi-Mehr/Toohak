@@ -1,0 +1,144 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>adminQuizRestore.test.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/Tests/adminQuizRestore.test.ts</td><td class="">96.34%</td><td class="">80%</td><td class="">164</td><td class="">158</td><td class="">6</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">import { Token } from &#x27;../dataStore&#x27;;
+import {
+  requestQuizRestore,
+  requestClear,
+  requestRegister,
+  requestQuizCreate,
+  requestQuizRemove
+} from &#x27;./testHelper&#x27;;
+
+/// ////////////////////////////////////////////////////////////////////////////
+/// //////////////////////////////// Tests /////////////////////////////////////
+/// ////////////////////////////////////////////////////////////////////////////
+
+// Clear the dataBase before each test to avoid data interference
+beforeEach(() =&gt; {
+  requestClear();
+});
+
+// Test 400 : Quiz Name of restored quiz is already used by another active quiz
+test(&#x27;Test Restored Quiz Name&#x27;, () =&gt; {
+  // Register a user
+  const userId: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+  // Create a quiz with userId
+  const quizId: number = requestQuizCreate(userId.token, &#x27;Quiz 1&#x27;,
+    &#x27;This is Quiz 1&#x27;).quizId;
+
+  // Remove the quiz
+  requestQuizRemove(userId.token, quizId);
+
+  // Create a new quiz with the name of removed quiz
+  requestQuizCreate(userId.token, &#x27;Quiz 1&#x27;, &#x27;This is the new Quiz 1&#x27;);
+
+  // Restore the quiz with same name
+  const result = requestQuizRestore(userId.token, quizId);
+  expect(result).toHaveProperty(&#x27;error&#x27;);
+});
+
+// Test 400 : Quiz ID refers to a quiz thats not in trash
+test(&#x27;Test Restored Quiz Not In Trash&#x27;, () =&gt; {
+  // Test : Restoring a quiz that is not in trash
+  // Register a user
+  const userId: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+    // Create a quiz with userId
+  const quizId: number = requestQuizCreate(userId.token, &#x27;Quiz 1&#x27;,
+    &#x27;This is Quiz 1&#x27;).quizId;
+
+  // Restore the quiz that has not been removed
+  const result = requestQuizRestore(userId.token, quizId);
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+test(&#x27;Quiz ID does not exist&#x27;, () =&gt; {
+  // Register a user
+  const userId: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+    // Create a quiz with userId
+  const quizId: number = requestQuizCreate(userId.token, &#x27;Quiz 1&#x27;,
+    &#x27;This is Quiz 1&#x27;).quizId;
+
+  // Restore a quiz with non-existing or wrongly inputted quizId
+  const result = requestQuizRestore(userId.token, quizId + 1);
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+// Test 401 : Invalid AuthUserId Format
+test(&#x27;Test Invalid AuthUserId Format&#x27;, () =&gt; {
+  // authUserId is empty
+  let result = requestQuizRestore(0, 11);
+  expect(result).toMatchObject({ error: expect.any(String) });
+
+  // authUserId contains out of range number
+  result = requestQuizRestore(-1, 11);
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+test(&#x27;Test Invalid AuthUserId&#x27;, () =&gt; {
+  // Register a user
+  const userId: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+    // Create a quiz with userId
+  const quizId: number = requestQuizCreate(userId.token, &#x27;Quiz 1&#x27;,
+    &#x27;This is Quiz 1&#x27;).quizId;
+
+  // Remove the quiz
+  requestQuizRemove(userId.token, quizId);
+
+  // Restore the quiz with invalid userId
+  const result = requestQuizRestore(userId.token + 1, quizId);
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+// Test 403 : Valid token but user is not the owner of the quiz
+test(&#x27;Quiz ID does not owned by user&#x27;, () =&gt; {
+  // Register a user
+  const userId1: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+    // Register another user
+  const userId2: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+    // Create a quiz owned by user 1
+  const quizId: number = requestQuizCreate(userId1.token, &#x27;Quiz 1&#x27;,
+    &#x27;This is Quiz 1&#x27;).quizId;
+
+  // Restoring the quiz from user 1 using userId of user 2
+  const result = requestQuizRestore(userId2.token, quizId);
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+// Test 200 : Perfect Case
+test(&#x27;Perfect Case&#x27;, () =&gt; {
+  // Register a user
+  const userId: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+    // Create a quiz with userId
+  const quizId: number = requestQuizCreate(userId.token, &#x27;Quiz 1&#x27;,
+    &#x27;This is Quiz 1&#x27;).quizId;
+
+  // Remove the quiz
+  requestQuizRemove(userId.token, quizId);
+
+  // Restore the quiz with invalid userId
+  const result = requestQuizRestore(userId.token, quizId);
+  expect(result).not.toHaveProperty(&#x27;error&#x27;);
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/Tests/adminQuizRestore.test.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizRestore.test.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizRestore.test.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizRestore.test.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizRestore.test.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizRestore.test.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Wed, 01 Nov 2023 00:14:18 GMT</p>
+    </body>
+  </html>
+  

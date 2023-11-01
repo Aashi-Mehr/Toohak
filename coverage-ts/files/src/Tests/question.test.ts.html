@@ -1,0 +1,426 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>question.test.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/Tests/question.test.ts</td><td class="">99.58%</td><td class="">80%</td><td class="">474</td><td class="">472</td><td class="">2</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">import {
+  requestClear,
+  requestRegister,
+  requestQuizCreate,
+  requestQuestionCreate,
+  requestQuizInfo
+} from &#x27;./testHelper&#x27;;
+
+/// ////////////////////////////////////////////////////////////////////////////
+/// //////////////////////////////// Tests /////////////////////////////////////
+/// ////////////////////////////////////////////////////////////////////////////
+
+const ERROR = { error: expect.any(String) };
+
+const invalidUser = 10000;
+const quizId = -4123214;
+const invlalidQuestion1 = &#x27;asdf&#x27;;
+const invlalidQuestion2 = &#x27;qweasdzsfhkngkujdfhgujklhgjbfrtyfghvbnsadsafsafsafc&#x27;;
+const questionString = &#x27;How to call a person without a body and a nose?&#x27;;
+
+const answers = [
+  {
+    answer: &#x27;Nobody Knows&#x27;,
+    correct: true
+  },
+  {
+    answer: &#x27;Onebody Knows&#x27;,
+    correct: false
+  }
+];
+
+const answers2 = [
+  {
+    answer: &#x27;Nobody Knows&#x27;,
+    correct: true
+  },
+  {
+    answer: &#x27;Onebody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Twobody Knows&#x27;,
+    correct: true
+  },
+  {
+    answer: &#x27;Threebody Knows&#x27;,
+    correct: false
+  }
+];
+
+const invalidAnswerLength1 = [
+  {
+    answer: &#x27;Nobody Knows&#x27;,
+    correct: true
+  }
+];
+
+const invalidAnswerLength2 = [
+  {
+    answer: &#x27;Nobody Knows&#x27;,
+    correct: true
+  },
+  {
+    answer: &#x27;Onebody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Twobody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Threebody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Fourbody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Fivebody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Sixbody Knows&#x27;,
+    correct: false
+  }
+];
+
+const answersInvliadStringLength1 = [
+  {
+    answer: &#x27;Nobody Knows&#x27;,
+    correct: true
+  },
+  {
+    answer: &#x27;&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Twobody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Threebody Knows&#x27;,
+    correct: false
+  }
+];
+
+const answersInvliadStringLength2 = [
+  {
+    answer: &#x27;Nobody Knows&#x27;,
+    correct: true
+  },
+  {
+    answer: &#x27;Onebody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Twobody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Threebody Knowsssssssssssssssss&#x27;,
+    correct: false
+  }
+];
+
+const answersDuplicateAnswers = [
+  {
+    answer: &#x27;Nobody Knows&#x27;,
+    correct: true
+  },
+  {
+    answer: &#x27;Onebody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Nobody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Threebody Knows&#x27;,
+    correct: false
+  }
+];
+
+const answersNoCorrect = [
+  {
+    answer: &#x27;Nobody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Onebody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Twobody Knows&#x27;,
+    correct: false
+  },
+  {
+    answer: &#x27;Threebody Knows&#x27;,
+    correct: false
+  }
+];
+
+const questionBody = {
+  question: questionString,
+  duration: 60,
+  points: 5,
+  answers: answers,
+};
+
+const questionBody2 = {
+  question: questionString,
+  duration: 30,
+  points: 7,
+  answers: answers2,
+};
+
+const questionBodyNegativeDuration = {
+  question: questionString,
+  duration: -1,
+  points: 5,
+  answers: answers,
+};
+
+const questionBodyInvalidPoint1 = {
+  question: questionString,
+  duration: 60,
+  points: 0,
+  answers: answers,
+};
+
+const questionBodyInvalidPoint2 = {
+  question: questionString,
+  duration: 60,
+  points: 11,
+  answers: answers,
+};
+
+beforeEach(() =&gt; {
+  requestClear();
+});
+
+describe(&#x27;questionCreate&#x27;, () =&gt; {
+  describe(&#x27;ERROR Tests 401 403&#x27;, () =&gt; {
+    test(&#x27;token is not a valid user&#x27;, () =&gt; {
+      // token is not an integer
+      const result = requestQuestionCreate(invalidUser, quizId, questionBody);
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;Quiz ID does not refer to a valid quiz&#x27;, () =&gt; {
+      const token1 = requestRegister(&#x27;first.last1@gmail.com&#x27;, &#x27;abcd1234&#x27;, &#x27;first&#x27;, &#x27;last&#x27;).token;
+      const result = requestQuestionCreate(token1, quizId, questionBody);
+
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;Quiz ID does not refer to a quiz that this user owns&#x27;, () =&gt; {
+      const token1 = requestRegister(&#x27;first.last1@gmail.com&#x27;, &#x27;abcd1234&#x27;, &#x27;first&#x27;, &#x27;last&#x27;).token;
+      const token2 = requestRegister(&#x27;first.last2@gmail.com&#x27;, &#x27;abcd1234&#x27;, &#x27;first&#x27;, &#x27;last&#x27;).token;
+      const quizId1 = requestQuizCreate(token2, &#x27;first last&#x27;, &#x27;fist_test&#x27;).quizId;
+
+      const result = requestQuestionCreate(token1, quizId1, questionBody);
+
+      expect(result).toMatchObject(ERROR);
+    });
+  });
+
+  describe(&#x27;ERROR Tests 400&#x27;, () =&gt; {
+    let token1: number;
+    let quizId1: number;
+
+    beforeEach(() =&gt; {
+      token1 = requestRegister(&#x27;first.last1@gmail.com&#x27;, &#x27;abcd1234&#x27;, &#x27;first&#x27;, &#x27;last&#x27;).token;
+      quizId1 = requestQuizCreate(token1, &#x27;first last&#x27;, &#x27;fist_test&#x27;).quizId;
+    });
+
+    test(&#x27;Question string is less than 5 characters in length&#x27;, () =&gt; {
+      const question = {
+        question: invlalidQuestion1,
+        duration: 60,
+        points: 5,
+        answers: answers,
+      };
+      const result = requestQuestionCreate(token1, quizId1, question);
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;Question string is greater than 50 characters in length&#x27;, () =&gt; {
+      const question = {
+        question: invlalidQuestion2,
+        duration: 60,
+        points: 5,
+        answers: answers,
+      };
+      const result = requestQuestionCreate(token1, quizId1, question);
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;The question has less than 2 answers&#x27;, () =&gt; {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: invalidAnswerLength1,
+      };
+      const result = requestQuestionCreate(token1, quizId1, question);
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;The question has more than 6 answers&#x27;, () =&gt; {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: invalidAnswerLength2,
+      };
+      const result = requestQuestionCreate(token1, quizId1, question);
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;The question duration is not a positive number&#x27;, () =&gt; {
+      const result = requestQuestionCreate(token1, quizId1, questionBodyNegativeDuration);
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;The sum of the question durations in the quiz exceeds 3 minutes&#x27;, () =&gt; {
+      // question body has a length of 60 seconds
+      for (let i = 0; i &lt; 3; i++) {
+        const result = requestQuestionCreate(token1, quizId1, questionBody);
+        expect(result).not.toMatchObject(ERROR);
+      }
+
+      const result = requestQuestionCreate(token1, quizId1, questionBody);
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;Sum of the question durations in the quiz will be 181 seconds&#x27;, () =&gt; {
+      // question body has a length of 60 seconds
+      for (let i = 0; i &lt; 3; i++) {
+        const result = requestQuestionCreate(token1, quizId1, questionBody);
+        expect(result).not.toMatchObject(ERROR);
+      }
+
+      const result = requestQuestionCreate(token1, quizId1, {
+        question: &#x27;Who let the dogs out?&#x27;,
+        duration: 1,
+        points: 10,
+        answers: [
+          { answer: &#x27;who?&#x27;, correct: false },
+          { answer: &#x27;you?&#x27;, correct: true }
+        ]
+      });
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;The points awarded for the question are less than 1&#x27;, () =&gt; {
+      const result = requestQuestionCreate(token1, quizId1, questionBodyInvalidPoint1);
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;The points awarded for the question are greater than 10&#x27;, () =&gt; {
+      const result = requestQuestionCreate(token1, quizId1, questionBodyInvalidPoint2);
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;The length of any answer is shorter than 1 character long&#x27;, () =&gt; {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: answersInvliadStringLength1,
+      };
+      const result = requestQuestionCreate(token1, quizId1, question);
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;The length of any answer is longer than 30 characters long&#x27;, () =&gt; {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: answersInvliadStringLength2,
+      };
+      const result = requestQuestionCreate(token1, quizId1, question);
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;Any answer strings are duplicates of one another (within the same question)&#x27;, () =&gt; {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: answersDuplicateAnswers,
+      };
+      const result = requestQuestionCreate(token1, quizId1, question);
+      expect(result).toMatchObject(ERROR);
+    });
+
+    test(&#x27;There are no correct answers&#x27;, () =&gt; {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: answersNoCorrect,
+      };
+      const result = requestQuestionCreate(token1, quizId1, question);
+      expect(result).toMatchObject(ERROR);
+    });
+  });
+
+  describe(&#x27;VALID Tests&#x27;, () =&gt; {
+    let token1: number;
+    let quizId1: number;
+    beforeEach(() =&gt; {
+      token1 = requestRegister(&#x27;first.last1@gmail.com&#x27;, &#x27;abcd1234&#x27;, &#x27;first&#x27;, &#x27;last&#x27;).token;
+      quizId1 = requestQuizCreate(token1, &#x27;first last&#x27;, &#x27;fist_test&#x27;).quizId;
+    });
+
+    test(&#x27;return question id&#x27;, () =&gt; {
+      const result = requestQuestionCreate(token1, quizId1, questionBody);
+      expect(result).toMatchObject({ questionId: expect.any(Number) });
+    });
+
+    test(&#x27;return unique question id&#x27;, () =&gt; {
+      const result = requestQuestionCreate(token1, quizId1, questionBody);
+      const result2 = requestQuestionCreate(token1, quizId1, questionBody2);
+      expect(result).not.toMatchObject(result2);
+    });
+
+    test(&#x27;successfully create the question with correct infos&#x27;, () =&gt; {
+      const questionId = requestQuestionCreate(
+        token1,
+        quizId1,
+        questionBody
+      ).questionId;
+
+      const result = requestQuizInfo(token1, quizId1);
+
+      expect(result.questions[0].questionId).toStrictEqual(questionId);
+      expect(result.questions[0].question).toStrictEqual(questionString);
+      expect(result.questions[0].duration).toStrictEqual(60);
+      expect(result.questions[0].points).toStrictEqual(5);
+      expect(result.questions[0].answers.length).toStrictEqual(2);
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/Tests/question.test.ts&quot;,&quot;line&quot;:12,&quot;character&quot;:16,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/question.test.ts&quot;,&quot;line&quot;:382,&quot;character&quot;:37,&quot;text&quot;:&quot;questionId&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Wed, 01 Nov 2023 00:14:18 GMT</p>
+    </body>
+  </html>
+  

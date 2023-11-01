@@ -1,0 +1,476 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>server.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/server.ts</td><td class="">94.69%</td><td class="">80%</td><td class="">1016</td><td class="">962</td><td class="">54</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">import express, { json, Request, Response } from &#x27;express&#x27;;
+import { echo } from &#x27;./newecho&#x27;;
+import morgan from &#x27;morgan&#x27;;
+import config from &#x27;./config.json&#x27;;
+import cors from &#x27;cors&#x27;;
+import YAML from &#x27;yaml&#x27;;
+import sui from &#x27;swagger-ui-express&#x27;;
+import fs from &#x27;fs&#x27;;
+import path from &#x27;path&#x27;;
+import process from &#x27;process&#x27;;
+
+import data from &#x27;../data.json&#x27;;
+
+import {
+  adminAuthLogin,
+  adminAuthRegister,
+  adminUserDetails,
+  adminAuthLogout,
+  adminUserDetailsEdit,
+  adminUserPasswordEdit,
+} from &#x27;./auth&#x27;;
+
+import {
+  adminQuizList,
+  adminQuizInfo,
+  adminQuizCreate,
+  adminQuizDescriptionUpdate,
+  adminQuizTransfer,
+  adminQuizRemove,
+  adminQuizNameUpdate,
+  adminQuizTrash,
+  adminQuizRestore,
+  adminQuizEmptyTrash
+} from &#x27;./quiz&#x27;;
+
+import {
+  adminQuestionCreate,
+  adminQuestionMove,
+  adminQuestionDuplicate,
+  updateQuestion,
+  deleteQuestion,
+} from &#x27;./question&#x27;;
+
+import { clear } from &#x27;./other&#x27;;
+import { getData, setData, token401, unauth403 } from &#x27;./dataStore&#x27;;
+
+// Set up web app
+const app = express();
+// Use middleware that allows us to access the JSON body of requests
+app.use(json());
+// Use middleware that allows for access from other domains
+app.use(cors());
+// for logging errors (print to terminal)
+app.use(morgan(&#x27;dev&#x27;));
+// for producing the docs that define the API
+const file = fs.readFileSync(path.join(process.cwd(), &#x27;swagger.yaml&#x27;), &#x27;utf8&#x27;);
+app.get(&#x27;/&#x27;, (req: Request, res: Response) =&gt; res.redirect(&#x27;/docs&#x27;));
+app.use(&#x27;/docs&#x27;, sui.serve, sui.setup(YAML.parse(file), {
+  swaggerOptions: { docExpansion: config.expandDocs ? &#x27;full&#x27; : &#x27;list&#x27; }
+}));
+
+const PORT: number = parseInt(process.env.PORT || config.port);
+const HOST: string = process.env.IP || &#x27;localhost&#x27;;
+
+// ====================================================================
+//  ================= WORK IS DONE BELOW THIS LINE ===================
+// ====================================================================
+// Used after every put, post, delete routes to keep data.json updated
+function backupData(req: Request, res: Response, response: any) {
+  fs.writeFile(&#x27;data.json&#x27;, JSON.stringify(getData()), (err) =&gt; {
+    if (err) return res.status(404).json(response);
+  });
+}
+
+// Example get request
+app.get(&#x27;/echo&#x27;, (req: Request, res: Response) =&gt; {
+  const data = req.query.echo as string;
+  const ret = echo(data);
+
+  if (&#x27;error&#x27; in ret) res.status(400);
+  return res.json(ret);
+});
+
+// ====================================================================
+//  ========================= AUTH FUNCTIONS =========================
+// ====================================================================
+
+// adminAuthRegister
+app.post(&#x27;/v1/admin/auth/register&#x27;, (req: Request, res: Response) =&gt; {
+  const { email, password, nameFirst, nameLast } = req.body;
+  const response = adminAuthRegister(email, password, nameFirst, nameLast);
+
+  if (&#x27;error&#x27; in response) return res.status(400).json(response);
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminAuthLogin
+app.post(&#x27;/v1/admin/auth/login&#x27;, (req: Request, res: Response) =&gt; {
+  const { email, password } = req.body;
+  const response = adminAuthLogin(email, password);
+
+  if (&#x27;error&#x27; in response) return res.status(400).json(response);
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminUserDetails
+app.get(&#x27;/v1/admin/user/details&#x27;, (req: Request, res: Response) =&gt; {
+  const token = parseInt(req.query.token as string);
+  const response = adminUserDetails(token);
+
+  if (&#x27;error&#x27; in response) return res.status(401).json(response);
+  res.json(response);
+});
+
+// adminAuthLogout
+app.post(&#x27;/v1/admin/auth/logout&#x27;, (req: Request, res: Response) =&gt; {
+  const token = parseInt(req.body.token);
+  const response = adminAuthLogout(token);
+
+  if (&#x27;error&#x27; in response) return res.status(401).json(response);
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminUserDetailsEdit
+app.put(&#x27;/v1/admin/user/details&#x27;, (req: Request, res: Response) =&gt; {
+  const { token, email, nameFirst, nameLast } = req.body;
+  const response = adminUserDetailsEdit(parseInt(token), email,
+    nameFirst, nameLast);
+
+  if (&#x27;error&#x27; in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    return res.status(400).json(response);
+  }
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminUserPasswordEdit
+app.put(&#x27;/v1/admin/user/password&#x27;, (req: Request, res: Response) =&gt; {
+  const { token, oldPassword, newPassword } = req.body;
+  const response = adminUserPasswordEdit(parseInt(token), oldPassword,
+    newPassword);
+
+  if (&#x27;error&#x27; in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    return res.status(400).json(response);
+  }
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// ====================================================================
+//  ========================= QUIZ FUNCTIONS =========================
+// ====================================================================
+
+// adminQuizList
+app.get(&#x27;/v1/admin/quiz/list&#x27;, (req: Request, res: Response) =&gt; {
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizList(token);
+
+  if (&#x27;error&#x27; in response) return res.status(401).json(response);
+  res.json(response);
+});
+
+// adminQuizCreate
+app.post(&#x27;/v1/admin/quiz&#x27;, (req: Request, res: Response) =&gt; {
+  const { token, name, description } = req.body;
+  const response = adminQuizCreate(parseInt(token), name, description);
+
+  if (&#x27;error&#x27; in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    return res.status(400).json(response);
+  }
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizTrash
+app.get(&#x27;/v1/admin/quiz/trash&#x27;, (req: Request, res: Response) =&gt; {
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizTrash(token);
+
+  if (&#x27;error&#x27; in response) return res.status(401).json(response);
+  res.json(response);
+});
+
+// adminQuizRemove
+app.delete(&#x27;/v1/admin/quiz/:quizid&#x27;, (req: Request, res: Response) =&gt; {
+  const token = parseInt(req.query.token as string);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizRemove(token, quizId);
+
+  if (&#x27;error&#x27; in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    return res.status(403).json(response);
+  }
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizInfo
+app.get(&#x27;/v1/admin/quiz/:quizid&#x27;, (req: Request, res: Response) =&gt; {
+  const quizId = parseInt(req.params.quizid);
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizInfo(token, quizId);
+
+  if (&#x27;error&#x27; in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    return res.status(403).json(response);
+  }
+  res.json(response);
+});
+
+// adminQuizNameUpdate
+app.put(&#x27;/v1/admin/quiz/:quizid/name&#x27;, (req: Request, res: Response) =&gt; {
+  const { token, name } = req.body;
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizNameUpdate(parseInt(token), quizId, name);
+
+  if (&#x27;error&#x27; in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
+  }
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizDescriptionUpdate
+app.put(&#x27;/v1/admin/quiz/:quizid/description&#x27;, (req: Request, res: Response) =&gt; {
+  const { token, description } = req.body;
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizDescriptionUpdate(parseInt(token), quizId,
+    description);
+
+  if (&#x27;error&#x27; in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
+  }
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizTransfer
+app.post(&#x27;/v1/admin/quiz/:quizid/transfer&#x27;, (req: Request, res: Response) =&gt; {
+  let { token, userEmail } = req.body;
+  token = parseInt(token);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizTransfer(token, quizId, userEmail);
+
+  if (&#x27;error&#x27; in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
+  }
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizRestore
+app.post(&#x27;/v1/admin/quiz/:quizid/restore&#x27;, (req: Request, res: Response) =&gt; {
+  const token = parseInt(req.body.token);
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuizRestore(token, quizId);
+
+  if (&#x27;error&#x27; in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
+  }
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizEmptyTrash
+app.delete(&#x27;/v1/admin/quiz/trash/empty&#x27;, (req: Request, res: Response) =&gt; {
+  const token = parseInt(req.query.token as string);
+  const quizId = JSON.parse(req.query.quizIds as string);
+  const response = adminQuizEmptyTrash(token, quizId);
+
+  if (&#x27;error&#x27; in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
+  }
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// ====================================================================
+//  ========================= QUESTION FUNCTIONS ======================
+// ====================================================================
+
+// adminQuestionCreate
+app.post(&#x27;/v1/admin/quiz/:quizid/question&#x27;, (req: Request, res: Response) =&gt; {
+  const { token, questionBody } = req.body;
+  const quizId = parseInt(req.params.quizid);
+  const response = adminQuestionCreate(parseInt(token), quizId, questionBody);
+
+  if (&#x27;error&#x27; in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
+  }
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// adminQuizUpdateQuestion
+app.put(&#x27;/v1/admin/quiz/:quizid/question/:questionid&#x27;,
+  (req: Request, res: Response) =&gt; {
+    const questionId = parseInt(req.params.questionid);
+    const quizId = parseInt(req.params.quizid);
+    let { token, questionBody } = req.body;
+    token = parseInt(token);
+
+    const response = updateQuestion(token, quizId, questionId, questionBody);
+
+    if (&#x27;error&#x27; in response) {
+      if (response.error === token401) return res.status(401).json(response);
+      if (response.error === unauth403) return res.status(403).json(response);
+      return res.status(400).json(response);
+    }
+
+    res.json(response);
+    backupData(req, res, response);
+  });
+
+// adminQuizDeleteQuestion
+app.delete(&#x27;/v1/admin/quiz/:quizid/question/:questionid&#x27;,
+  (req: Request, res: Response) =&gt; {
+    const token = parseInt(req.query.token as string);
+    const quizId = parseInt(req.params.quizid);
+    const questionId = parseInt(req.params.questionid);
+
+    const response = deleteQuestion(token, quizId, questionId);
+
+    if (&#x27;error&#x27; in response) {
+      if (response.error === token401) return res.status(401).json(response);
+      if (response.error === unauth403) return res.status(403).json(response);
+      return res.status(400).json(response);
+    }
+
+    res.json(response);
+    backupData(req, res, response);
+  });
+
+// adminQuestionMove
+app.put(&#x27;/v1/admin/quiz/:quizid/question/:questionid/move&#x27;,
+  (req: Request, res: Response) =&gt; {
+    let { token, newPosition } = req.body;
+    const quesId = parseInt(req.params.questionid);
+    const quizId = parseInt(req.params.quizid);
+
+    token = parseInt(token);
+    newPosition = parseInt(newPosition);
+
+    const response = adminQuestionMove(token, newPosition, quesId, quizId);
+
+    if (&#x27;error&#x27; in response) {
+      if (response.error === token401) return res.status(401).json(response);
+      if (response.error === unauth403) return res.status(403).json(response);
+      return res.status(400).json(response);
+    }
+
+    res.json(response);
+    backupData(req, res, response);
+  });
+
+// adminQuestionDuplicate
+app.post(&#x27;/v1/admin/quiz/:quizid/question/:questionid/duplicate&#x27;,
+  (req: Request, res: Response) =&gt; {
+    const { token } = req.body;
+    const quiz = req.params.quizid;
+    const question = req.params.questionid;
+
+    const token1 = parseInt(token);
+    const quesId = parseInt(question);
+    const quizId = parseInt(quiz);
+
+    const response = adminQuestionDuplicate(token1, quesId, quizId);
+
+    if (&#x27;error&#x27; in response) {
+      if (response.error === token401) return res.status(401).json(response);
+      if (response.error === unauth403) return res.status(403).json(response);
+      return res.status(400).json(response);
+    }
+
+    res.json(response);
+    backupData(req, res, response);
+  });
+
+// ====================================================================
+//  ======================== OTHER FUNCTIONS =========================
+// ====================================================================
+
+// clear
+app.delete(&#x27;/v1/clear&#x27;, (req: Request, res: Response) =&gt; {
+  const response = clear();
+
+  res.json(response);
+  backupData(req, res, response);
+});
+
+// ====================================================================
+//  ================= WORK IS DONE ABOVE THIS LINE ===================
+// ====================================================================
+
+app.use((req: Request, res: Response) =&gt; {
+  const error = `
+    404 Not found - This could be because:
+      0. You have defined routes below (not above) this middleware in server.ts
+      1. You have not implemented the route ${req.method} ${req.path}
+      2. There is a typo in either your test or server, e.g. /posts/list in one
+         and, incorrectly, /post/list in the other
+      3. You are using ts-node (instead of ts-node-dev) to start your server and
+         have forgotten to manually restart to load the new changes
+      4. You&#x27;ve forgotten a leading slash (/), e.g. you have posts/list instead
+         of /posts/list in your server.ts or test file
+  `;
+  res.status(404).json({ error });
+});
+
+// start server
+const server = app.listen(PORT, HOST, () =&gt; {
+  // DO NOT CHANGE THIS LINE
+  console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
+
+  // On start, import all data from data.json and set it to data in dataStore
+  if (data) setData(data);
+  else {
+    setData({
+      users: [],
+      quizzes: [],
+      sessions: []
+    });
+  }
+});
+
+// For coverage, handle Ctrl+C gracefully
+process.on(&#x27;SIGINT&#x27;, () =&gt; {
+  backupData(null, null, null);
+  server.close(() =&gt; console.log(&#x27;Shutting down server gracefully.&#x27;));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:49,&quot;text&quot;:&quot;response&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:41,&quot;text&quot;:&quot;response&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:10,&quot;text&quot;:&quot;email&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:17,&quot;text&quot;:&quot;password&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:27,&quot;text&quot;:&quot;nameFirst&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:38,&quot;text&quot;:&quot;nameLast&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:55,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:10,&quot;text&quot;:&quot;email&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:17,&quot;text&quot;:&quot;password&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:34,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:29,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:34,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:128,&quot;character&quot;:10,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:128,&quot;character&quot;:17,&quot;text&quot;:&quot;email&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:128,&quot;character&quot;:24,&quot;text&quot;:&quot;nameFirst&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:128,&quot;character&quot;:35,&quot;text&quot;:&quot;nameLast&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:128,&quot;character&quot;:52,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:10,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:17,&quot;text&quot;:&quot;oldPassword&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:30,&quot;text&quot;:&quot;newPassword&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:50,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:10,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:17,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:23,&quot;text&quot;:&quot;description&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:43,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:10,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:17,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:30,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:10,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:17,&quot;text&quot;:&quot;description&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:37,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:8,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:15,&quot;text&quot;:&quot;userEmail&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:33,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:2,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:272,&quot;character&quot;:29,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:272,&quot;character&quot;:34,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:17,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:17,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:8,&quot;text&quot;:&quot;quizId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:10,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:17,&quot;text&quot;:&quot;questionBody&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:38,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:10,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:17,&quot;text&quot;:&quot;questionBody&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:38,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:4,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:364,&quot;character&quot;:10,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:364,&quot;character&quot;:17,&quot;text&quot;:&quot;newPosition&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:364,&quot;character&quot;:37,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:368,&quot;character&quot;:4,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:4,&quot;text&quot;:&quot;newPosition&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:386,&quot;character&quot;:12,&quot;text&quot;:&quot;token&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/server.ts&quot;,&quot;line&quot;:386,&quot;character&quot;:26,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Wed, 01 Nov 2023 00:14:18 GMT</p>
+    </body>
+  </html>
+  

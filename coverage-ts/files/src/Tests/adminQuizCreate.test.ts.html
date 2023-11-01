@@ -1,0 +1,231 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>adminQuizCreate.test.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/Tests/adminQuizCreate.test.ts</td><td class="">97.74%</td><td class="">80%</td><td class="">266</td><td class="">260</td><td class="">6</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Import interfaces, requests
+import { QuizId, Token } from &#x27;../dataStore&#x27;;
+import {
+  requestClear,
+  requestRegister,
+  requestQuizCreate,
+  requestQuizRemove
+} from &#x27;./testHelper&#x27;;
+
+beforeEach(() =&gt; {
+  requestClear();
+});
+
+// Token is empty or invalid (does not refer to valid logged in user session)
+describe(&#x27;INVALID Tokens&#x27;, () =&gt; {
+  let result: QuizId;
+
+  test(&#x27;Token is out of valid range&#x27;, () =&gt; {
+    // Token contains out of range number
+    result = requestQuizCreate(-1, &#x27;Quiz&#x27;, &#x27;quizDescription&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+
+  test(&#x27;Token is empty&#x27;, () =&gt; {
+    // Token is empty
+    result = requestQuizCreate(0, &#x27;Quiz&#x27;, &#x27;quizDescription&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+
+  test(&#x27;Token doesn\&#x27;t exist&#x27;, () =&gt; {
+    // Token doesn&#x27;t exist
+    const token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+      &#x27;first&#x27;, &#x27;last&#x27;).token;
+
+    // Correct format for token but does not exist in data base
+    const result = requestQuizCreate(token + 1, &#x27;QuizName&#x27;, &#x27;description&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+});
+
+// Name contains invalid (Not alphanumeric or spaces) characters
+// Name is either less than 3 characters or more than 30 characters long
+// Name is already used by the current logged in user for another active quiz
+describe(&#x27;INVALID Quiz Name&#x27;, () =&gt; {
+  let result: QuizId;
+  let authRegisterResult: Token;
+  let authId: number;
+
+  beforeEach(() =&gt; {
+    authRegisterResult = requestRegister(&#x27;validEmail@gmail.com&#x27;,
+      &#x27;Val1dPassword&#x27;, &#x27;first&#x27;, &#x27;last&#x27;);
+    authId = authRegisterResult.token;
+  });
+
+  // Test : Name With Invalid Characters
+  test(&#x27;Name With Invalid Character \&#x27;#\&#x27;&#x27;, () =&gt; {
+    // Name contains spaces, but also special characters
+    result = requestQuizCreate(authId, &#x27;Qu1# COMP&#x27;, &#x27;quizDescription&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+
+  test(&#x27;Name With Invalid Character \&#x27;~\&#x27;&#x27;, () =&gt; {
+    // Non alphanumeric characters
+    result = requestQuizCreate(authId, &#x27;Quiz~COMP&#x27;, &#x27;quizDescription&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+
+  test(&#x27;Name With Invalid Characters \&#x27;``+\&#x27;&#x27;, () =&gt; {
+    result = requestQuizCreate(authId, &#x27;Qu1z``+ COMP1511&#x27;, &#x27;quizDescription&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+
+  test(&#x27;Name With Invalid Characters \&#x27;==_-\&#x27;&#x27;, () =&gt; {
+    result = requestQuizCreate(authId, &#x27;Qu1z==_-C0MP1511&#x27;, &#x27;quizDescription&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+
+  // Invalid Name Lengths
+  test(&#x27;Name Length Less than 3&#x27;, () =&gt; {
+    // Name is less than 3 characters long
+    const result = requestQuizCreate(authId, &#x27;Qu&#x27;, &#x27;quizDescription&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+
+  test(&#x27;Name Empty&#x27;, () =&gt; {
+    // Name is empty
+    result = requestQuizCreate(authId, &#x27;&#x27;, &#x27;quizDescription&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+
+  test(&#x27;Name Length Greater than 30&#x27;, () =&gt; {
+    // Name is more than 30 characters long
+    result = requestQuizCreate(authId, &#x27;Quizzzzzzzzzzzzzzzz COMPPPPPPPPPPPPP&#x27;,
+      &#x27;quizDescription&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+
+  test(&#x27;Name Length Greater than 30 with Special Characters&#x27;, () =&gt; {
+    // Name is more than 30 characters long and contains special characters
+    result = requestQuizCreate(authId, &#x27;Quizzzzzzzzzzzzzzzz C@MPPPPPPPPPPPPP&#x27;,
+      &#x27;quizDescription&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+
+  test(&#x27;Name Length Greater than 30 with Valid Numbers&#x27;, () =&gt; {
+    // Name is more than 30 characters long and contains numbers
+    result = requestQuizCreate(authId, &#x27;Qu1zzzzzzzzzzzzzzzz COMPPPPPPPPPPPPP&#x27;,
+      &#x27;quizDescription&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+
+  // Test : Quiz Name Is Already Used
+  test(&#x27;Name Is Already Used by Current User&#x27;, () =&gt; {
+    requestQuizCreate(authId, &#x27;quizName1&#x27;, &#x27;This quiz is about COMP1531&#x27;);
+
+    // Name is already used by the current logged in user for another quiz
+    const result = requestQuizCreate(authId, &#x27;quizName1&#x27;, &#x27;quizDescription1&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+});
+
+// Description is more than 100 characters in length
+describe(&#x27;INVALID Description&#x27;, () =&gt; {
+  test(&#x27;Description Length Greater than 100&#x27;, () =&gt; {
+    const authRegisterResult: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;,
+      &#x27;Val1dPassword&#x27;, &#x27;first&#x27;, &#x27;last&#x27;);
+    const authId: number = authRegisterResult.token;
+
+    // Description is more than 100 characters
+    const result = requestQuizCreate(authId, &#x27;COMP Quiz &#x27;,
+      &#x27;This might be the longest quiz description ever been tested. This quiz &#x27; +
+        &#x27;is the most amazing quiz ever been made.&#x27;);
+    expect(result.quizId).toStrictEqual(-1);
+  });
+});
+
+// Valid Token, Name and Description
+describe(&#x27;VALID Details&#x27;, () =&gt; {
+  let authRegisterResult: Token;
+  let authId: number;
+  let result: QuizId;
+
+  // Registering 1 valid user
+  beforeEach(() =&gt; {
+    authRegisterResult = requestRegister(&#x27;validEmail@gmail.com&#x27;,
+      &#x27;Val1dPassword&#x27;, &#x27;first&#x27;, &#x27;last&#x27;);
+    authId = authRegisterResult.token;
+  });
+
+  // 1 user, 1 quiz
+  test(&#x27;Simple Case 1: Creating 1 Quiz&#x27;, () =&gt; {
+    result = requestQuizCreate(authId, &#x27;COMP Quiz&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+    expect(result).toMatchObject({ quizId: expect.any(Number) });
+  });
+
+  // 1 user, 2 quizzes
+  test(&#x27;Simple Case 2: Creating 2 Quizzes&#x27;, () =&gt; {
+    requestQuizCreate(authId, &#x27;COMP Quiz&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+    result = requestQuizCreate(authId, &#x27;COMP Quiz2&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+    expect(result).toMatchObject({ quizId: expect.any(Number) });
+  });
+
+  // 1 user, multiple quizzes
+  test(&#x27;Simple Case 3: Creating Multiple Quizzes&#x27;, () =&gt; {
+    requestQuizCreate(authId, &#x27;COMP Quiz1&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+    requestQuizCreate(authId, &#x27;COMP Quiz2&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+    result = requestQuizCreate(authId, &#x27;COMP Quiz3&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+    expect(result).toMatchObject({ quizId: expect.any(Number) });
+  });
+
+  // 2 users with 1 quiz each of the same name
+  test(&#x27;Complex Case 1: 2 Users 1 Quiz Each&#x27;, () =&gt; {
+    const authRegisterResult2 = requestRegister(&#x27;validEmail2@gmail.com&#x27;,
+      &#x27;Val1dPassword&#x27;, &#x27;first&#x27;, &#x27;last&#x27;);
+    const authId2 = authRegisterResult2.token;
+
+    requestQuizCreate(authId, &#x27;COMP Quiz1&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+    result = requestQuizCreate(authId2, &#x27;COMP Quiz1&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+    expect(result).toMatchObject({ quizId: expect.any(Number) });
+  });
+
+  // Multiple users with multiple quizzes, some same names
+  test(&#x27;Complex Case 1: Multiple Users Multiple Quizzes&#x27;, () =&gt; {
+    const authRegisterResult2 = requestRegister(&#x27;validEmail2@gmail.com&#x27;,
+      &#x27;Val1dPassword&#x27;, &#x27;first&#x27;, &#x27;last&#x27;);
+    const authId2 = authRegisterResult2.token;
+
+    const authRegisterResult3 = requestRegister(&#x27;validEmail2@gmail.com&#x27;,
+      &#x27;Val1dPassword&#x27;, &#x27;first&#x27;, &#x27;last&#x27;);
+    const authId3 = authRegisterResult3.token;
+
+    const authRegisterResult4 = requestRegister(&#x27;validEmail2@gmail.com&#x27;,
+      &#x27;Val1dPassword&#x27;, &#x27;first&#x27;, &#x27;last&#x27;);
+    const authId4 = authRegisterResult4.token;
+
+    requestQuizCreate(authId, &#x27;COMP Quiz1&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+    requestQuizCreate(authId2, &#x27;COMP Quiz1&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+    requestQuizCreate(authId3, &#x27;COMP Quiz1&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+    requestQuizCreate(authId4, &#x27;COMP Quiz1&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+
+    result = requestQuizCreate(authId2, &#x27;COMP Quiz2&#x27;, &#x27;COMP1531 Quiz.&#x27;);
+    expect(result).toMatchObject({ quizId: expect.any(Number) });
+  });
+
+  test(&#x27;Reusing the name of a deleted quiz&#x27;, () =&gt; {
+    const quizId = requestQuizCreate(authId, &#x27;quizName1&#x27;, &#x27;&#x27;).quizId;
+    requestQuizRemove(authId, quizId);
+
+    // Name is already used by the current logged in user for another quiz
+    const result = requestQuizCreate(authId, &#x27;quizName1&#x27;, &#x27;&#x27;);
+    expect(result).toStrictEqual({ quizId: expect.any(Number) });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/Tests/adminQuizCreate.test.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:35,&quot;text&quot;:&quot;quizId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizCreate.test.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:35,&quot;text&quot;:&quot;quizId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizCreate.test.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:35,&quot;text&quot;:&quot;quizId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizCreate.test.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:35,&quot;text&quot;:&quot;quizId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizCreate.test.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:35,&quot;text&quot;:&quot;quizId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizCreate.test.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:35,&quot;text&quot;:&quot;quizId&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Wed, 01 Nov 2023 00:14:18 GMT</p>
+    </body>
+  </html>
+  

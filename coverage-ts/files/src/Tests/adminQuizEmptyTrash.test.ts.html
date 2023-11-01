@@ -1,0 +1,175 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>adminQuizEmptyTrash.test.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/Tests/adminQuizEmptyTrash.test.ts</td><td class="">96.25%</td><td class="">80%</td><td class="">267</td><td class="">257</td><td class="">10</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Test for adminQuizEmptyTrash
+import { Token } from &#x27;../dataStore&#x27;;
+import {
+  requestQuizEmptyTrash,
+  requestClear,
+  requestRegister,
+  requestQuizCreate,
+  requestQuizRemove,
+} from &#x27;./testHelper&#x27;;
+
+/// ////////////////////////////////////////////////////////////////////////////
+/// //////////////////////////////// Tests /////////////////////////////////////
+/// ////////////////////////////////////////////////////////////////////////////
+
+// Clear the dataBase before each test to avoid data interference
+beforeEach(() =&gt; {
+  requestClear();
+});
+
+// Test 401 : Invalid AuthUserId Format
+test(&#x27;Test Invalid AuthUserId Format&#x27;, () =&gt; {
+  // authUserId is empty
+  const token = requestRegister(&#x27;v@gmail.com&#x27;, &#x27;Val1Pass&#x27;, &#x27;fir&#x27;, &#x27;las&#x27;).token;
+  const quizId1 = requestQuizCreate(token, &#x27;Quiz 1&#x27;, &#x27;&#x27;).quizId;
+  const quizId2 = requestQuizCreate(token, &#x27;Quiz 2&#x27;, &#x27;&#x27;).quizId;
+  requestQuizRemove(token, quizId1);
+  requestQuizRemove(token, quizId2);
+
+  let result = requestQuizEmptyTrash(0, [quizId1, quizId2]);
+  expect(result).toMatchObject({ error: expect.any(String) });
+
+  // authUserId contains out of range number
+  result = requestQuizEmptyTrash(-1, [quizId1, quizId2]);
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+test(&#x27;Test Invalid AuthUserId&#x27;, () =&gt; {
+  // Register a user
+  const userId: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+    // Create a quiz with userId
+  const quizId: number = requestQuizCreate(userId.token, &#x27;Quiz 1&#x27;,
+    &#x27;This is Quiz 1&#x27;).quizId;
+
+  // Remove the quiz
+  requestQuizRemove(userId.token, quizId);
+
+  // Permanently delete the quiz with invalid userId
+  const result = requestQuizEmptyTrash(userId.token + 1, [quizId]);
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+// Test 400: One or more of the quiz ids is not a valid quiz
+test(&#x27;Quiz ID(s) is not a valid quiz&#x27;, () =&gt; {
+  // Register a user
+  const userId: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+  // Create quizzes with userId
+  const quizId1: number = requestQuizCreate(userId.token,
+    &#x27;Quiz 1&#x27;, &#x27;This is Quiz 1&#x27;).quizId;
+  const quizId2: number = requestQuizCreate(userId.token,
+    &#x27;Quiz 2&#x27;, &#x27;This is Quiz 2&#x27;).quizId;
+
+  // Move the quizzes to the trash
+  requestQuizRemove(userId.token, quizId1);
+  requestQuizRemove(userId.token, quizId2);
+
+  // Permanently delete the quizzes with invalid quizIds
+  const result1 = requestQuizEmptyTrash(userId.token, [quizId1 + 1]);
+  expect(result1).toMatchObject({ error: expect.any(String) });
+
+  const result2 = requestQuizEmptyTrash(userId.token, [quizId2 + 100]);
+  expect(result2).toMatchObject({ error: expect.any(String) });
+
+  const result3 = requestQuizEmptyTrash(userId.token, [-1]);
+  expect(result3).toMatchObject({ error: expect.any(String) });
+});
+
+// Test 400 : Quiz ID refers to a quiz thats not in trash
+test(&#x27;Test Restored Quiz Not In Trash&#x27;, () =&gt; {
+  // Register a user
+  const userId: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+  // Create a quiz with userId
+  const quizId1: number = requestQuizCreate(userId.token, &#x27;Quiz 1&#x27;,
+    &#x27;This is Quiz 1&#x27;).quizId;
+  // Create a quiz with userId
+  const quizId2: number = requestQuizCreate(userId.token, &#x27;Quiz 2&#x27;,
+    &#x27;This is Quiz 2&#x27;).quizId;
+
+  // Permanently delete the quizzes that has not been removed
+  const result1 = requestQuizEmptyTrash(userId.token, [quizId1]);
+  expect(result1).toMatchObject({ error: expect.any(String) });
+
+  const result2 = requestQuizEmptyTrash(userId.token, [quizId2]);
+  expect(result2).toMatchObject({ error: expect.any(String) });
+
+  const result3 = requestQuizEmptyTrash(userId.token, [quizId1, quizId2]);
+  expect(result3).toMatchObject({ error: expect.any(String) });
+});
+
+// Test 403 : Valid token but user is not the owner of the quiz
+test(&#x27;Quiz ID does not owned by user&#x27;, () =&gt; {
+  // Register a user
+  const userId1: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+  // Register another user
+  const userId2: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+  // Create a quiz owned by user 1
+  const quizId: number = requestQuizCreate(userId1.token, &#x27;Quiz 1&#x27;,
+    &#x27;This is Quiz 1&#x27;).quizId;
+
+  // Move the quizzes to the trash
+  requestQuizRemove(userId1.token, quizId);
+
+  // Restoring the quiz from user 1 using userId of user 2
+  const result = requestQuizEmptyTrash(userId2.token, [quizId]);
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+// Test 200 : Valid inputs
+test(&#x27;Perfect Case 1&#x27;, () =&gt; {
+  // Register a user
+  const userId: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+  // Create a quiz with userId
+  const quizId1: number = requestQuizCreate(userId.token, &#x27;Quiz 1&#x27;,
+    &#x27;This is Quiz 1&#x27;).quizId;
+
+  // Move the quizzes to the trash
+  requestQuizRemove(userId.token, quizId1);
+
+  // Restoring the quiz from user 1 using userId of user 2
+  const result = requestQuizEmptyTrash(userId.token, [quizId1]);
+  expect(Object.keys(result).length).toStrictEqual(0);
+});
+
+test(&#x27;Perfect Case 2&#x27;, () =&gt; {
+  // Register a user
+  const userId: Token = requestRegister(&#x27;validEmail@gmail.com&#x27;, &#x27;Val1dPassword&#x27;,
+    &#x27;first&#x27;, &#x27;last&#x27;);
+  // Create a quiz with userId
+  const quizId1: number = requestQuizCreate(userId.token, &#x27;Quiz 1&#x27;,
+    &#x27;This is Quiz 1&#x27;).quizId;
+  // Create a quiz with userId
+  const quizId2: number = requestQuizCreate(userId.token, &#x27;Quiz 2&#x27;,
+    &#x27;This is Quiz 2&#x27;).quizId;
+
+  // Move the quizzes to the trash
+  requestQuizRemove(userId.token, quizId1);
+  requestQuizRemove(userId.token, quizId2);
+
+  // Restoring the quiz from user 1 using userId of user 2
+  const result = requestQuizEmptyTrash(userId.token, [quizId1, quizId2]);
+  expect(Object.keys(result).length).toStrictEqual(0);
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/Tests/adminQuizEmptyTrash.test.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizEmptyTrash.test.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizEmptyTrash.test.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizEmptyTrash.test.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:34,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizEmptyTrash.test.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:34,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizEmptyTrash.test.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:34,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizEmptyTrash.test.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:34,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizEmptyTrash.test.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:34,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizEmptyTrash.test.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:34,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/Tests/adminQuizEmptyTrash.test.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:33,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Wed, 01 Nov 2023 00:14:18 GMT</p>
+    </body>
+  </html>
+  
