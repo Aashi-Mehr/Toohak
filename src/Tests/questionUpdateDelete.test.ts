@@ -272,6 +272,12 @@ describe('adminQuizQuestionUpdate', () => {
     expect(result).toMatchObject({ error: expect.any(String) });
   });
 
+  test('Valid token is provided, but the quiz is invalid', () => {
+    // Valid token is provided, but the user is unauthorised
+    result = requestQuesUpdate(token1, quizId1 + 1, questionId1, finalQ);
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
   test('Valid token is provided, but unauthorised after transfer', () => {
     // Valid token is provided, but unauthorised after transfer
     requestRegister('a@gmail.com', 'Val1Pass', 'fir', 'las');
@@ -493,6 +499,12 @@ describe('adminQuizQuestionDelete', () => {
     // Valid token is provided, but the user is unauthorised
     const token2 = requestRegister('a@gmail.com', 'Val1Pass', 'fir', 'las').token;
     result = requestQuesDelete(token2, quizId1, questionId1);
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('Valid token is provided, but the quiz is invalid', () => {
+    // Valid token is provided, but the user is unauthorised
+    result = requestQuesDelete(token1, quizId1 + 1, questionId1);
     expect(result).toMatchObject({ error: expect.any(String) });
   });
 

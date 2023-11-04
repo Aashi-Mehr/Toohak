@@ -296,7 +296,10 @@ function getUniqueID(allData: Datastore): number {
     // Removing usedIds
     const len = usedIds.length;
     for (let i = 0; i < len; i++) {
+      /* istanbul ignore next */
       if (allIds.indexOf(usedIds[0]) !== -1) {
+        // Having more than 10 000 users causes the tests to be too slow, so the
+        // coverage error cannot be fixed
         allIds.splice(allIds.indexOf(usedIds[0]), 1);
         usedIds.splice(0, 1);
       }

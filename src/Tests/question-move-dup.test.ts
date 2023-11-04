@@ -116,6 +116,85 @@ describe('adminQuesMove', () => {
     const result = requestQuesMove(userId.token, 1, quesId2, quizId);
     expect(result).toMatchObject({});
   });
+
+  test('INVALID Unauthorised 403: Case 1', () => {
+    userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last');
+    quizId = requestQuizCreate(userId.token, 'first last', 'first quiz').quizId;
+    quesId2 = requestQuestionCreate(userId.token,
+      quizId,
+      {
+        question: 'Who is the Monarch of England?',
+        duration: 4,
+        points: 5,
+        answers: [
+          {
+            answer: 'Prince Charles',
+            correct: true
+          },
+          {
+            answer: 'Lovely Joe',
+            correct: false
+          }
+        ]
+      }
+    ).questionId;
+
+    const result = requestQuesMove(userId.token, 1, quesId2, quizId + 1);
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Unauthorised 403: Case 2', () => {
+    userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last');
+    const user2 = requestRegister('first.last2@gmail.com', 'abcd1234', 'first', 'last');
+    quizId = requestQuizCreate(userId.token, 'first last', 'first quiz').quizId;
+    quesId2 = requestQuestionCreate(userId.token,
+      quizId,
+      {
+        question: 'Who is the Monarch of England?',
+        duration: 4,
+        points: 5,
+        answers: [
+          {
+            answer: 'Prince Charles',
+            correct: true
+          },
+          {
+            answer: 'Lovely Joe',
+            correct: false
+          }
+        ]
+      }
+    ).questionId;
+
+    const result = requestQuesMove(user2.token, 1, quesId2, quizId);
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Unauthorised 401', () => {
+    userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last');
+    quizId = requestQuizCreate(userId.token, 'first last', 'first quiz').quizId;
+    quesId2 = requestQuestionCreate(userId.token,
+      quizId,
+      {
+        question: 'Who is the Monarch of England?',
+        duration: 4,
+        points: 5,
+        answers: [
+          {
+            answer: 'Prince Charles',
+            correct: true
+          },
+          {
+            answer: 'Lovely Joe',
+            correct: false
+          }
+        ]
+      }
+    ).questionId;
+
+    const result = requestQuesMove(userId.token + 1, 1, quesId2, quizId);
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
 });
 
 // Test function : adminQuesDup
@@ -197,5 +276,83 @@ describe('adminQuesDup', () => {
 
     const result = requestQuesDup(userId1.token, quizId, quesId2);
     expect(result).toMatchObject({ questionId: expect.any(Number) });
+  });
+
+  test('INVALID Unauthorised 401', () => {
+    userId1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last');
+    quizId = requestQuizCreate(userId1.token, 'first last', 'first quiz').quizId;
+    quesId2 = requestQuestionCreate(userId1.token,
+      quizId,
+      {
+        question: 'Who is the Monarch of England?',
+        duration: 4,
+        points: 5,
+        answers: [
+          {
+            answer: 'Prince Charles',
+            correct: true
+          },
+          {
+            answer: 'Lovely Joe',
+            correct: false
+          }
+        ]
+      }
+    ).questionId;
+
+    const result = requestQuesDup(userId1.token + 1, quizId, quesId2);
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Unauthorised 403', () => {
+    userId1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last');
+    quizId = requestQuizCreate(userId1.token, 'first last', 'first quiz').quizId;
+    quesId2 = requestQuestionCreate(userId1.token,
+      quizId,
+      {
+        question: 'Who is the Monarch of England?',
+        duration: 4,
+        points: 5,
+        answers: [
+          {
+            answer: 'Prince Charles',
+            correct: true
+          },
+          {
+            answer: 'Lovely Joe',
+            correct: false
+          }
+        ]
+      }
+    ).questionId;
+
+    const result = requestQuesDup(userId1.token, quizId + 1, quesId2);
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('INVALID Duration 400', () => {
+    userId1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last');
+    quizId = requestQuizCreate(userId1.token, 'first last', 'first quiz').quizId;
+    quesId2 = requestQuestionCreate(userId1.token,
+      quizId,
+      {
+        question: 'Who is the Monarch of England?',
+        duration: 179,
+        points: 5,
+        answers: [
+          {
+            answer: 'Prince Charles',
+            correct: true
+          },
+          {
+            answer: 'Lovely Joe',
+            correct: false
+          }
+        ]
+      }
+    ).questionId;
+
+    const result = requestQuesDup(userId1.token, quizId, quesId2);
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 });

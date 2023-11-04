@@ -166,8 +166,10 @@ export function adminUserPasswordEdit(token: number, oldPass: string,
   // ERROR CHECKING
   // Ensuring the user is valid
   const user = getUser(token, getData());
+
   // Return error message if token is invalid
   if (!user) return { error: token401 };
+
   // Return error message if the password entered does not match old password
   if (user.password !== oldPass) return { error: oldPass400 };
 
@@ -177,6 +179,7 @@ export function adminUserPasswordEdit(token: number, oldPass: string,
 
   // Return error if password does not contain letters
   if (hasLetter === false || hasNumber === false) return { error: passChar400 };
+
   // Return error if password is less than 8 characters
   if (newPass.length < 8) return { error: passLen400 };
 
