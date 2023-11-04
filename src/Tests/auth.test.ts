@@ -609,7 +609,7 @@ describe('adminUserPasswordEdit', () => {
   });
 
   test('INVALID Password: Less than 8 characters', () => {
-    result = requestPasswordEdit(token, 'Val1dPassword', 'newpass');
+    result = requestPasswordEdit(token, 'Val1dPassword', 'newp0ss');
     expect(result).toMatchObject({ error: expect.any(String) });
   });
 
@@ -626,9 +626,17 @@ describe('adminUserPasswordEdit', () => {
     expect(result).toMatchObject({ error: expect.any(String) });
   });
 
+  test('INVALID Password: Given old password is wrong', () => {
+    result = requestPasswordEdit(token, 'Val0dPassword', 'NewVal1dPass');
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
   test('VALID token: Simple Case 1', () => {
     result = requestPasswordEdit(token, 'Val1dPassword', 'NewVal1dPass');
     expect(Object.keys(result).length).toStrictEqual(0);
+
+    const result2 = requestLogin('first.last@gmail.com', 'NewVal1dPass');
+    expect(result2).toMatchObject({ token: expect.any(Number) });
   });
 
   test('VALID token: Simple Case 2', () => {
@@ -636,6 +644,9 @@ describe('adminUserPasswordEdit', () => {
       'Val1dPassword2', 'first', 'last').token;
     result = requestPasswordEdit(token, 'Val1dPassword2', 'NEWVal1dPassword2');
     expect(Object.keys(result).length).toStrictEqual(0);
+
+    const result2 = requestLogin('first.last2@gmail.com', 'NEWVal1dPassword2');
+    expect(result2).toMatchObject({ token: expect.any(Number) });
   });
 
   test('VALID token: Simple Case 3', () => {

@@ -68,9 +68,7 @@ const HOST: string = process.env.IP || 'localhost';
 // ====================================================================
 // Used after every put, post, delete routes to keep data.json updated
 function backupData(req: Request, res: Response, response: any) {
-  fs.writeFile('data.json', JSON.stringify(getData()), (err) => {
-    if (err) return res.status(404).json(response);
-  });
+  fs.writeFileSync('data.json', JSON.stringify(getData()));
 }
 
 // Example get request
@@ -196,7 +194,7 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
 
   if ('error' in response) {
     if (response.error === token401) return res.status(401).json(response);
-    return res.status(403).json(response);
+    else return res.status(403).json(response);
   }
 
   res.json(response);
@@ -224,8 +222,8 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
 
   if ('error' in response) {
     if (response.error === token401) return res.status(401).json(response);
-    if (response.error === unauth403) return res.status(403).json(response);
-    return res.status(400).json(response);
+    else if (response.error === unauth403) return res.status(403).json(response);
+    else return res.status(400).json(response);
   }
 
   res.json(response);
@@ -241,8 +239,8 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 
   if ('error' in response) {
     if (response.error === token401) return res.status(401).json(response);
-    if (response.error === unauth403) return res.status(403).json(response);
-    return res.status(400).json(response);
+    else if (response.error === unauth403) return res.status(403).json(response);
+    else return res.status(400).json(response);
   }
 
   res.json(response);
@@ -371,8 +369,8 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
 
     if ('error' in response) {
       if (response.error === token401) return res.status(401).json(response);
-      if (response.error === unauth403) return res.status(403).json(response);
-      return res.status(400).json(response);
+      else if (response.error === unauth403) return res.status(403).json(response);
+      else return res.status(400).json(response);
     }
 
     res.json(response);
@@ -394,8 +392,8 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
 
     if ('error' in response) {
       if (response.error === token401) return res.status(401).json(response);
-      if (response.error === unauth403) return res.status(403).json(response);
-      return res.status(400).json(response);
+      else if (response.error === unauth403) return res.status(403).json(response);
+      else return res.status(400).json(response);
     }
 
     res.json(response);
@@ -443,13 +441,7 @@ const server = app.listen(PORT, HOST, () => {
 
   // On start, import all data from data.json and set it to data in dataStore
   if (data) setData(data);
-  else {
-    setData({
-      users: [],
-      quizzes: [],
-      sessions: []
-    });
-  }
+  else clear();
 });
 
 // For coverage, handle Ctrl+C gracefully

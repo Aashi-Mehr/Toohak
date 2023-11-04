@@ -55,12 +55,24 @@ test('Quiz ID does not exist', () => {
   // Register a user
   const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
     'first', 'last');
-    // Create a quiz with userId
+  // Create a quiz with userId
   const quizId: number = requestQuizCreate(userId.token, 'Quiz 1',
     'This is Quiz 1').quizId;
 
   // Restore a quiz with non-existing or wrongly inputted quizId
   const result = requestQuizRestore(userId.token, quizId + 1);
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+test('Quiz not in trash', () => {
+  // Register a user
+  const userId: number = requestRegister('validEmail@gmail.com',
+    'Val1dPassword', 'first', 'last').token;
+  // Create a quiz with userId
+  const quizId: number = requestQuizCreate(userId, 'Quiz1', '').quizId;
+
+  // Restore a quiz with non-existing or wrongly inputted quizId
+  const result = requestQuizRestore(userId, quizId);
   expect(result).toMatchObject({ error: expect.any(String) });
 });
 

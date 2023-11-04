@@ -20,7 +20,8 @@ function clear(): Record<string, never> {
   setData({
     users: [],
     quizzes: [],
-    sessions: []
+    sessions: [],
+    quizSessions: []
   });
 
   return { };

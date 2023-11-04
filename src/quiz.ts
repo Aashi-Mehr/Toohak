@@ -16,7 +16,8 @@ import {
   unauth403,
   notUser400,
   currUser400,
-  notBin400
+  notBin400,
+  QuizAdd
 } from './dataStore';
 
 /** adminQuizList
@@ -77,12 +78,15 @@ function adminQuizCreate(token: number, name: string, description: string):
   if (description.length > 100) return { error: desc400 };
 
   // Error checking: In used quiz name
-  const userQuizzes = adminQuizList(token);
-  if ('quizzes' in userQuizzes) {
-    const quizzes = userQuizzes.quizzes;
-    for (const quiz of quizzes) {
-      if (quiz.name === name) return { error: nameUsed400 };
+  const quizzes: QuizAdd[] = [];
+  for (const quiz of getData().quizzes) {
+    if (quiz.authId === user.authUserId && quiz.in_trash === false) {
+      quizzes.push(quiz);
     }
+  }
+
+  for (const quiz of quizzes) {
+    if (quiz.name === name) return { error: nameUsed400 };
   }
 
   // Returning and altering data
@@ -127,10 +131,10 @@ function adminQuizRemove(token: number, quizId: number):
     quiz.timeLastEdited = Math.floor(Date.now() / 1000);
     quiz.in_trash = true;
     return { };
+  } else {
+    // It's not owned by given user
+    return { error: unauth403 };
   }
-
-  // It's not owned by given user
-  return { error: unauth403 };
 }
 
 /** adminQuizInfo
@@ -218,10 +222,10 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
     quiz.name = name;
     quiz.timeLastEdited = Math.floor(Date.now() / 1000);
     return { };
+  } else {
+    // Quiz is invalid
+    return { error: unauth403 };
   }
-
-  // Quiz is invalid
-  return { error: unauth403 };
 }
 
 /** adminQuizDescriptionUpdate
@@ -254,12 +258,11 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
   if (quiz.in_trash === false) {
     quiz.description = description;
     quiz.timeLastEdited = Math.floor(Date.now() / 1000);
-
     return { };
+  } else {
+    // Exit with an error message if the quiz is invalid
+    return { error: unauth403 };
   }
-
-  // Exit with an error message if the quiz is invalid
-  return { error: unauth403 };
 }
 
 /** adminQuizTransfer
@@ -358,7 +361,8 @@ function adminQuizRestore(token: number, quizId: number):
   for (const activeQuiz of existingQuizzes) {
     if (activeQuiz.name === quiz.name &&
       activeQuiz.authId === user.authUserId &&
-      activeQuiz.in_trash === false) {
+      activeQuiz.in_trash === false &&
+      activeQuiz.quizId !== quizId) {
       // Return error if quiz name of the restored quiz is already used
       // by another active quiz or quiz is not in trash
       return { error: nameUsed400 };
@@ -372,9 +376,7 @@ function adminQuizRestore(token: number, quizId: number):
     quiz.in_trash = false;
 
     return { };
-  }
-
-  return { error: notBin400 };
+  } else return { error: notBin400 };
 }
 
 /** adminQuizEmptyTrash

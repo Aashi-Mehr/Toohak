@@ -50,13 +50,13 @@ function detailsCheck(email: string, password: string,
     return { error: userChar400 };
   }
   if (nameFirst.length < 2 || nameFirst.length > 20 ||
-      nameLast.length < 2 || nameLast.length > 20) return { error: userChar400 };
+      nameLast.length < 2 || nameLast.length > 20) {
+    return { error: userChar400 };
+  }
 
   // Email needs to be valid
   const validator = require('validator');
-  if (!validator.isEmail(email)) {
-    return { error: emailValid400 };
-  }
+  if (!validator.isEmail(email)) return { error: emailValid400 };
 
   // Email cannot be duplicated
   for (const user of users) {
@@ -166,8 +166,10 @@ export function adminUserPasswordEdit(token: number, oldPass: string,
   // ERROR CHECKING
   // Ensuring the user is valid
   const user = getUser(token, getData());
+
   // Return error message if token is invalid
   if (!user) return { error: token401 };
+
   // Return error message if the password entered does not match old password
   if (user.password !== oldPass) return { error: oldPass400 };
 
@@ -177,6 +179,7 @@ export function adminUserPasswordEdit(token: number, oldPass: string,
 
   // Return error if password does not contain letters
   if (hasLetter === false || hasNumber === false) return { error: passChar400 };
+
   // Return error if password is less than 8 characters
   if (newPass.length < 8) return { error: passLen400 };
 

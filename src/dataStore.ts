@@ -126,7 +126,7 @@ interface QuizInfo {
 
 interface QuizList { quizzes: QuizBrief[] }
 
-interface QuizAdd {
+interface QuizAdd { // Need to add thumbnail URL component
   quizId: number,
   authId: number,
   name: string,
@@ -148,11 +148,26 @@ interface Token {
   token: number
 }
 
+// INTERFACE Quiz Sessions
+interface quizSessionPlayers {
+  name: string,
+  playerId: number
+}
+
+interface quizSessionAdd {
+  sessionId: number,
+  state: string,
+  atQuestion: number,
+  quiz: QuizAdd,
+  players: quizSessionPlayers[]
+}
+
 // INTERFACE Datastore
 interface Datastore {
   users: UserAdd[],
   quizzes: QuizAdd[],
-  sessions: SessionAdd[]
+  sessions: SessionAdd[],
+  quizSessions: quizSessionAdd[]
 }
 
 // Datastore, initially set in server.ts on startup
@@ -281,7 +296,10 @@ function getUniqueID(allData: Datastore): number {
     // Removing usedIds
     const len = usedIds.length;
     for (let i = 0; i < len; i++) {
+      /* istanbul ignore next */
       if (allIds.indexOf(usedIds[0]) !== -1) {
+        // Having more than 10 000 users causes the tests to be too slow, so the
+        // coverage error cannot be fixed
         allIds.splice(allIds.indexOf(usedIds[0]), 1);
         usedIds.splice(0, 1);
       }
