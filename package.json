@@ -3,12 +3,13 @@
         "test": "jest",
         "tsc": "tsc --project tsconfig.json",
         "ts-node": "ts-node",
-        "ts-node-coverage": "nyc --reporter=text --reporter=lcov ts-node",
         "start-coverage": "nyc --reporter=text --reporter=lcov ts-node src/server.ts",
         "lint": "eslint src/**/*.{ts,js}",
         "lint-fix": "eslint --fix src/**/*.{ts,js}",
         "start": "ts-node -T src/server.ts",
-        "start-dev": "ts-node-dev src/server.ts"
+        "ts-node-coverage": "nyc --reporter=text --reporter=lcov ts-node -T src/server.ts",
+        "cleanup-sync-request": "pkill -f node_modules/sync-rpc/lib/worker.js > /dev/null 2>&1",
+        "posttest": "npm run cleanup-sync-request || true"
     },
     "dependencies": {
         "cors": "^2.8.5",
@@ -42,5 +43,10 @@
         "sync-request-curl": "^2.1.5",
         "ts-jest": "^28.0.2",
         "yaml": "^2.2.2"
+    },
+    "nyc": {
+        "exclude": [
+            "echo.*"
+        ]
     }
 }
