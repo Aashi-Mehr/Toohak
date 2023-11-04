@@ -55,7 +55,7 @@ function detailsCheck(email: string, password: string,
   }
 
   // Email needs to be valid
-  let validator = require('validator');
+  const validator = require('validator');
   if (!validator.isEmail(email)) return { error: emailValid400 };
 
   // Email cannot be duplicated

@@ -442,13 +442,7 @@ const server = app.listen(PORT, HOST, () => {
 
   // On start, import all data from data.json and set it to data in dataStore
   if (data) setData(data);
-  else {
-    setData({
-      users: [],
-      quizzes: [],
-      sessions: []
-    });
-  }
+  else clear();
 });
 
 // For coverage, handle Ctrl+C gracefully

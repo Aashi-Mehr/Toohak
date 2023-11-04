@@ -2,10 +2,13 @@
     "scripts": {
         "test": "jest",
         "tsc": "tsc --project tsconfig.json",
+        "ts-node": "ts-node",
+        "ts-node-coverage": "nyc --reporter=text --reporter=lcov ts-node",
+        "start-coverage": "nyc --reporter=text --reporter=lcov ts-node src/server.ts",
         "lint": "eslint src/**/*.{ts,js}",
         "lint-fix": "eslint --fix src/**/*.{ts,js}",
         "start": "ts-node -T src/server.ts",
-        "ts-node-coverage": "typescript-coverage-report"
+        "start-dev": "ts-node-dev src/server.ts"
     },
     "dependencies": {
         "cors": "^2.8.5",
@@ -38,7 +41,6 @@
         "swagger-ui-express": "^4.6.2",
         "sync-request-curl": "^2.1.5",
         "ts-jest": "^28.0.2",
-        "typescript-coverage-report": "^0.8.0",
         "yaml": "^2.2.2"
     }
 }

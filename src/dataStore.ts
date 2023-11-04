@@ -126,7 +126,7 @@ interface QuizInfo {
 
 interface QuizList { quizzes: QuizBrief[] }
 
-interface QuizAdd {
+interface QuizAdd { // Need to add thumbnail URL component
   quizId: number,
   authId: number,
   name: string,
@@ -148,11 +148,26 @@ interface Token {
   token: number
 }
 
+// INTERFACE Quiz Sessions
+interface quizSessionPlayers {
+  name: string,
+  playerId: number
+}
+
+interface quizSessionAdd {
+  sessionId: number,
+  state: string,
+  atQuestion: number,
+  quiz: QuizAdd,
+  players: quizSessionPlayers[]
+}
+
 // INTERFACE Datastore
 interface Datastore {
   users: UserAdd[],
   quizzes: QuizAdd[],
-  sessions: SessionAdd[]
+  sessions: SessionAdd[],
+  quizSessions: quizSessionAdd[]
 }
 
 // Datastore, initially set in server.ts on startup
