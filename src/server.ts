@@ -289,7 +289,7 @@ app.put('/v2/admin/user/password', (req: Request, res: Response) => {
 // ====================================================================
 
 // adminQuizList
-app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+app.get('/v2/admin/quiz/list', (req: Request, res: Response) => {
   const token = parseInt(req.headers.token as string);
   res.json(adminQuizList(token));
 });
@@ -333,7 +333,7 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
 });
 
 // adminQuizInfo
-app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = parseInt(req.headers.token as string);
   const quizId = parseInt(req.params.quizid);
   res.json(adminQuizInfo(token, quizId));

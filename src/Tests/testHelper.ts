@@ -198,28 +198,42 @@ export function requestQuizInfo(token: number | string, quizId: number):
   QuizInfo {
   const res = request(
     'GET',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '?token=' + token,
+    SERVER_URL + '/v2/admin/quiz/' + quizId + '?token=' + token,
     {
-      qs: { }
+      headers: {
+        token: token.toString()
+      }
     }
   );
-  return JSON.parse(res.body.toString());
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // GET QUIZ LIST Define wrapper function
-export function requestQuizList(token: number | string):
-  QuizList | ErrorObject {
+export function requestQuizList(token: number | string): QuizList {
   const res = request(
     'GET',
-    SERVER_URL + '/v1/admin/quiz/list?token=' + token,
+    SERVER_URL + '/v2/admin/quiz/list?token=' + token,
     {
-      qs: {}
+      headers: {
+        token: token.toString()
+      }
     }
   );
-  const result = JSON.parse(res.body as string);
+    
+  const result = JSON.parse(res.body.toString());
 
-  if ('error' in result) return { error: 'error' };
-  else return result;
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // PUT QUIZ DESCRIPTION UODATE Define Wrapper Function
