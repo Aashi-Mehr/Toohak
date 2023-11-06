@@ -171,7 +171,12 @@ interface Datastore {
 }
 
 // Datastore, initially set in server.ts on startup
-let data: Datastore;
+let data: Datastore = {
+  users: [],
+  quizzes: [],
+  sessions: [],
+  quizSessions: []
+};
 
 // DATASTORE FUNCTIONS
 /** getData

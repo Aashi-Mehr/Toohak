@@ -45,8 +45,8 @@ export function requestRegister(email: string, password: string,
     }
   );
 
-  let result = JSON.parse(res.body.toString());
-  
+  const result = JSON.parse(res.body.toString());
+
   if (res.statusCode !== 200) {
     throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
   }
@@ -67,7 +67,7 @@ export function requestLogin(email: string, password: string): Token {
     }
   );
 
-  let result = JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
 
   if (res.statusCode !== 200) {
     throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
@@ -88,8 +88,8 @@ export function requestDetails(token: number): Details | ErrorObject {
     }
   );
 
-  let result = JSON.parse(res.body.toString());
-  
+  const result = JSON.parse(res.body.toString());
+
   if (res.statusCode !== 200) {
     throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
   }
@@ -110,8 +110,8 @@ export function requestLogout(token: number):
     }
   );
 
-  let result = JSON.parse(res.body.toString());
-  
+  const result = JSON.parse(res.body.toString());
+
   if (res.statusCode !== 200) {
     throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
   }
@@ -137,8 +137,8 @@ export function requestDetailsEdit(token: number, email: string,
     }
   );
 
-  let result = JSON.parse(res.body.toString());
-  
+  const result = JSON.parse(res.body.toString());
+
   if (res.statusCode !== 200) {
     throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
   }
@@ -163,8 +163,8 @@ export function requestPasswordEdit(token: number, oldPass: string,
     }
   );
 
-  let result = JSON.parse(res.body.toString());
-  
+  const result = JSON.parse(res.body.toString());
+
   if (res.statusCode !== 200) {
     throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
   }

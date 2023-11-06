@@ -228,7 +228,7 @@ describe('adminUserDetails', () => {
     // Testing cases where the token doesn't refer to a valid user
     token = requestRegister('first.last@gmail.com', 'Val1dPassword', 'first',
       'last').token;
-      expect(() => requestDetails(token + 1)).toThrow(HTTPError[401]);
+    expect(() => requestDetails(token + 1)).toThrow(HTTPError[401]);
   });
 
   test('VALID token: Simple Case 1', () => {

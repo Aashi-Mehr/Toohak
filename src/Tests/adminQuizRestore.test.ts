@@ -106,10 +106,10 @@ test('Test Invalid AuthUserId', () => {
 // Test 403 : Valid token but user is not the owner of the quiz
 test('Quiz ID does not owned by user', () => {
   // Register a user
-  const userId1: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+  const userId1: Token = requestRegister('validEmail1@gmail.com', 'Val1dPass',
     'first', 'last');
     // Register another user
-  const userId2: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+  const userId2: Token = requestRegister('validEmail2@gmail.com', 'Val1dPass',
     'first', 'last');
     // Create a quiz owned by user 1
   const quizId: number = requestQuizCreate(userId1.token, 'Quiz 1',
