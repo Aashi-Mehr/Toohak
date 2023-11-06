@@ -7,7 +7,7 @@
     Zhejun Gu (z5351573)
 
   Edited on:
-    25/10/2023
+    06/11/2023
   */
 
 /// ////////////////////////////////////////////////////////////////////////////
@@ -25,13 +25,15 @@ import {
   requestClear
 } from './testHelper';
 
+import HTTPError from 'http-errors';
+
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 
 // Clear the dataBase before each test to avoid data interference
 beforeEach(() => {
-  return requestClear();
+  requestClear();
 });
 
 // Test function : adminQuesMove
@@ -82,13 +84,21 @@ describe('adminQuesMove', () => {
       }
     ).questionId;
 
-    const result1 = requestQuesMove(userId.token, 1, 555, quizId);
-    const result2 = requestQuesMove(userId.token, -12, quesId1, quizId);
-    const result3 = requestQuesMove(userId.token, 3, quesId1, quizId);
+    expect(() => requestQuesMove(
+      userId.token, 1, 555, quizId
+    )).toThrow(HTTPError[400]);
 
-    expect(result1).toMatchObject({ error: expect.any(String) });
-    expect(result2).toMatchObject({ error: expect.any(String) });
-    expect(result3).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuesMove(
+      userId.token, -12, quesId1, quizId
+    )).toThrow(HTTPError[400]);
+
+    expect(() => requestQuesMove(
+      userId.token, 3, quesId1, quizId
+    )).toThrow(HTTPError[400]);
+
+    expect(() => requestQuesMove(
+      userId.token + 1024, 1, quesId1, quizId
+    )).toThrow(HTTPError[401]);
   });
 
   test('VALID INPUT', () => {
@@ -139,8 +149,9 @@ describe('adminQuesMove', () => {
       }
     ).questionId;
 
-    const result = requestQuesMove(userId.token, 1, quesId2, quizId + 1);
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuesMove(
+      userId.token, 1, quesId2, quizId + 1
+    )).toThrow(HTTPError[403]);
   });
 
   test('INVALID Unauthorised 403: Case 2', () => {
@@ -166,8 +177,9 @@ describe('adminQuesMove', () => {
       }
     ).questionId;
 
-    const result = requestQuesMove(user2.token, 1, quesId2, quizId);
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuesMove(
+      user2.token, 1, quesId2, quizId
+    )).toThrow(HTTPError[403]);
   });
 
   test('INVALID Unauthorised 401', () => {
@@ -192,8 +204,9 @@ describe('adminQuesMove', () => {
       }
     ).questionId;
 
-    const result = requestQuesMove(userId.token + 1, 1, quesId2, quizId);
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuesMove(
+      userId.token + 1, 1, quesId2, quizId
+    )).toThrow(HTTPError[401]);
   });
 });
 
@@ -248,11 +261,13 @@ describe('adminQuesDup', () => {
       }
     ).questionId;
 
-    const result1 = requestQuesDup(userId1.token, quizId, (quesId1 + 1));
-    const result3 = requestQuesDup(userId2.token, quizId, quesId1);
+    expect(() => requestQuesDup(
+      userId1.token, quizId, (quesId1 + 1)
+    )).toThrow(HTTPError[400]);
 
-    expect(result1).toMatchObject({ error: expect.any(String) });
-    expect(result3).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuesDup(
+      userId2.token, quizId, quesId1
+    )).toThrow(HTTPError[403]);
   });
 
   test('VALID INPUT', () => {
@@ -300,8 +315,9 @@ describe('adminQuesDup', () => {
       }
     ).questionId;
 
-    const result = requestQuesDup(userId1.token + 1, quizId, quesId2);
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuesDup(
+      userId1.token + 1, quizId, quesId2
+    )).toThrow(HTTPError[401]);
   });
 
   test('INVALID Unauthorised 403', () => {
@@ -326,8 +342,9 @@ describe('adminQuesDup', () => {
       }
     ).questionId;
 
-    const result = requestQuesDup(userId1.token, quizId + 1, quesId2);
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuesDup(
+      userId1.token, quizId + 1, quesId2
+    )).toThrow(HTTPError[403]);
   });
 
   test('INVALID Duration 400', () => {
@@ -352,7 +369,8 @@ describe('adminQuesDup', () => {
       }
     ).questionId;
 
-    const result = requestQuesDup(userId1.token, quizId, quesId2);
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuesDup(
+      userId1.token, quizId, quesId2
+    )).toThrow(HTTPError[400]);
   });
 });

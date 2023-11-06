@@ -6,6 +6,8 @@ import {
   requestQuizTransfer
 } from './testHelper';
 
+import HTTPError from 'http-errors';
+
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
@@ -77,8 +79,8 @@ describe('requestQuizTransfer', () => {
 
     test('successful transferred', () => {
       requestQuizTransfer(token1, quizId1, email2);
-      expect(requestQuizInfo(token1, quizId1)).toMatchObject(ERROR);
-      expect(requestQuizInfo(token2, quizId1)).not.toMatchObject(ERROR);
+      expect(() => requestQuizInfo(token1, quizId1)).toThrow(HTTPError[403]);
+      expect(() => requestQuizInfo(token2, quizId1)).not.toThrow(HTTPError[401]);
     });
   });
 });

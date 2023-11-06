@@ -153,6 +153,85 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
 }); */
 
 // ====================================================================
+//  ========================= QUIZ FUNCTIONS =========================
+// ====================================================================
+//  ========================== ITERATION 2 ===========================
+// ====================================================================
+
+/* // adminQuizList
+app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizList(token);
+
+  if ('error' in response) return res.status(401).json(response);
+  res.json(response);
+});
+
+// adminQuizInfo
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizInfo(token, quizId);
+
+  if ('error' in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    return res.status(403).json(response);
+  }
+  res.json(response);
+}); */
+
+// ====================================================================
+//  ========================= QUESTION FUNCTIONS =====================
+// ====================================================================
+//  ========================== ITERATION 2 ===========================
+// ====================================================================
+
+/* // adminQuestionMove
+app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
+  (req: Request, res: Response) => {
+    let { token, newPosition } = req.body;
+    const quesId = parseInt(req.params.questionid);
+    const quizId = parseInt(req.params.quizid);
+
+    token = parseInt(token);
+    newPosition = parseInt(newPosition);
+
+    const response = adminQuestionMove(token, newPosition, quesId, quizId);
+
+    if ('error' in response) {
+      if (response.error === token401) return res.status(401).json(response);
+      else if (response.error === unauth403) return res.status(403).json(response);
+      else return res.status(400).json(response);
+    }
+
+    res.json(response);
+    backupData();
+  });
+
+// adminQuestionDuplicate
+app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
+  (req: Request, res: Response) => {
+    const { token } = req.body;
+    const quiz = req.params.quizid;
+    const question = req.params.questionid;
+
+    const token1 = parseInt(token);
+    const quesId = parseInt(question);
+    const quizId = parseInt(quiz);
+
+    const response = adminQuestionDuplicate(token1, quesId, quizId);
+
+    if ('error' in response) {
+      if (response.error === token401) return res.status(401).json(response);
+      else if (response.error === unauth403) return res.status(403).json(response);
+      else return res.status(400).json(response);
+    }
+
+    res.json(response);
+    backupData();
+  }); */
+
+// ====================================================================
 //  ========================= AUTH FUNCTIONS =========================
 // ====================================================================
 //  ========================== ITERATION 3 ===========================
@@ -206,14 +285,13 @@ app.put('/v2/admin/user/password', (req: Request, res: Response) => {
 // ====================================================================
 //  ========================= QUIZ FUNCTIONS =========================
 // ====================================================================
+//  ========================== ITERATION 3 ===========================
+// ====================================================================
 
 // adminQuizList
-app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
-  const response = adminQuizList(token);
-
-  if ('error' in response) return res.status(401).json(response);
-  res.json(response);
+app.get('/v2/admin/quiz/list', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  res.json(adminQuizList(token));
 });
 
 // adminQuizCreate
@@ -255,16 +333,10 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
 });
 
 // adminQuizInfo
-app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
   const quizId = parseInt(req.params.quizid);
-  const token = parseInt(req.query.token as string);
-  const response = adminQuizInfo(token, quizId);
-
-  if ('error' in response) {
-    if (response.error === token401) return res.status(401).json(response);
-    return res.status(403).json(response);
-  }
-  res.json(response);
+  res.json(adminQuizInfo(token, quizId));
 });
 
 // adminQuizNameUpdate
@@ -350,7 +422,9 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
 });
 
 // ====================================================================
-//  ========================= QUESTION FUNCTIONS ======================
+//  ========================= QUESTION FUNCTIONS =====================
+// ====================================================================
+//  ========================== ITERATION 3 ===========================
 // ====================================================================
 
 // adminQuestionCreate
@@ -409,47 +483,27 @@ app.delete('/v1/admin/quiz/:quizid/question/:questionid',
   });
 
 // adminQuestionMove
-app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
+app.put('/v2/admin/quiz/:quizid/question/:questionid/move',
   (req: Request, res: Response) => {
-    let { token, newPosition } = req.body;
-    const quesId = parseInt(req.params.questionid);
     const quizId = parseInt(req.params.quizid);
+    const quesId = parseInt(req.params.questionid);
+    const token = parseInt(req.headers.token as string);
 
-    token = parseInt(token);
+    let { newPosition } = req.body;
     newPosition = parseInt(newPosition);
 
-    const response = adminQuestionMove(token, newPosition, quesId, quizId);
-
-    if ('error' in response) {
-      if (response.error === token401) return res.status(401).json(response);
-      else if (response.error === unauth403) return res.status(403).json(response);
-      else return res.status(400).json(response);
-    }
-
-    res.json(response);
+    res.json(adminQuestionMove(token, newPosition, quesId, quizId));
     backupData();
   });
 
 // adminQuestionDuplicate
-app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
+app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate',
   (req: Request, res: Response) => {
-    const { token } = req.body;
-    const quiz = req.params.quizid;
-    const question = req.params.questionid;
+    const quizId = parseInt(req.params.quizid as string);
+    const quesId = parseInt(req.params.questionid as string);
+    const token = parseInt(req.headers.token as string);
 
-    const token1 = parseInt(token);
-    const quesId = parseInt(question);
-    const quizId = parseInt(quiz);
-
-    const response = adminQuestionDuplicate(token1, quesId, quizId);
-
-    if ('error' in response) {
-      if (response.error === token401) return res.status(401).json(response);
-      else if (response.error === unauth403) return res.status(403).json(response);
-      else return res.status(400).json(response);
-    }
-
-    res.json(response);
+    res.json(adminQuestionDuplicate(token, quesId, quizId));
     backupData();
   });
 
