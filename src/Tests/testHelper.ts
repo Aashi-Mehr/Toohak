@@ -34,7 +34,7 @@ export function requestRegister(email: string, password: string,
   nameFirst: string, nameLast: string): Token {
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/auth/register',
+    SERVER_URL + '/v2/admin/auth/register',
     {
       json: {
         email: email,
@@ -58,7 +58,7 @@ export function requestRegister(email: string, password: string,
 export function requestLogin(email: string, password: string): Token {
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/auth/login',
+    SERVER_URL + '/v2/admin/auth/login',
     {
       json: {
         email: email,
