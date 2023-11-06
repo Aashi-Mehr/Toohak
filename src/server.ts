@@ -486,7 +486,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
     const quizId = parseInt(req.params.quizid);
     const quesId = parseInt(req.params.questionid);
     const token = parseInt(req.headers.token as string);
-    
+
     let { newPosition } = req.body;
     newPosition = parseInt(newPosition);
 
