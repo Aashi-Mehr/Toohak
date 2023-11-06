@@ -7,11 +7,8 @@
   Zhejun Gu (z5351573)
 
   Edited on:
-  20/10/2023
+  06/11/2023
   */
-
-import request from 'sync-request-curl';
-import { port, url } from '../config.json';
 
 import {
   ErrorObject,
@@ -25,25 +22,19 @@ import {
   requestQuizCreate,
   requestQuizList,
   requestQuizInfo,
-  requestQuizRemove
+  requestQuizRemove,
+  requestClear
 } from './testHelper';
 
-const SERVER_URL = `${url}:${port}`;
+import HTTPError from 'http-errors';
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 
-// Clear the dataBase before each test to avoid data interference
+// Clearing the datastore, so that the tests are independent of previous data
 beforeEach(() => {
-  const res = request(
-    'DELETE',
-    SERVER_URL + '/v1/clear',
-    {
-      qs: { }
-    }
-  );
-  return JSON.parse(res.body.toString());
+  requestClear();
 });
 
 // Test function : adminQuizList
@@ -53,18 +44,14 @@ describe('adminQuizList', () => {
   let quizId: number;
 
   test('INVALID User Id: Type of string or negative number', () => {
-    quiz = requestQuizList('123321');
-    expect(quiz).toMatchObject({ error: expect.any(String) });
-
-    quiz = requestQuizList(-1);
-    expect(quiz).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuizList('123321')).toThrow(HTTPError[401]);
+    expect(() => requestQuizList(-1)).toThrow(HTTPError[401]);
   });
 
   test('INVALID User Id: Not in the data base', () => {
-    userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first',
+    userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 
       'last');
-    quiz = requestQuizList(11);
-    expect(quiz).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuizList(11)).toThrow(HTTPError[401]);
   });
 
   test('VALID 1 Quiz', () => {
@@ -122,11 +109,8 @@ describe('adminQuizInfo', () => {
   let quizId: number;
 
   test('INVALID User Id: Not a number or out of range number', () => {
-    quiz = requestQuizInfo('12321', 1);
-    expect(quiz).toMatchObject({ error: expect.any(String) });
-
-    quiz = requestQuizInfo(-1, 1);
-    expect(quiz).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuizInfo('123321', 1)).toThrow(HTTPError[401]);
+    expect(() => requestQuizInfo(-1, 1)).toThrow(HTTPError[401]);
   });
 
   test('INVALID User Id: Invalid quizId or quizId not matching', () => {
@@ -134,12 +118,10 @@ describe('adminQuizInfo', () => {
     quizId = requestQuizCreate(1, 'first last', 'fist_test').quizId;
 
     // Quiz ID does not refer to a valid quiz
-    quiz = requestQuizInfo(1, -100);
-    expect(quiz).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuizInfo(1, 100)).toThrow(HTTPError[403]);
 
     // Quiz ID does not refer to a quiz that this user owns
-    quiz = requestQuizInfo(2, 2);
-    expect(quiz).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuizInfo(2, 2)).toThrow(HTTPError[403]);
   });
 
   test('INVALID User Id: UserId does not exist', () => {
@@ -147,8 +129,7 @@ describe('adminQuizInfo', () => {
     userId = requestRegister('firstlast@gmail.com', 'abcd1234', 'firs', 'last');
 
     // Correct format UserId but never is the Id being registered
-    quiz = requestQuizInfo(4, 1);
-    expect(quiz).toMatchObject({ error: expect.any(String) });
+    expect(() => requestQuizInfo(4, 1)).toThrow(HTTPError[401]);
   });
 
   test('Test Valid User and Quiz Ids', () => {
@@ -194,7 +175,8 @@ describe('adminQuizInfo', () => {
     userId = requestRegister('user1@gmail.com', 'C123321c', 'first', 'last');
     quizId = requestQuizCreate(userId.token, 'first last', '').quizId;
 
-    const quiz = requestQuizInfo(userId.token, quizId + 1);
-    expect(quiz).toStrictEqual({ error: expect.any(String) });
+    expect(() => requestQuizInfo(
+      userId.token, quizId + 1
+    )).toThrow(HTTPError[403]);
   });
 });
