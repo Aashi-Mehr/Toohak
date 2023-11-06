@@ -19,6 +19,11 @@ import {
 } from './dataStore';
 
 import HTTPError from 'http-errors';
+import crypto from 'crypto';
+
+function hash(plaintext: string) {
+  return crypto.createHash('sha256').update(plaintext).digest('hex').toString();
+}
 
 /** adminDetailsCheck
   * Checks email, password, and name then returns its validity
@@ -98,10 +103,10 @@ export function adminAuthRegister(email: string, password: string,
     nameLast: nameLast,
     name: nameFirst + ' ' + nameLast,
     email: email,
-    password: password,
+    password: hash(password),
     successful_log_time: 1,
     failed_password_num: 0,
-    prev_passwords: [password]
+    prev_passwords: [hash(password)]
   });
 
   data.sessions.push({
@@ -171,7 +176,7 @@ export function adminUserPasswordEdit(token: number, oldPass: string,
   if (!user) throw HTTPError(401, token401);
 
   // Return error message if the password entered does not match old password
-  if (user.password !== oldPass) throw HTTPError(400, oldPass400);
+  if (user.password !== hash(oldPass)) throw HTTPError(400, oldPass400);
 
   // Password needs to have letters and numbers, greater than 8 characters
   const hasLetter = /[a-zA-Z]/.test(newPass);
@@ -188,12 +193,12 @@ export function adminUserPasswordEdit(token: number, oldPass: string,
   // Loop through previous password and return error if the new password
   // is the same as the old password
   for (const pass of user.prev_passwords) {
-    if (newPass === pass) throw HTTPError(400, newPass400);
+    if (hash(newPass) === pass) throw HTTPError(400, newPass400);
   }
 
   // Push newPass into user details and set newPass to password
-  user.prev_passwords.push(newPass);
-  user.password = newPass;
+  user.prev_passwords.push(hash(newPass));
+  user.password = hash(newPass);
 
   return { };
 }
@@ -215,9 +220,9 @@ export function adminAuthLogin(email: string, password: string):
   for (const user of users) {
     // If the password is incorrect, but the email is correct, then attempts
     // need to be increased
-    if (user.email === email && user.password !== password) {
+    if (user.email === email && user.password !== hash(password)) {
       user.failed_password_num++;
-    } else if (user.email === email && user.password === password) {
+    } else if (user.email === email && user.password === hash(password)) {
       // Both the password and email are correct, so the user is logged-in
       user.failed_password_num = 0;
       user.successful_log_time++;
