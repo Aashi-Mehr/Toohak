@@ -483,45 +483,25 @@ app.delete('/v1/admin/quiz/:quizid/question/:questionid',
 // adminQuestionMove
 app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
   (req: Request, res: Response) => {
-    let { token, newPosition } = req.body;
-    const quesId = parseInt(req.params.questionid);
     const quizId = parseInt(req.params.quizid);
-
-    token = parseInt(token);
+    const quesId = parseInt(req.params.questionid);
+    const token = parseInt(req.headers.token as string);
+    
+    let { newPosition } = req.body;
     newPosition = parseInt(newPosition);
 
-    const response = adminQuestionMove(token, newPosition, quesId, quizId);
-
-    if ('error' in response) {
-      if (response.error === token401) return res.status(401).json(response);
-      else if (response.error === unauth403) return res.status(403).json(response);
-      else return res.status(400).json(response);
-    }
-
-    res.json(response);
+    res.json(adminQuestionMove(token, newPosition, quesId, quizId));
     backupData();
   });
 
 // adminQuestionDuplicate
 app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
   (req: Request, res: Response) => {
-    const { token } = req.body;
-    const quiz = req.params.quizid;
-    const question = req.params.questionid;
+    const quizId = parseInt(req.params.quizid as string);
+    const quesId = parseInt(req.params.questionid as string);
+    const token = parseInt(req.headers.token as string);
 
-    const token1 = parseInt(token);
-    const quesId = parseInt(question);
-    const quizId = parseInt(quiz);
-
-    const response = adminQuestionDuplicate(token1, quesId, quizId);
-
-    if ('error' in response) {
-      if (response.error === token401) return res.status(401).json(response);
-      else if (response.error === unauth403) return res.status(403).json(response);
-      else return res.status(400).json(response);
-    }
-
-    res.json(response);
+    res.json(adminQuestionDuplicate(token, quesId, quizId));
     backupData();
   });
 
