@@ -201,35 +201,35 @@ export function adminQuestionMove(token: number, newPosition: number,
   * @returns { ErrorObject } - If any input error exists
   */
 export function updateQuestion(token: number, quizId: number, quesId: number,
-  questionBody: Question): Record<string, never> {
+  questionBody: Question): ErrorObject | Record<string, never> {
   // Error Checking
   // Check if the user is valid
   const user = getUser(token, getData());
-  if (!user) throw HTTPError(401, token401);
+  if (!user) return { error: token401 };
 
   // Check if the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) throw HTTPError(403, unauth403);
+  if (!quiz) return { error: unauth403 };
 
   // Checking that the user owns the quiz
-  if (quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
+  if (quiz.authId !== user.authUserId) return { error: unauth403 };
 
   // Check if the question exists within the quiz
   let question: Question;
   for (const ques of quiz.questions) {
     if (ques.questionId === quesId) question = ques;
   }
-  if (!question) throw HTTPError(400, quesID400);
+  if (!question) return { error: quesID400 };
 
   const valid = validQuestionBody(questionBody);
-  if (valid.error) throw HTTPError(400, valid.error);
+  if (valid.error) return valid;
 
   // Sum of the question durations in the quiz exceeds 3 minutes
   let durationSum = questionBody.duration;
   for (const ques of quiz.questions) {
     if (ques.questionId !== quesId) durationSum += ques.duration;
   }
-  if (durationSum > 180) throw HTTPError(400, quizDur400);
+  if (durationSum > 180) return { error: quizDur400 };
 
   // No errors occur, so update the question
   question.question = questionBody.question;
@@ -289,30 +289,30 @@ export function deleteQuestion(token: number, quizId: number, quesId: number):
   * @returns { ErrorObject } - If any input error exists
   */
 export function adminQuestionDuplicate(token: number, quesId: number,
-  quizId: number): QuestionId | ErrorObject {
+  quizId: number): QuestionId {
   // Get data from database, ensure the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Ensuring the user exists with a valid token
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Ensuring the user owns the quiz
-  if (user.authUserId !== quiz.authId) return { error: unauth403 };
+  if (user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);
 
   // Get the question asked for moving, esnuring it exists
   let currQues: Question;
   for (const question of quiz.questions) {
     if (question.questionId === quesId) currQues = question;
   }
-  if (!currQues) return { error: quesID400 };
+  if (!currQues) throw HTTPError(400, quesID400);
 
   let durationSum = currQues.duration;
   for (const ques of quiz.questions) {
     durationSum += ques.duration;
   }
-  if (durationSum > 180) return { error: quizDur400 };
+  if (durationSum > 180) throw HTTPError(400, quizDur400);
 
   const newId = getUniqueID(getData());
   quiz.questions.push({

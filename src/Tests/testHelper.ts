@@ -369,7 +369,7 @@ export function requestQuesMove(token: number | string, newPosition: number,
 
 // QUESTION Duplicate Define wrapper function
 export function requestQuesDup(token: number, quizid: number,
-  questionid: number): ErrorObject {
+  questionid: number): QuestionId {
   const res = request(
     'POST',
     `${SERVER_URL}/v2/admin/quiz/${quizid}/question/${questionid}/duplicate`,

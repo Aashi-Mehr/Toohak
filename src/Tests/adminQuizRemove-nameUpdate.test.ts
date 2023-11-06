@@ -8,6 +8,8 @@ import {
   requestQuizInfo
 } from './testHelper';
 
+import HTTPError from 'http-errors';
+
 // Clear the database before each test to avoid data interference
 beforeEach(() => {
   requestClear();
@@ -52,9 +54,9 @@ describe('adminQuizRemove', () => {
     expect(requestQuizList(token.token)).toMatchObject({
       quizzes: []
     });
-    expect(requestQuizInfo(token.token, quizId.quizId)).toMatchObject({
-      error: expect.any(String)
-    });
+    expect(() => requestQuizInfo(
+      token.token, quizId.quizId
+    )).toThrow(HTTPError[403]);
   });
 });
 
