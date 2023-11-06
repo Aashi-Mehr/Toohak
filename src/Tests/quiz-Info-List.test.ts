@@ -49,7 +49,7 @@ describe('adminQuizList', () => {
   });
 
   test('INVALID User Id: Not in the data base', () => {
-    userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 
+    userId = requestRegister('first.last1@gmail.com', 'abcd1234', 'first',
       'last');
     expect(() => requestQuizList(11)).toThrow(HTTPError[401]);
   });
@@ -118,10 +118,10 @@ describe('adminQuizInfo', () => {
     quizId = requestQuizCreate(1, 'first last', 'fist_test').quizId;
 
     // Quiz ID does not refer to a valid quiz
-    expect(() => requestQuizInfo(1, 100)).toThrow(HTTPError[403]);
+    expect(() => requestQuizInfo(1, 100)).toThrow(HTTPError[401]);
 
     // Quiz ID does not refer to a quiz that this user owns
-    expect(() => requestQuizInfo(2, 2)).toThrow(HTTPError[403]);
+    expect(() => requestQuizInfo(2, 2)).toThrow(HTTPError[401]);
   });
 
   test('INVALID User Id: UserId does not exist', () => {

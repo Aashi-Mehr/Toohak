@@ -226,7 +226,7 @@ export function requestQuizList(token: number | string): QuizList {
       }
     }
   );
-    
+
   const result = JSON.parse(res.body.toString());
 
   if (res.statusCode !== 200) {
@@ -344,33 +344,49 @@ export function requestQuizRestore(token: number, quizId: number):
 
 // QUESTION MOVE Define wrapper function
 export function requestQuesMove(token: number | string, newPosition: number,
-  quesId: number, quizId: number): ErrorObject | Record<string, never> {
+  quesId: number, quizId: number): Record<string, never> {
   const res = request(
     'PUT',
-    `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}/move`,
+    `${SERVER_URL}/v2/admin/quiz/${quizId}/question/${quesId}/move`,
     {
       json: {
-        token: token,
         newPosition: newPosition
+      },
+      headers: {
+        token: token.toString()
       }
     }
   );
-  return JSON.parse(res.body.toString());
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // QUESTION Duplicate Define wrapper function
 export function requestQuesDup(token: number, quizid: number,
-  questionid: number): QuestionId | ErrorObject {
+  questionid: number): ErrorObject {
   const res = request(
     'POST',
-    `${SERVER_URL}/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`,
+    `${SERVER_URL}/v2/admin/quiz/${quizid}/question/${questionid}/duplicate`,
     {
-      json: {
-        token: token
+      headers: {
+        token: token.toString()
       }
     }
   );
-  return JSON.parse(res.body.toString());
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // QUESTION Update Define wrapper function

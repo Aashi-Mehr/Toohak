@@ -422,7 +422,9 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
 });
 
 // ====================================================================
-//  ========================= QUESTION FUNCTIONS ======================
+//  ========================= QUESTION FUNCTIONS =====================
+// ====================================================================
+//  ========================== ITERATION 3 ===========================
 // ====================================================================
 
 // adminQuestionCreate
@@ -481,7 +483,7 @@ app.delete('/v1/admin/quiz/:quizid/question/:questionid',
   });
 
 // adminQuestionMove
-app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
+app.put('/v2/admin/quiz/:quizid/question/:questionid/move',
   (req: Request, res: Response) => {
     const quizId = parseInt(req.params.quizid);
     const quesId = parseInt(req.params.questionid);
@@ -495,7 +497,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
   });
 
 // adminQuestionDuplicate
-app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
+app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate',
   (req: Request, res: Response) => {
     const quizId = parseInt(req.params.quizid as string);
     const quesId = parseInt(req.params.questionid as string);
