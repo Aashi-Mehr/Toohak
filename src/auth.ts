@@ -21,7 +21,14 @@ import {
 import HTTPError from 'http-errors';
 import crypto from 'crypto';
 
-function hash(plaintext: string) {
+/** hash
+  * Returns the hash of a given string (sha256 and hex)
+  *
+  * @param { string } plaintext - The string to hash
+  *
+  * @returns { string } - All cases
+  */
+function hash(plaintext: string): string {
   return crypto.createHash('sha256').update(plaintext).digest('hex').toString();
 }
 
