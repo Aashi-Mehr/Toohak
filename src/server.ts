@@ -67,7 +67,7 @@ const HOST: string = process.env.IP || 'localhost';
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
 // Used after every put, post, delete routes to keep data.json updated
-function backupData(req: Request, res: Response, response: any) {
+function backupData() {
   fs.writeFileSync('data.json', JSON.stringify(getData()));
 }
 
@@ -88,7 +88,7 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminAuthLogin
@@ -98,56 +98,38 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminUserDetails
-app.get('/v1/admin/user/details', (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
-  const response = adminUserDetails(token);
-
-  if ('error' in response) return res.status(401).json(response);
-  res.json(response);
+app.get('/v2/admin/user/details', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  res.json(adminUserDetails(token));
 });
 
 // adminAuthLogout
-app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
-  const token = parseInt(req.body.token);
-  const response = adminAuthLogout(token);
-
-  if ('error' in response) return res.status(401).json(response);
-  res.json(response);
-  backupData(req, res, response);
+app.post('/v2/admin/auth/logout', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  res.json(adminAuthLogout(token));
+  backupData();
 });
 
 // adminUserDetailsEdit
-app.put('/v1/admin/user/details', (req: Request, res: Response) => {
-  const { token, email, nameFirst, nameLast } = req.body;
-  const response = adminUserDetailsEdit(parseInt(token), email,
-    nameFirst, nameLast);
+app.put('/v2/admin/user/details', (req: Request, res: Response) => {
+  const { email, nameFirst, nameLast } = req.body;
+  const token = parseInt(req.headers.token as string);
 
-  if ('error' in response) {
-    if (response.error === token401) return res.status(401).json(response);
-    return res.status(400).json(response);
-  }
-
-  res.json(response);
-  backupData(req, res, response);
+  res.json(adminUserDetailsEdit(token, email, nameFirst, nameLast));
+  backupData();
 });
 
 // adminUserPasswordEdit
-app.put('/v1/admin/user/password', (req: Request, res: Response) => {
-  const { token, oldPassword, newPassword } = req.body;
-  const response = adminUserPasswordEdit(parseInt(token), oldPassword,
-    newPassword);
+app.put('/v2/admin/user/password', (req: Request, res: Response) => {
+  const { oldPassword, newPassword } = req.body;
+  const token = parseInt(req.headers.token as string);
 
-  if ('error' in response) {
-    if (response.error === token401) return res.status(401).json(response);
-    return res.status(400).json(response);
-  }
-
-  res.json(response);
-  backupData(req, res, response);
+  res.json(adminUserPasswordEdit(token, oldPassword, newPassword));
+  backupData();
 });
 
 // ====================================================================
@@ -174,7 +156,7 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizTrash
@@ -198,7 +180,7 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizInfo
@@ -227,7 +209,7 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizDescriptionUpdate
@@ -244,7 +226,7 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizTransfer
@@ -261,7 +243,7 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizRestore
@@ -277,7 +259,7 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizEmptyTrash
@@ -293,7 +275,7 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // ====================================================================
@@ -313,7 +295,7 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizUpdateQuestion
@@ -333,7 +315,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid',
     }
 
     res.json(response);
-    backupData(req, res, response);
+    backupData();
   });
 
 // adminQuizDeleteQuestion
@@ -352,7 +334,7 @@ app.delete('/v1/admin/quiz/:quizid/question/:questionid',
     }
 
     res.json(response);
-    backupData(req, res, response);
+    backupData();
   });
 
 // adminQuestionMove
@@ -374,7 +356,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
     }
 
     res.json(response);
-    backupData(req, res, response);
+    backupData();
   });
 
 // adminQuestionDuplicate
@@ -397,7 +379,7 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
     }
 
     res.json(response);
-    backupData(req, res, response);
+    backupData();
   });
 
 // ====================================================================
@@ -409,7 +391,7 @@ app.delete('/v1/clear', (req: Request, res: Response) => {
   const response = clear();
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // ====================================================================
@@ -446,6 +428,6 @@ const server = app.listen(PORT, HOST, () => {
 
 // For coverage, handle Ctrl+C gracefully
 process.on('SIGINT', () => {
-  backupData(null, null, null);
+  backupData();
   server.close(() => console.log('Shutting down server gracefully.'));
 });
