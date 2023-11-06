@@ -185,11 +185,11 @@ describe('VALID Details', () => {
       'Val1dPassword', 'first', 'last');
     const authId2 = authRegisterResult2.token;
 
-    const authRegisterResult3 = requestRegister('validEmail2@gmail.com',
+    const authRegisterResult3 = requestRegister('validEmail3@gmail.com',
       'Val1dPassword', 'first', 'last');
     const authId3 = authRegisterResult3.token;
 
-    const authRegisterResult4 = requestRegister('validEmail2@gmail.com',
+    const authRegisterResult4 = requestRegister('validEmail4@gmail.com',
       'Val1dPassword', 'first', 'last');
     const authId4 = authRegisterResult4.token;
 

@@ -18,6 +18,20 @@ import {
   token401
 } from './dataStore';
 
+import HTTPError from 'http-errors';
+import crypto from 'crypto';
+
+/** hash
+  * Returns the hash of a given string (sha256 and hex)
+  *
+  * @param { string } plaintext - The string to hash
+  *
+  * @returns { string } - All cases
+  */
+function hash(plaintext: string): string {
+  return crypto.createHash('sha256').update(plaintext).digest('hex').toString();
+}
+
 /** adminDetailsCheck
   * Checks email, password, and name then returns its validity
   *
@@ -79,9 +93,9 @@ function detailsCheck(email: string, password: string,
   * @returns { ErrorObject } - If the details are invalid
   */
 export function adminAuthRegister(email: string, password: string,
-  nameFirst: string, nameLast: string): Token | ErrorObject {
+  nameFirst: string, nameLast: string): Token {
   const valid = detailsCheck(email, password, nameFirst, nameLast);
-  if ('error' in valid) return valid;
+  if ('error' in valid) throw HTTPError(400, valid.error);
 
   const data = getData();
 
@@ -96,10 +110,10 @@ export function adminAuthRegister(email: string, password: string,
     nameLast: nameLast,
     name: nameFirst + ' ' + nameLast,
     email: email,
-    password: password,
+    password: hash(password),
     successful_log_time: 1,
     failed_password_num: 0,
-    prev_passwords: [password]
+    prev_passwords: [hash(password)]
   });
 
   data.sessions.push({
@@ -120,14 +134,13 @@ export function adminAuthRegister(email: string, password: string,
   * @param { string } nameLast - The new last name
   *
   * @returns { Record<string, never> } - If the deails are valid
-  * @returns { ErrorObject } - If the details are invalid
   */
 export function adminUserDetailsEdit(token: number, email: string,
-  nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
+  nameFirst: string, nameLast: string): Record<string, never> {
   // Get user details
   const user = getUser(token, getData());
   // If the token is invalid, return error
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Get user details
   const users = getData().users;
@@ -138,7 +151,7 @@ export function adminUserDetailsEdit(token: number, email: string,
   const valid = detailsCheck(email, user.password, nameFirst, nameLast);
   if ('error' in valid) {
     users.push(user);
-    return valid;
+    throw HTTPError(400, valid.error);
   }
 
   // ALTERING DATA If no error, push the new user and return the token
@@ -159,39 +172,40 @@ export function adminUserDetailsEdit(token: number, email: string,
   * @param { number } newPass - The new first name
   *
   * @returns { Record<string, never> } - If the deails are valid
-  * @returns { ErrorObject } - If the details are invalid
   */
 export function adminUserPasswordEdit(token: number, oldPass: string,
-  newPass: string): ErrorObject | Record<string, never> {
+  newPass: string): Record<string, never> {
   // ERROR CHECKING
   // Ensuring the user is valid
   const user = getUser(token, getData());
 
   // Return error message if token is invalid
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Return error message if the password entered does not match old password
-  if (user.password !== oldPass) return { error: oldPass400 };
+  if (user.password !== hash(oldPass)) throw HTTPError(400, oldPass400);
 
   // Password needs to have letters and numbers, greater than 8 characters
   const hasLetter = /[a-zA-Z]/.test(newPass);
   const hasNumber = /\d/.test(newPass);
 
   // Return error if password does not contain letters
-  if (hasLetter === false || hasNumber === false) return { error: passChar400 };
+  if (hasLetter === false || hasNumber === false) {
+    throw HTTPError(400, passChar400);
+  }
 
   // Return error if password is less than 8 characters
-  if (newPass.length < 8) return { error: passLen400 };
+  if (newPass.length < 8) throw HTTPError(400, passLen400);
 
   // Loop through previous password and return error if the new password
   // is the same as the old password
   for (const pass of user.prev_passwords) {
-    if (newPass === pass) return { error: newPass400 };
+    if (hash(newPass) === pass) throw HTTPError(400, newPass400);
   }
 
   // Push newPass into user details and set newPass to password
-  user.prev_passwords.push(newPass);
-  user.password = newPass;
+  user.prev_passwords.push(hash(newPass));
+  user.password = hash(newPass);
 
   return { };
 }
@@ -213,9 +227,9 @@ export function adminAuthLogin(email: string, password: string):
   for (const user of users) {
     // If the password is incorrect, but the email is correct, then attempts
     // need to be increased
-    if (user.email === email && user.password !== password) {
+    if (user.email === email && user.password !== hash(password)) {
       user.failed_password_num++;
-    } else if (user.email === email && user.password === password) {
+    } else if (user.email === email && user.password === hash(password)) {
       // Both the password and email are correct, so the user is logged-in
       user.failed_password_num = 0;
       user.successful_log_time++;
@@ -235,7 +249,7 @@ export function adminAuthLogin(email: string, password: string):
 
   // If all of the above code ran, but the token wasn't returned, then the
   // details were incorrect
-  return { error: passInv400 };
+  throw HTTPError(400, passInv400);
 }
 
 /** adminUserDetails
@@ -244,13 +258,12 @@ export function adminAuthLogin(email: string, password: string):
   * @param { number } token - The user's session token
   *
   * @returns { Details } - If the token is valid
-  * @returns { ErrorObject } - If the token is invalid
   */
-export function adminUserDetails(token: number): Details | ErrorObject {
+export function adminUserDetails(token: number): Details {
   // Finds the user using the token, undefined is returned if not found
   const user = getUser(token, getData());
   // Return error if token is invalid
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Return the user's details
   return {
@@ -273,13 +286,12 @@ export function adminUserDetails(token: number): Details | ErrorObject {
   * @returns { Record<string, never> } - If the token is valid
   * @returns { ErrorObject } - If the token is invalid
   */
-export function adminAuthLogout(token: number):
-  ErrorObject | Record<string, never> {
+export function adminAuthLogout(token: number): Record<string, never> {
   // Finds the user using the token, undefined is returned if not found
   const session = getSession(token, getData().sessions);
 
   // If session is not valid or exist
-  if (!session) return { error: token401 };
+  if (!session) throw HTTPError(401, token401);
 
   // Set the validity of session to be false
   session.is_valid = false;

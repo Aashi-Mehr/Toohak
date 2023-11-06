@@ -67,7 +67,7 @@ const HOST: string = process.env.IP || 'localhost';
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
 // Used after every put, post, delete routes to keep data.json updated
-function backupData(req: Request, res: Response, response: any) {
+function backupData() {
   fs.writeFileSync('data.json', JSON.stringify(getData()));
 }
 
@@ -80,15 +80,17 @@ app.get('/echo', (req: Request, res: Response) => {
 // ====================================================================
 //  ========================= AUTH FUNCTIONS =========================
 // ====================================================================
+//  ========================== ITERATION 2 ===========================
+// ====================================================================
 
-// adminAuthRegister
+/* // adminAuthRegister
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   const { email, password, nameFirst, nameLast } = req.body;
   const response = adminAuthRegister(email, password, nameFirst, nameLast);
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminAuthLogin
@@ -98,7 +100,7 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
 
   if ('error' in response) return res.status(400).json(response);
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminUserDetails
@@ -117,7 +119,7 @@ app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
 
   if ('error' in response) return res.status(401).json(response);
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminUserDetailsEdit
@@ -132,7 +134,7 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminUserPasswordEdit
@@ -148,6 +150,57 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
 
   res.json(response);
   backupData(req, res, response);
+}); */
+
+// ====================================================================
+//  ========================= AUTH FUNCTIONS =========================
+// ====================================================================
+//  ========================== ITERATION 3 ===========================
+// ====================================================================
+
+// adminAuthRegister
+app.post('/v2/admin/auth/register', (req: Request, res: Response) => {
+  const { email, password, nameFirst, nameLast } = req.body;
+  res.json(adminAuthRegister(email, password, nameFirst, nameLast));
+  backupData();
+});
+
+// adminAuthLogin
+app.post('/v2/admin/auth/login', (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  res.json(adminAuthLogin(email, password));
+  backupData();
+});
+
+// adminUserDetails
+app.get('/v2/admin/user/details', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  res.json(adminUserDetails(token));
+});
+
+// adminAuthLogout
+app.post('/v2/admin/auth/logout', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  res.json(adminAuthLogout(token));
+  backupData();
+});
+
+// adminUserDetailsEdit
+app.put('/v2/admin/user/details', (req: Request, res: Response) => {
+  const { email, nameFirst, nameLast } = req.body;
+  const token = parseInt(req.headers.token as string);
+
+  res.json(adminUserDetailsEdit(token, email, nameFirst, nameLast));
+  backupData();
+});
+
+// adminUserPasswordEdit
+app.put('/v2/admin/user/password', (req: Request, res: Response) => {
+  const { oldPassword, newPassword } = req.body;
+  const token = parseInt(req.headers.token as string);
+
+  res.json(adminUserPasswordEdit(token, oldPassword, newPassword));
+  backupData();
 });
 
 // ====================================================================
@@ -174,7 +227,7 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizTrash
@@ -198,7 +251,7 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizInfo
@@ -227,7 +280,7 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizDescriptionUpdate
@@ -244,7 +297,7 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizTransfer
@@ -261,7 +314,7 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizRestore
@@ -277,7 +330,7 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizEmptyTrash
@@ -293,7 +346,7 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // ====================================================================
@@ -313,7 +366,7 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   }
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // adminQuizUpdateQuestion
@@ -333,7 +386,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid',
     }
 
     res.json(response);
-    backupData(req, res, response);
+    backupData();
   });
 
 // adminQuizDeleteQuestion
@@ -352,7 +405,7 @@ app.delete('/v1/admin/quiz/:quizid/question/:questionid',
     }
 
     res.json(response);
-    backupData(req, res, response);
+    backupData();
   });
 
 // adminQuestionMove
@@ -374,7 +427,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
     }
 
     res.json(response);
-    backupData(req, res, response);
+    backupData();
   });
 
 // adminQuestionDuplicate
@@ -397,7 +450,7 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
     }
 
     res.json(response);
-    backupData(req, res, response);
+    backupData();
   });
 
 // ====================================================================
@@ -409,7 +462,7 @@ app.delete('/v1/clear', (req: Request, res: Response) => {
   const response = clear();
 
   res.json(response);
-  backupData(req, res, response);
+  backupData();
 });
 
 // ====================================================================
@@ -446,6 +499,6 @@ const server = app.listen(PORT, HOST, () => {
 
 // For coverage, handle Ctrl+C gracefully
 process.on('SIGINT', () => {
-  backupData(null, null, null);
+  backupData();
   server.close(() => console.log('Shutting down server gracefully.'));
 });

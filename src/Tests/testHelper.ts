@@ -1,6 +1,8 @@
 
+import HTTPError from 'http-errors';
 import request from 'sync-request-curl';
 import { port, url } from '../config.json';
+
 import {
   Token,
   QuizId,
@@ -32,7 +34,7 @@ export function requestRegister(email: string, password: string,
   nameFirst: string, nameLast: string): Token {
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/auth/register',
+    SERVER_URL + '/v2/admin/auth/register',
     {
       json: {
         email: email,
@@ -45,15 +47,18 @@ export function requestRegister(email: string, password: string,
 
   const result = JSON.parse(res.body.toString());
 
-  if ('error' in result) return { token: -1 };
-  else return result;
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // POST LOGIN Define wrapper function
 export function requestLogin(email: string, password: string): Token {
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/auth/login',
+    SERVER_URL + '/v2/admin/auth/login',
     {
       json: {
         email: email,
@@ -64,21 +69,32 @@ export function requestLogin(email: string, password: string): Token {
 
   const result = JSON.parse(res.body.toString());
 
-  if ('error' in result) return { token: -1 };
-  else return result;
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // GET DETAILS Define wrapper function
 export function requestDetails(token: number): Details | ErrorObject {
   const res = request(
     'GET',
-    SERVER_URL + '/v1/admin/user/details?token=' + token,
+    SERVER_URL + '/v2/admin/user/details',
     {
-      qs: { }
+      headers: {
+        token: token.toString()
+      }
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // POST LOGOUT Define wrapper function
@@ -86,15 +102,21 @@ export function requestLogout(token: number):
   ErrorObject | Record<string, never> {
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/auth/logout',
+    SERVER_URL + '/v2/admin/auth/logout',
     {
-      json: {
-        token: token,
+      headers: {
+        token: token.toString(),
       }
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // PUT EDIT DETAILS Define wrapper function
@@ -102,18 +124,26 @@ export function requestDetailsEdit(token: number, email: string,
   nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
   const res = request(
     'PUT',
-    SERVER_URL + '/v1/admin/user/details',
+    SERVER_URL + '/v2/admin/user/details',
     {
       json: {
-        token: token,
         email: email,
         nameFirst: nameFirst,
         nameLast: nameLast
+      },
+      headers: {
+        token: token.toString()
       }
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // PUT EDIT PASSWORD Define wrapper function
@@ -121,17 +151,25 @@ export function requestPasswordEdit(token: number, oldPass: string,
   newPass: string): ErrorObject | Record<string, never> {
   const res = request(
     'PUT',
-    SERVER_URL + '/v1/admin/user/password',
+    SERVER_URL + '/v2/admin/user/password',
     {
       json: {
-        token: token,
         oldPassword: oldPass,
         newPassword: newPass
+      },
+      headers: {
+        token: token.toString()
       }
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // POST QUIZ CREATE Define wrapper function
