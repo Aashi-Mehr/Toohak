@@ -1,6 +1,8 @@
 
+import HTTPError from 'http-errors';
 import request from 'sync-request-curl';
 import { port, url } from '../config.json';
+
 import {
   Token,
   QuizId,
@@ -28,11 +30,11 @@ export function requestClear() {
 }
 
 // POST REGISTER Define wrapper function
-export function requestRegister(email: string, password: string, nameFirst: string,
-  nameLast: string): Token {
+export function requestRegister(email: string, password: string,
+  nameFirst: string, nameLast: string): Token {
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/auth/register',
+    SERVER_URL + '/v2/admin/auth/register',
     {
       json: {
         email: email,
@@ -45,15 +47,18 @@ export function requestRegister(email: string, password: string, nameFirst: stri
 
   const result = JSON.parse(res.body.toString());
 
-  if ('error' in result) return { token: -1 };
-  else return result;
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // POST LOGIN Define wrapper function
 export function requestLogin(email: string, password: string): Token {
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/auth/login',
+    SERVER_URL + '/v2/admin/auth/login',
     {
       json: {
         email: email,
@@ -64,73 +69,107 @@ export function requestLogin(email: string, password: string): Token {
 
   const result = JSON.parse(res.body.toString());
 
-  if ('error' in result) return { token: -1 };
-  else return result;
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // GET DETAILS Define wrapper function
 export function requestDetails(token: number): Details | ErrorObject {
   const res = request(
     'GET',
-    SERVER_URL + '/v1/admin/user/details?token=' + token,
+    SERVER_URL + '/v2/admin/user/details',
     {
-      qs: { }
+      headers: {
+        token: token.toString()
+      }
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // POST LOGOUT Define wrapper function
-export function requestLogout(token: number): ErrorObject | Record<string, never> {
+export function requestLogout(token: number):
+  ErrorObject | Record<string, never> {
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/auth/logout',
+    SERVER_URL + '/v2/admin/auth/logout',
     {
-      json: {
-        token: token,
+      headers: {
+        token: token.toString(),
       }
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // PUT EDIT DETAILS Define wrapper function
-export function requestDetailsEdit(token: number, email: string, nameFirst: string,
-  nameLast: string): ErrorObject | Record<string, never> {
+export function requestDetailsEdit(token: number, email: string,
+  nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
   const res = request(
     'PUT',
-    SERVER_URL + '/v1/admin/user/details',
+    SERVER_URL + '/v2/admin/user/details',
     {
       json: {
-        token: token,
         email: email,
         nameFirst: nameFirst,
         nameLast: nameLast
+      },
+      headers: {
+        token: token.toString()
       }
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // PUT EDIT PASSWORD Define wrapper function
-export function requestPasswordEdit(token: number, oldPass: string, newPass: string):
-  ErrorObject | Record<string, never> {
+export function requestPasswordEdit(token: number, oldPass: string,
+  newPass: string): ErrorObject | Record<string, never> {
   const res = request(
     'PUT',
-    SERVER_URL + '/v1/admin/user/password',
+    SERVER_URL + '/v2/admin/user/password',
     {
       json: {
-        token: token,
         oldPassword: oldPass,
         newPassword: newPass
+      },
+      headers: {
+        token: token.toString()
       }
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // POST QUIZ CREATE Define wrapper function
@@ -159,27 +198,42 @@ export function requestQuizInfo(token: number | string, quizId: number):
   QuizInfo {
   const res = request(
     'GET',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '?token=' + token,
+    SERVER_URL + '/v2/admin/quiz/' + quizId + '?token=' + token,
     {
-      qs: { }
+      headers: {
+        token: token.toString()
+      }
     }
   );
-  return JSON.parse(res.body.toString());
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // GET QUIZ LIST Define wrapper function
-export function requestQuizList(token: number | string): QuizList | ErrorObject {
+export function requestQuizList(token: number | string): QuizList {
   const res = request(
     'GET',
-    SERVER_URL + '/v1/admin/quiz/list?token=' + token,
+    SERVER_URL + '/v2/admin/quiz/list?token=' + token,
     {
-      qs: {}
+      headers: {
+        token: token.toString()
+      }
     }
   );
-  const result = JSON.parse(res.body as string);
 
-  if ('error' in result) return { error: 'error' };
-  else return result;
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // PUT QUIZ DESCRIPTION UODATE Define Wrapper Function
@@ -244,7 +298,8 @@ export function requestQuestionCreate(token: number | string,
   return JSON.parse(res.body.toString());
 }
 
-export function requestQuizTransfer(token: number | string, quizId: number, userEmail: string) {
+export function requestQuizTransfer(token: number | string, quizId: number,
+  userEmail: string) {
   const res = request(
     'POST',
     SERVER_URL + '/v1/admin/quiz/' + quizId + '/transfer',
@@ -289,33 +344,49 @@ export function requestQuizRestore(token: number, quizId: number):
 
 // QUESTION MOVE Define wrapper function
 export function requestQuesMove(token: number | string, newPosition: number,
-  quesId: number, quizId: number): ErrorObject | Record<string, never> {
+  quesId: number, quizId: number): Record<string, never> {
   const res = request(
     'PUT',
-    `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}/move`,
+    `${SERVER_URL}/v2/admin/quiz/${quizId}/question/${quesId}/move`,
     {
       json: {
-        token: token,
         newPosition: newPosition
+      },
+      headers: {
+        token: token.toString()
       }
     }
   );
-  return JSON.parse(res.body.toString());
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // QUESTION Duplicate Define wrapper function
 export function requestQuesDup(token: number, quizid: number,
-  questionid: number): QuestionId | ErrorObject {
+  questionid: number): QuestionId {
   const res = request(
     'POST',
-    `${SERVER_URL}/v1/admin/quiz/${quizid}/question/${questionid}/duplicate`,
+    `${SERVER_URL}/v2/admin/quiz/${quizid}/question/${questionid}/duplicate`,
     {
-      json: {
-        token: token
+      headers: {
+        token: token.toString()
       }
     }
   );
-  return JSON.parse(res.body.toString());
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // QUESTION Update Define wrapper function
@@ -336,8 +407,8 @@ export function requestQuesUpdate(token: number, quizId: number, quesId: number,
 }
 
 // QUESTION Update Define wrapper function
-export function requestQuesDelete(token: number, quizId: number, quesId: number):
-  ErrorObject | Record<string, never> {
+export function requestQuesDelete(token: number, quizId: number,
+  quesId: number): ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
     `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}?token=${token}`,
@@ -354,7 +425,8 @@ export function requestQuizEmptyTrash(token: number, quizId: number[]):
   ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
-    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId + ']&token=' + token,
+    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId +
+      ']&token=' + token,
     {
       qs: { }
     }

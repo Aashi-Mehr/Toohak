@@ -14,6 +14,8 @@ import {
   requestClear
 } from './testHelper';
 
+import HTTPError from 'http-errors';
+
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
@@ -29,72 +31,62 @@ describe('adminAuthRegister', () => {
   // Error checking
   test('INVALID Password: No numbers', () => {
     // Password must contain numbers
-    result = requestRegister('first.last1@gmail.com', 'invalidpassword',
-      'first', 'last');
-    expect(result.token).toStrictEqual(-1);
+    expect(() => requestRegister('first.last1@gmail.com', 'invalidpassword',
+      'first', 'last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Password: No letters', () => {
     // Password must contain letters
-    result = requestRegister('first.last2@gmail.com', '123456789', 'first',
-      'last');
-    expect(result.token).toStrictEqual(-1);
+    expect(() => requestRegister('first.last2@gmail.com', '123456789', 'first',
+      'last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Password: Less than 8 characters', () => {
     // Password must be greater than or equal to 8 characters
-    result = requestRegister('first.last3@gmail.com', 'acb123', 'first',
-      'last');
-    expect(result.token).toStrictEqual(-1);
+    expect(() => requestRegister('first.last3@gmail.com', 'acb123', 'first',
+      'last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Name: First name contains numbers', () => {
     // Name cannot have non-letter, non-space, non-spostrophe characters
-    result = requestRegister('first.last4@gmail.com', 'Val1dPassword',
-      '1nval1d first', 'last');
-    expect(result.token).toStrictEqual(-1);
+    expect(() => requestRegister('first.last4@gmail.com', 'Val1dPassword',
+      '1nval1d first', 'last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Name: Last name contains numbers', () => {
     // Name cannot have non-letter, non-space, non-spostrophe characters
-    result = requestRegister('first.last5@gmail.com', 'Val1dPassword',
-      'first', '1nval1d last');
-    expect(result.token).toStrictEqual(-1);
+    expect(() => requestRegister('first.last5@gmail.com', 'Val1dPassword',
+      'first', '1nval1d last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Name: First name less than 2 characters', () => {
     // Name must be between 2 and 20 characters
-    result = requestRegister('first.last6@gmail.com', 'Val1dPassword', 'a',
-      'last');
-    expect(result.token).toStrictEqual(-1);
+    expect(() => requestRegister('first.last6@gmail.com', 'Val1dPassword', 'a',
+      'last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Name: Last name less than 2 characters', () => {
     // Name must be between 2 and 20 characters
-    result = requestRegister('first.last9@gmail.com', 'Val1dPassword',
-      'first', 'a');
-    expect(result.token).toStrictEqual(-1);
+    expect(() => requestRegister('first.last9@gmail.com', 'Val1dPassword',
+      'first', 'a')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Name: First name more than 20 characters', () => {
     // Name must be between 2 and 20 characters
-    result = requestRegister('first.last7@gmail.com', 'Val1dPassword',
-      'abcdefghijklmnopqrstuvwxyz', 'last');
-    expect(result.token).toStrictEqual(-1);
+    expect(() => requestRegister('first.last7@gmail.com', 'Val1dPassword',
+      'abcdefghijklmnopqrstuvwxyz', 'last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Name: Last name more than 20 characters', () => {
     // Name must be between 2 and 20 characters
-    result = requestRegister('first.last8@gmail.com', 'Val1dPassword', 'a',
-      'abcdefghijklmnopqrstuvwxyz');
-    expect(result.token).toStrictEqual(-1);
+    expect(() => requestRegister('first.last8@gmail.com', 'Val1dPassword', 'a',
+      'abcdefghijklmnopqrstuvwxyz')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Email: Does not satisfy validator.isEmail function', () => {
     // Email must satisfy validator
-    result = requestRegister('first..last@email', 'Val1dPassword',
-      'first', 'last');
-    expect(result.token).toStrictEqual(-1);
+    expect(() => requestRegister('first..last@email', 'Val1dPassword',
+      'first', 'last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Email: Used by another user', () => {
@@ -102,9 +94,8 @@ describe('adminAuthRegister', () => {
     requestRegister('first.last@gmail.com', 'Val1dPassword', 'first',
       'last');
 
-    result = requestRegister('first.last@gmail.com', 'Val1dPassword',
-      'firstName', 'lastName');
-    expect(result.token).toStrictEqual(-1);
+    expect(() => requestRegister('first.last@gmail.com', 'Val1dPassword',
+      'firstName', 'lastName')).toThrow(HTTPError[400]);
   });
 
   test('VALID Registration: Case 1', () => {
@@ -154,44 +145,49 @@ describe('adminAuthLogin', () => {
 
   test('INVALID Email: Case 1', () => {
     // Email does not exist
-    result = requestLogin('nonexisting@gmail.com', 'Val1dPassword');
-    expect(result).toMatchObject({ token: -1 });
+    expect(() => requestLogin(
+      'nonexisting@gmail.com', 'Val1dPassword'
+    )).toThrow(HTTPError[400]);
   });
 
   test('INVALID Email: Case 2', () => {
     // Email is empty
-    result = requestLogin('', 'Val1dPassword');
-    expect(result).toMatchObject({ token: -1 });
+    expect(() => requestLogin('', 'Val1dPassword')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Password: Case 1', () => {
     requestRegister('first.last1@gmail.com', 'Val1dPassword1', 'first', 'last');
-    result = requestLogin('first.last1@gmail.com', 'Val1dPasswoord');
-    expect(result).toMatchObject({ token: -1 });
+    expect(() => requestLogin(
+      'first.last1@gmail.com', 'Val1dPasswoord'
+    )).toThrow(HTTPError[400]);
   });
 
   test('INVALID Password: Case 2', () => {
     requestRegister('first.last2@gmail.com', 'Val1dPassword2', 'first', 'last');
-    result = requestLogin('first.last2@gmail.com', 'Val1dPasswoord');
-    expect(result).toMatchObject({ token: -1 });
+    expect(() => requestLogin(
+      'first.last2@gmail.com', 'Val1dPasswoord'
+    )).toThrow(HTTPError[400]);
   });
 
   test('INVALID Password: Case 3', () => {
     requestRegister('first.last3@gmail.com', 'Val1dPassword3', 'first', 'last');
-    result = requestLogin('first.last3@gmail.com', 'Val1dPasswoord');
-    expect(result).toMatchObject({ token: -1 });
+    expect(() => requestLogin(
+      'first.last3@gmail.com', 'Val1dPasswoord'
+    )).toThrow(HTTPError[400]);
   });
 
   test('INVALID Password: Case 4', () => {
     requestRegister('first.last4@gmail.com', 'Val1dPassword4', 'first', 'last');
-    result = requestLogin('first.last4@gmail.com', 'Val1dPasswoord');
-    expect(result).toMatchObject({ token: -1 });
+    expect(() => requestLogin(
+      'first.last4@gmail.com', 'Val1dPasswoord'
+    )).toThrow(HTTPError[400]);
   });
 
   test('INVALID Password: Case 5', () => {
     requestRegister('first.last4@gmail.com', 'Val1dPassword4', 'first', 'last');
-    result = requestLogin('first.last4@gmail.com', '');
-    expect(result).toMatchObject({ token: -1 });
+    expect(() => requestLogin(
+      'first.last4@gmail.com', ''
+    )).toThrow(HTTPError[400]);
   });
 
   test('VALID Details: Case 1', () => {
@@ -225,15 +221,14 @@ describe('adminUserDetails', () => {
 
   test('INVALID token: Out of the possible range', () => {
     // Tokens must be positive, non-null integers
-    expect(requestDetails(0)).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetails(0)).toThrow(HTTPError[401]);
   });
 
   test('INVALID token: Incorrect ID', () => {
     // Testing cases where the token doesn't refer to a valid user
     token = requestRegister('first.last@gmail.com', 'Val1dPassword', 'first',
       'last').token;
-    result = requestDetails(token + 1);
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetails(token + 1)).toThrow(HTTPError[401]);
   });
 
   test('VALID token: Simple Case 1', () => {
@@ -248,7 +243,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last1@gmail.com',
-        numSuccessfulLogins: 0,
+        numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
@@ -266,7 +261,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last2@gmail.com',
-        numSuccessfulLogins: 0,
+        numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
@@ -284,7 +279,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last3@gmail.com',
-        numSuccessfulLogins: 0,
+        numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
@@ -302,7 +297,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last4@gmail.com',
-        numSuccessfulLogins: 0,
+        numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
@@ -320,7 +315,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last1@gmail.com',
-        numSuccessfulLogins: 1,
+        numSuccessfulLogins: 2,
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
@@ -330,7 +325,10 @@ describe('adminUserDetails', () => {
     // Valid case, failed login attempts must increase
     requestRegister('first.last1@gmail.com', 'Val1dPassword1', 'first', 'last');
     token = requestLogin('first.last1@gmail.com', 'Val1dPassword1').token;
-    requestLogin('first.last1@gmail.com', 'INVal1dPassword1');
+
+    expect(() => requestLogin(
+      'first.last1@gmail.com', 'INVal1dPassword1')
+    ).toThrow(HTTPError[400]);
 
     result = requestDetails(token);
     expect(result).toMatchObject({
@@ -339,7 +337,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last1@gmail.com',
-        numSuccessfulLogins: 1,
+        numSuccessfulLogins: 2,
         numFailedPasswordsSinceLastLogin: 1,
       }
     });
@@ -349,8 +347,14 @@ describe('adminUserDetails', () => {
     // Adding more logins
     requestRegister('first.last1@gmail.com', 'Val1dPassword1', 'first', 'last');
     token = requestLogin('first.last1@gmail.com', 'Val1dPassword1').token;
-    requestLogin('first.last1@gmail.com', 'INVal1dPassword1');
-    requestLogin('first.last1@gmail.com', 'INVal1dPassword1');
+
+    expect(() => requestLogin(
+      'first.last1@gmail.com', 'INVal1dPassword1')
+    ).toThrow(HTTPError[400]);
+
+    expect(() => requestLogin(
+      'first.last1@gmail.com', 'INVal1dPassword1')
+    ).toThrow(HTTPError[400]);
 
     result = requestDetails(token);
     expect(result).toMatchObject({
@@ -359,7 +363,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last1@gmail.com',
-        numSuccessfulLogins: 1,
+        numSuccessfulLogins: 2,
         numFailedPasswordsSinceLastLogin: 2,
       }
     });
@@ -370,8 +374,15 @@ describe('adminUserDetails', () => {
     // Failed logins should reset after a successful login
     requestRegister('first.last1@gmail.com', 'Val1dPassword1', 'first', 'last');
     requestLogin('first.last1@gmail.com', 'Val1dPassword1');
-    requestLogin('first.last1@gmail.com', 'INVal1dPassword1');
-    requestLogin('first.last1@gmail.com', 'INVal1dPassword1');
+
+    expect(() => requestLogin(
+      'first.last1@gmail.com', 'INVal1dPassword1')
+    ).toThrow(HTTPError[400]);
+
+    expect(() => requestLogin(
+      'first.last1@gmail.com', 'INVal1dPassword1')
+    ).toThrow(HTTPError[400]);
+
     token = requestLogin('first.last1@gmail.com', 'Val1dPassword1').token;
 
     result = requestDetails(token);
@@ -381,7 +392,7 @@ describe('adminUserDetails', () => {
         userId: expect.any(Number),
         name: 'first last',
         email: 'first.last1@gmail.com',
-        numSuccessfulLogins: 2,
+        numSuccessfulLogins: 3,
         numFailedPasswordsSinceLastLogin: 0,
       }
     });
@@ -394,16 +405,14 @@ describe('adminAuthLogout', () => {
 
   test('INVALID Token: Doesn\'t Exist', () => {
     // Logging out a token that doesn't exist
-    token = requestRegister('first.last1@gmail.com', 'invalidpassword',
+    token = requestRegister('first.last1@gmail.com', 'Val1dPassword',
       'first', 'last').token;
-    result = requestLogout(token + 1);
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestLogout(token + 1)).toThrow(HTTPError[401]);
   });
 
   test('INVALID Token: Outside valid range', () => {
     // Logging out a token that's outside the valid range
-    result = requestLogout(0);
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestLogout(0)).toThrow(HTTPError[401]);
   });
 
   test('INVALID Token: Already Logged Out', () => {
@@ -411,8 +420,7 @@ describe('adminAuthLogout', () => {
     token = requestRegister('first.last1@gmail.com', 'Val1dPassword',
       'first', 'last').token;
     requestLogout(token);
-    result = requestLogout(token);
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestLogout(token)).toThrow(HTTPError[401]);
   });
 
   test('VALID Token: Simple Case 1', () => {
@@ -422,8 +430,7 @@ describe('adminAuthLogout', () => {
     result = requestLogout(token);
     expect(Object.keys(result).length).toStrictEqual(0);
 
-    const info = requestDetails(token);
-    expect(info).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetails(token)).toThrow(HTTPError[401]);
   });
 
   test('VALID Token: Simple Case 2', () => {
@@ -433,8 +440,7 @@ describe('adminAuthLogout', () => {
     result = requestLogout(token);
     expect(Object.keys(result).length).toStrictEqual(0);
 
-    const info = requestDetails(token);
-    expect(info).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetails(token)).toThrow(HTTPError[401]);
   });
 
   test('VALID Token: Simple Case 3', () => {
@@ -444,8 +450,7 @@ describe('adminAuthLogout', () => {
     result = requestLogout(token);
     expect(Object.keys(result).length).toStrictEqual(0);
 
-    const info = requestDetails(token);
-    expect(info).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetails(token)).toThrow(HTTPError[401]);
   });
 
   test('VALID Token: Complex Case 1', () => {
@@ -488,61 +493,54 @@ describe('adminUserDetailsEdit', () => {
   });
 
   test('INVALID token: Out of the possible range', () => {
-    result = requestDetailsEdit(0, 'hayden.smith@unsw.edu.au', 'Hayden',
-      'Smith');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetailsEdit(0, 'hayden.smith@unsw.edu.au', 'Hayden',
+      'Smith')).toThrow(HTTPError[401]);
   });
 
   test('INVALID token: Incorrect ID', () => {
-    result = requestDetailsEdit(token + 1, 'hayden.smith@unsw.edu.au', 'Hayden',
-      'Smith');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetailsEdit(token + 1, 'hayden.smith@unsw.edu.au',
+      'Hayden', 'Smith')).toThrow(HTTPError[401]);
   });
 
   test('INVALID Name: First name contains numbers', () => {
-    result = requestDetailsEdit(token, 'first.last4@gmail.com', '1nval1d first',
-      'last');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetailsEdit(token, 'first.last4@gmail.com',
+      '1nval1d first', 'last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Name: Last name contains numbers', () => {
-    result = requestDetailsEdit(token, 'first.last5@gmail.com', 'first',
-      '1nval1d last');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetailsEdit(token, 'first.last5@gmail.com', 'first',
+      '1nval1d last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Name: First name less than 2 characters', () => {
-    result = requestDetailsEdit(token, 'first.last6@gmail.com', 'a', 'last');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetailsEdit(token, 'first.last6@gmail.com', 'a',
+      'last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Name: Last name less than 2 characters', () => {
-    result = requestDetailsEdit(token, 'first.last9@gmail.com', 'first', 'a');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetailsEdit(token, 'first.last9@gmail.com', 'first',
+      'a')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Name: First name more than 20 characters', () => {
-    result = requestDetailsEdit(token, 'first.last7@gmail.com',
-      'abcdefghijklmnopqrstuvwxyz', 'last');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetailsEdit(token, 'first.last7@gmail.com',
+      'abcdefghijklmnopqrstuvwxyz', 'last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Name: Last name more than 20 characters', () => {
-    result = requestDetailsEdit(token, 'first.last8@gmail.com', 'a',
-      'abcdefghijklmnopqrstuvwxyz');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetailsEdit(token, 'first.last8@gmail.com', 'a',
+      'abcdefghijklmnopqrstuvwxyz')).toThrow(HTTPError[400]);
   });
 
   test('INVALID Email: Does not satisfy validator.isEmail function', () => {
-    result = requestDetailsEdit(token, 'first..last@email',
-      'first', 'last');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetailsEdit(token, 'first..last@email',
+      'first', 'last')).toThrow(HTTPError[400]);
   });
 
   test('INVALID details: Email already exists', () => {
     requestRegister('first.last2@gmail.com', 'Val1dPassword1', 'first', 'last');
-    result = requestDetailsEdit(token, 'first.last2@gmail.com', 'firs', 'last');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestDetailsEdit(token, 'first.last2@gmail.com', 'firs',
+      'last')).toThrow(HTTPError[400]);
   });
 
   test('VALID token: Simple Case 1', () => {
@@ -589,46 +587,64 @@ describe('adminUserPasswordEdit', () => {
   });
 
   test('INVALID token: Out of the possible range', () => {
-    result = requestPasswordEdit(0, 'Val1dPassword', 'NewVal1dPassword');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestPasswordEdit(
+      0, 'Val1dPassword', 'NewVal1dPassword'
+    )).toThrow(HTTPError[401]);
   });
 
   test('INVALID token: Incorrect ID', () => {
-    result = requestPasswordEdit(token + 1, 'Val1dPassword', 'NewVal1dPass');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestPasswordEdit(
+      token + 1, 'Val1dPassword', 'NewVal1dPass'
+    )).toThrow(HTTPError[401]);
   });
 
   test('INVALID Password: No numbers', () => {
-    result = requestPasswordEdit(token, 'Val1dPassword', 'newpassword');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestPasswordEdit(
+      token, 'Val1dPassword', 'newpassword'
+    )).toThrow(HTTPError[400]);
   });
 
   test('INVALID Password: No letters', () => {
-    result = requestPasswordEdit(token, 'Val1dPassword', '1234567890');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestPasswordEdit(
+      token, 'Val1dPassword', '1234567890'
+    )).toThrow(HTTPError[400]);
   });
 
   test('INVALID Password: Less than 8 characters', () => {
-    result = requestPasswordEdit(token, 'Val1dPassword', 'newpass');
-    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(() => requestPasswordEdit(
+      token, 'Val1dPassword', 'newp0ss'
+    )).toThrow(HTTPError[400]);
   });
 
   test('INVALID Password: Not changed', () => {
     requestPasswordEdit(token, 'Val1dPassword', 'NewVal1dPass');
-    result = requestPasswordEdit(token, 'NewVal1dPass', 'Val1dPassword');
-    expect(result).toMatchObject({ error: expect.any(String) });
+
+    expect(() => requestPasswordEdit(
+      token, 'NewVal1dPass', 'Val1dPassword'
+    )).toThrow(HTTPError[400]);
   });
 
   test('INVALID Password: Used before', () => {
     requestPasswordEdit(token, 'Val1dPassword', 'newpass123');
     requestPasswordEdit(token, 'newpass123', 'newnewpass123');
-    result = requestPasswordEdit(token, 'newnewpass123', 'Val1dPassword');
-    expect(result).toMatchObject({ error: expect.any(String) });
+
+    expect(() => requestPasswordEdit(
+      token, 'newnewpass123', 'Val1dPassword'
+    )).toThrow(HTTPError[400]);
+  });
+
+  test('INVALID Password: Given old password is wrong', () => {
+    expect(() => requestPasswordEdit(
+      token, 'Val0dPassword', 'NewVal1dPass'
+    )).toThrow(HTTPError[400]);
   });
 
   test('VALID token: Simple Case 1', () => {
     result = requestPasswordEdit(token, 'Val1dPassword', 'NewVal1dPass');
     expect(Object.keys(result).length).toStrictEqual(0);
+
+    const result2 = requestLogin('first.last@gmail.com', 'NewVal1dPass');
+    expect(result2).toMatchObject({ token: expect.any(Number) });
   });
 
   test('VALID token: Simple Case 2', () => {
@@ -636,6 +652,9 @@ describe('adminUserPasswordEdit', () => {
       'Val1dPassword2', 'first', 'last').token;
     result = requestPasswordEdit(token, 'Val1dPassword2', 'NEWVal1dPassword2');
     expect(Object.keys(result).length).toStrictEqual(0);
+
+    const result2 = requestLogin('first.last2@gmail.com', 'NEWVal1dPassword2');
+    expect(result2).toMatchObject({ token: expect.any(Number) });
   });
 
   test('VALID token: Simple Case 3', () => {

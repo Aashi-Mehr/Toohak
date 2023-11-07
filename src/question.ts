@@ -9,16 +9,80 @@ import {
   getUniqueID,
   getUser,
   getQuiz,
+  unauth403,
+  token401,
+  quesLen400,
+  ansNum400,
+  quesDur400,
+  quizDur400,
+  quesPoints400,
+  ansLen400,
+  ansDup400,
+  ansInc400,
+  quesID400,
+  quesPos400
 } from './dataStore';
 
+import HTTPError from 'http-errors';
+
 const COLOUR = ['red', 'blue', 'green', 'yellow', 'purple', 'brown', 'orange'];
+
+/** validQuestionBody
+  * Checks if a question body is valid
+  *
+  * @param { QuestionBody } questionBody - The question
+  *
+  * @returns { boolean } - If the token and the inputs is valid
+  */
+function validQuestionBody(questionBody: QuestionBody):
+  ErrorObject {
+  // Question is not within 5 and 50 characters in length
+  if (questionBody.question.length < 5 || questionBody.question.length > 50) {
+    return { error: quesLen400 };
+  }
+
+  // The question has more than 6 answers or less than 2 answers
+  if (questionBody.answers.length < 2 || questionBody.answers.length > 6) {
+    return { error: ansNum400 };
+  }
+
+  // The question duration is not a positive number
+  if (questionBody.duration <= 0) return { error: quesDur400 };
+
+  // The points awarded for the question are less than 1 or greater than 10
+  if (questionBody.points < 1 || questionBody.points > 10) {
+    return { error: quesPoints400 };
+  }
+
+  // The length of any answer is shorter than 1 character long, or longer than
+  // 30 characters long
+  // There are no correct answers
+  let correct = false;
+  for (const answer of questionBody.answers) {
+    if (answer.correct === true) correct = true;
+    if (answer.answer.length < 1 || answer.answer.length > 30) {
+      return { error: ansLen400 };
+    }
+  }
+  if (!correct) return { error: ansInc400 };
+
+  // Any answer strings are duplicates of one another (within the same question)
+  for (let i = 0; i < questionBody.answers.length; i++) {
+    const isEqual = (an: Answer) => an.answer === questionBody.answers[i].answer;
+    const firstInstance = questionBody.answers.findIndex(isEqual);
+    if (firstInstance !== i) return { error: ansDup400 };
+  }
+
+  // This will mean that no errors occur
+  return { error: '' };
+}
 
 /** adminQuestionCreate
   * Create a question for a given quiz
   *
   * @param { number } token - The token for the suer session
   * @param { number } quizId - The id for the quiz
-  * @param { number } questionBody - The question
+  * @param { QuestionBody } questionBody - The question
   *
   * @returns { QuestionId } - If the token and the inputs is valid
   * @returns { ErrorObject } - If the token or the inputs is invalid
@@ -29,69 +93,19 @@ export function adminQuestionCreate(token: number, quizId: number,
 
   // Checking if the user exists
   const user = getUser(token, data);
-  if (!user) {
-    return {
-      error: 'Token is empty or invalid (does not refer to ' +
-    'valid logged in user session)'
-    };
-  }
+  if (!user) return { error: token401 };
 
+  // Checking if user owns the quiz
   const quiz = getQuiz(quizId, data.quizzes);
-  if (!quiz) return { error: 'Quiz is not owned by user' };
+  if (!quiz) return { error: unauth403 };
+  if (quiz.authId !== user.authUserId) return { error: unauth403 };
 
-  if (quiz.authId !== user.authUserId) {
-    return {
-      error: 'Valid token is ' +
-    'provided, but user is not an owner of this quiz'
-    };
-  }
+  const valid = validQuestionBody(questionBody);
+  if (valid.error) { return valid; }
 
-  if (questionBody.question.length < 5 || questionBody.question.length > 50) {
-    return {
-      error: 'Question string is less than 5 characters in length or ' +
-      'greater than 50 characters in length'
-    };
-  } else if (questionBody.answers.length < 2 ||
-             questionBody.answers.length > 6) {
-    return { error: 'The question has more than 6 or less than 2 answers' };
-  } else if (questionBody.duration < 0) {
-    return { error: 'The question duration is not a positive number' };
-  }
-  let duration = 0;
-  for (const question of quiz.questions) {
-    duration += question.duration;
-  }
-  duration += questionBody.duration;
-  if (duration > 180) {
-    return {
-      error: 'The sum of the question durations in the quiz exceeds ' +
-      '3 minutes'
-    };
-  }
-  if (questionBody.points < 1 || questionBody.points > 10) {
-    return {
-      error: 'The points awarded for the question are less than 1 or ' +
-      'greater than 10'
-    };
-  }
-  const existedAnswers: string[] = [];
-  for (const answer of questionBody.answers) {
-    if (answer.answer.length < 1 || answer.answer.length > 30) {
-      return {
-        error: 'The length of any answer is shorter than 1 character ' +
-        'long, or longer than 30 characters long'
-      };
-    } else if (existedAnswers.includes(answer.answer)) {
-      return {
-        error: 'Any answer strings are duplicates of one another ' +
-        '(within the same question)'
-      };
-    }
-    existedAnswers.push(answer.answer);
-  }
-  if (!questionBody.answers.some(answer => answer.correct === true)) {
-    return { error: 'There are no correct answers' };
-  }
+  let durationSum = questionBody.duration;
+  for (const ques of quiz.questions) durationSum += ques.duration;
+  if (durationSum > 180) return { error: quizDur400 };
 
   const answers: Answer[] = [];
   for (const answer of questionBody.answers) {
@@ -136,24 +150,15 @@ export function adminQuestionCreate(token: number, quizId: number,
   * @returns { ErrorObject } - If any input error exists
   */
 export function adminQuestionMove(token: number, newPosition: number,
-  quesId: number, quizId: number): ErrorObject | Record<string, never> {
+  quesId: number, quizId: number): Record<string, never> {
   // Get data from database
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: 'Quiz ID is invalid' };
+  if (!quiz) throw HTTPError(403, unauth403);
 
+  // Ensuring the user owns the quiz
   const user = getUser(token, getData());
-  if (!user) {
-    return {
-      error: 'Token is empty or invalid (does not refer to valid logged in ' +
-             'user session)'
-    };
-  }
-
-  if (user.authUserId !== quiz.authId) {
-    return {
-      error: 'Valid token is provided, but user is not an owner of this quiz'
-    };
-  }
+  if (!user) throw HTTPError(401, token401);
+  if (user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);
 
   // Get the question asked for moving
   let currQues: Question;
@@ -166,10 +171,9 @@ export function adminQuestionMove(token: number, newPosition: number,
   }
 
   // Error check
-  if (!currQues) return { error: 'Ques ID is invalid' };
-  if (newPosition < 0 || newPosition > quiz.questions.length) {
-    return { error: 'New Postion is invalid' };
-  }
+  if (!currQues) throw HTTPError(400, quesID400);
+  if (newPosition < 0 || newPosition > quiz.questions.length ||
+      newPosition === currPos) throw HTTPError(400, quesPos400);
 
   // Get the question at the new position
   const swithedQues = quiz.questions[newPosition];
@@ -201,76 +205,31 @@ export function updateQuestion(token: number, quizId: number, quesId: number,
   // Error Checking
   // Check if the user is valid
   const user = getUser(token, getData());
-  if (!user) {
-    return {
-      error: 'Token is empty or invalid (does not refer to ' +
-             'valid logged in user session)'
-    };
-  }
+  if (!user) return { error: token401 };
 
   // Check if the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: 'Invalid quiz ID' };
+  if (!quiz) return { error: unauth403 };
 
   // Checking that the user owns the quiz
-  if (quiz.authId !== user.authUserId) {
-    return {
-      error: 'Valid token is provided, but user is unauthorised'
-    };
-  }
+  if (quiz.authId !== user.authUserId) return { error: unauth403 };
 
   // Check if the question exists within the quiz
   let question: Question;
   for (const ques of quiz.questions) {
     if (ques.questionId === quesId) question = ques;
   }
-  if (!question) return { error: 'Question Id is invalid within this quiz' };
+  if (!question) return { error: quesID400 };
 
-  // Question is not within 5 and 50 characters in length
-  if (questionBody.question.length < 5 || questionBody.question.length > 50) {
-    return { error: 'Invalid question length' };
-  }
-
-  // The question has more than 6 answers or less than 2 answers
-  if (questionBody.answers.length < 2 || questionBody.answers.length > 6) {
-    return { error: 'Invalid number of answers' };
-  }
-
-  // The question duration is not a positive number
-  if (questionBody.duration <= 0) {
-    return { error: 'The question duration is not a positive number' };
-  }
+  const valid = validQuestionBody(questionBody);
+  if (valid.error) return valid;
 
   // Sum of the question durations in the quiz exceeds 3 minutes
   let durationSum = questionBody.duration;
   for (const ques of quiz.questions) {
     if (ques.questionId !== quesId) durationSum += ques.duration;
   }
-  if (durationSum > 180) return { error: 'The total duration is too long' };
-
-  // The points awarded for the question are less than 1 or greater than 10
-  if (questionBody.points < 1 || questionBody.points > 10) {
-    return { error: 'Points are invalid' };
-  }
-
-  // The length of any answer is shorter than 1 character long, or longer than
-  // 30 characters long
-  // There are no correct answers
-  let correct = false;
-  for (const answer of questionBody.answers) {
-    if (answer.correct === true) correct = true;
-    if (answer.answer.length < 1 || answer.answer.length > 30) {
-      return { error: 'Answers are too long/short' };
-    }
-  }
-  if (!correct) return { error: 'No correct answer' };
-
-  // Any answer strings are duplicates of one another (within the same question)
-  for (let i = 0; i < questionBody.answers.length; i++) {
-    const isEqual = (an: Answer) => an.answer === questionBody.answers[i].answer;
-    const firstInstance = questionBody.answers.findIndex(isEqual);
-    if (firstInstance !== i) return { error: 'Answers are duplicated' };
-  }
+  if (durationSum > 180) return { error: quizDur400 };
 
   // No errors occur, so update the question
   question.question = questionBody.question;
@@ -299,23 +258,14 @@ export function deleteQuestion(token: number, quizId: number, quesId: number):
   // Error Checking
   // Check if the user is valid
   const user = getUser(token, getData());
-  if (!user) {
-    return {
-      error: 'Token is empty or invalid (does not refer to ' +
-             'valid logged in user session)'
-    };
-  }
+  if (!user) return { error: token401 };
 
   // Check if the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: 'Invalid quiz ID' };
+  if (!quiz) return { error: unauth403 };
 
   // Checking that the user owns the quiz
-  if (quiz.authId !== user.authUserId) {
-    return {
-      error: 'Valid token is provided, but user is unauthorised'
-    };
-  }
+  if (quiz.authId !== user.authUserId) return { error: unauth403 };
 
   // Check if the question exists within the quiz
   for (const ques of quiz.questions) {
@@ -325,7 +275,7 @@ export function deleteQuestion(token: number, quizId: number, quesId: number):
     }
   }
 
-  return { error: 'Question Id is invalid within this quiz' };
+  return { error: quesID400 };
 }
 
 /** adminQuesDup
@@ -339,33 +289,30 @@ export function deleteQuestion(token: number, quizId: number, quesId: number):
   * @returns { ErrorObject } - If any input error exists
   */
 export function adminQuestionDuplicate(token: number, quesId: number,
-  quizId: number): QuestionId | ErrorObject {
+  quizId: number): QuestionId {
   // Get data from database, ensure the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: 'Quiz ID is invalid' };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Ensuring the user exists with a valid token
   const user = getUser(token, getData());
-  if (!user) {
-    return {
-      error: 'Token is empty or invalid (does not refer to valid logged in ' +
-             'user session)'
-    };
-  }
+  if (!user) throw HTTPError(401, token401);
 
   // Ensuring the user owns the quiz
-  if (user.authUserId !== quiz.authId) {
-    return {
-      error: 'Valid token is provided, but user is not an owner of this quiz'
-    };
-  }
+  if (user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);
 
   // Get the question asked for moving, esnuring it exists
   let currQues: Question;
   for (const question of quiz.questions) {
     if (question.questionId === quesId) currQues = question;
   }
-  if (!currQues) return { error: 'Ques ID is invalid' };
+  if (!currQues) throw HTTPError(400, quesID400);
+
+  let durationSum = currQues.duration;
+  for (const ques of quiz.questions) {
+    durationSum += ques.duration;
+  }
+  if (durationSum > 180) throw HTTPError(400, quizDur400);
 
   const newId = getUniqueID(getData());
   quiz.questions.push({

@@ -20,11 +20,17 @@ beforeEach(() => {
 // Test 401 : Invalid AuthUserId Format
 test('Test Invalid AuthUserId Format', () => {
   // authUserId is empty
-  let result = requestQuizEmptyTrash(0, [11, 90, 700]);
+  const token = requestRegister('v@gmail.com', 'Val1Pass', 'fir', 'las').token;
+  const quizId1 = requestQuizCreate(token, 'Quiz 1', '').quizId;
+  const quizId2 = requestQuizCreate(token, 'Quiz 2', '').quizId;
+  requestQuizRemove(token, quizId1);
+  requestQuizRemove(token, quizId2);
+
+  let result = requestQuizEmptyTrash(0, [quizId1, quizId2]);
   expect(result).toMatchObject({ error: expect.any(String) });
 
   // authUserId contains out of range number
-  result = requestQuizEmptyTrash(-1, [11]);
+  result = requestQuizEmptyTrash(-1, [quizId1, quizId2]);
   expect(result).toMatchObject({ error: expect.any(String) });
 });
 
@@ -96,10 +102,10 @@ test('Test Restored Quiz Not In Trash', () => {
 // Test 403 : Valid token but user is not the owner of the quiz
 test('Quiz ID does not owned by user', () => {
   // Register a user
-  const userId1: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+  const userId1: Token = requestRegister('validEmail1@gmail.com', 'Val1dPass',
     'first', 'last');
   // Register another user
-  const userId2: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+  const userId2: Token = requestRegister('validEmail2@gmail.com', 'Val1dPass',
     'first', 'last');
   // Create a quiz owned by user 1
   const quizId: number = requestQuizCreate(userId1.token, 'Quiz 1',
