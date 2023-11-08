@@ -8,6 +8,8 @@ import {
   requestQuizInfo
 } from './testHelper';
 
+import HTTPError from 'http-errors';
+
 // Clear the database before each test to avoid data interference
 beforeEach(() => {
   requestClear();
@@ -22,6 +24,25 @@ describe('adminQuizRemove', () => {
     expect(result3).toMatchObject({ error: expect.any(String) });
   });
 
+  test('Invalid Quiz', () => {
+    // INVALID Unauthorised 400
+    const token = requestRegister('user@gmail.com', 'password1', 'John', 'Doe');
+    const quizId = requestQuizCreate(token.token, 'New Quiz', 'Description');
+
+    const result3 = requestQuizRemove(token.token, quizId.quizId + 1);
+    expect(result3).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('Invalid Token Authorisation', () => {
+    // INVALID Unauthorised 400
+    const token = requestRegister('user@gmail.com', 'password1', 'John', 'Doe');
+    const t2 = requestRegister('jd@gmail.com', 'Val1dPas', 'Joe', 'Doe').token;
+    const quizId = requestQuizCreate(token.token, 'New Quiz', 'Description');
+
+    const result3 = requestQuizRemove(t2, quizId.quizId);
+    expect(result3).toMatchObject({ error: expect.any(String) });
+  });
+
   test('Valid User and Quiz IDs', () => {
     // Register a user and create a quiz
     const token = requestRegister('user@gmail.com', 'password1', 'John', 'Doe');
@@ -33,9 +54,9 @@ describe('adminQuizRemove', () => {
     expect(requestQuizList(token.token)).toMatchObject({
       quizzes: []
     });
-    expect(requestQuizInfo(token.token, quizId.quizId)).toMatchObject({
-      error: expect.any(String)
-    });
+    expect(() => requestQuizInfo(
+      token.token, quizId.quizId
+    )).toThrow(HTTPError[403]);
   });
 });
 
@@ -46,6 +67,36 @@ describe('adminQuizNameUpdate', () => {
     // Test with user ID out of range
     const result = requestQuizNameUpdate(1, 0, 'New Quiz Name');
     expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('Invalid Quiz', () => {
+    // INVALID Unauthorised 400
+    const token = requestRegister('user@gmail.com', 'password1', 'John', 'Doe');
+    const quizId = requestQuizCreate(token.token, 'New Quiz', 'Description');
+
+    const result3 = requestQuizNameUpdate(token.token, quizId.quizId + 1, 'New');
+    expect(result3).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('Invalid Token Authorisation', () => {
+    // INVALID Unauthorised 400
+    const token = requestRegister('user@gmail.com', 'password1', 'John', 'Doe');
+    const t2 = requestRegister('jd@gmail.com', 'Val1dPas', 'Joe', 'Doe').token;
+    const quizId = requestQuizCreate(token.token, 'New Quiz', 'Description');
+
+    const result3 = requestQuizNameUpdate(t2, quizId.quizId, 'New');
+    expect(result3).toMatchObject({ error: expect.any(String) });
+  });
+
+  test('Invalid Token Authorisation', () => {
+    // INVALID Unauthorised 400
+    const t2 = requestRegister('jd@gmail.com', 'Val1dPas', 'Joe', 'Doe').token;
+    const quizId = requestQuizCreate(t2, 'New Quiz', 'Description');
+
+    requestQuizRemove(t2, quizId.quizId);
+
+    const result3 = requestQuizNameUpdate(t2, quizId.quizId, 'New');
+    expect(result3).toMatchObject({ error: expect.any(String) });
   });
 
   test('Invalid Quiz Name', () => {

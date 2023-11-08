@@ -55,12 +55,24 @@ test('Quiz ID does not exist', () => {
   // Register a user
   const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
     'first', 'last');
-    // Create a quiz with userId
+  // Create a quiz with userId
   const quizId: number = requestQuizCreate(userId.token, 'Quiz 1',
     'This is Quiz 1').quizId;
 
   // Restore a quiz with non-existing or wrongly inputted quizId
   const result = requestQuizRestore(userId.token, quizId + 1);
+  expect(result).toMatchObject({ error: expect.any(String) });
+});
+
+test('Quiz not in trash', () => {
+  // Register a user
+  const userId: number = requestRegister('validEmail@gmail.com',
+    'Val1dPassword', 'first', 'last').token;
+  // Create a quiz with userId
+  const quizId: number = requestQuizCreate(userId, 'Quiz1', '').quizId;
+
+  // Restore a quiz with non-existing or wrongly inputted quizId
+  const result = requestQuizRestore(userId, quizId);
   expect(result).toMatchObject({ error: expect.any(String) });
 });
 
@@ -94,10 +106,10 @@ test('Test Invalid AuthUserId', () => {
 // Test 403 : Valid token but user is not the owner of the quiz
 test('Quiz ID does not owned by user', () => {
   // Register a user
-  const userId1: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+  const userId1: Token = requestRegister('validEmail1@gmail.com', 'Val1dPass',
     'first', 'last');
     // Register another user
-  const userId2: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+  const userId2: Token = requestRegister('validEmail2@gmail.com', 'Val1dPass',
     'first', 'last');
     // Create a quiz owned by user 1
   const quizId: number = requestQuizCreate(userId1.token, 'Quiz 1',
