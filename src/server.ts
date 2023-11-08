@@ -80,82 +80,52 @@ app.get('/echo', (req: Request, res: Response) => {
 // ====================================================================
 //  ========================= AUTH FUNCTIONS =========================
 // ====================================================================
-//  ========================== ITERATION 2 ===========================
+//  =========================== VERSION 1 ============================
 // ====================================================================
 
-/* // adminAuthRegister
+// adminAuthRegister
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   const { email, password, nameFirst, nameLast } = req.body;
-  const response = adminAuthRegister(email, password, nameFirst, nameLast);
-
-  if ('error' in response) return res.status(400).json(response);
-  res.json(response);
+  res.json(adminAuthRegister(email, password, nameFirst, nameLast));
   backupData();
 });
 
 // adminAuthLogin
 app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const response = adminAuthLogin(email, password);
-
-  if ('error' in response) return res.status(400).json(response);
-  res.json(response);
+  res.json(adminAuthLogin(email, password));
   backupData();
 });
 
 // adminUserDetails
 app.get('/v1/admin/user/details', (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
-  const response = adminUserDetails(token);
-
-  if ('error' in response) return res.status(401).json(response);
-  res.json(response);
+  res.json(adminUserDetails(parseInt(req.query.token as string)));
 });
 
 // adminAuthLogout
 app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
-  const token = parseInt(req.body.token);
-  const response = adminAuthLogout(token);
-
-  if ('error' in response) return res.status(401).json(response);
-  res.json(response);
+  res.json(adminAuthLogout(req.body.token));
   backupData();
 });
 
 // adminUserDetailsEdit
 app.put('/v1/admin/user/details', (req: Request, res: Response) => {
   const { token, email, nameFirst, nameLast } = req.body;
-  const response = adminUserDetailsEdit(parseInt(token), email,
-    nameFirst, nameLast);
-
-  if ('error' in response) {
-    if (response.error === token401) return res.status(401).json(response);
-    return res.status(400).json(response);
-  }
-
-  res.json(response);
+  res.json(adminUserDetailsEdit(parseInt(token), email, nameFirst, nameLast));
   backupData();
 });
 
 // adminUserPasswordEdit
 app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   const { token, oldPassword, newPassword } = req.body;
-  const response = adminUserPasswordEdit(parseInt(token), oldPassword,
-    newPassword);
-
-  if ('error' in response) {
-    if (response.error === token401) return res.status(401).json(response);
-    return res.status(400).json(response);
-  }
-
-  res.json(response);
-  backupData(req, res, response);
-}); */
+  res.json(adminUserPasswordEdit(parseInt(token), oldPassword, newPassword));
+  backupData();
+});
 
 // ====================================================================
 //  ========================= AUTH FUNCTIONS =========================
 // ====================================================================
-//  ========================== ITERATION 3 ===========================
+//  =========================== VERSION 2 ============================
 // ====================================================================
 
 // adminAuthRegister
@@ -205,6 +175,8 @@ app.put('/v2/admin/user/password', (req: Request, res: Response) => {
 
 // ====================================================================
 //  ========================= QUIZ FUNCTIONS =========================
+// ====================================================================
+//  =========================== VERSION 1 ============================
 // ====================================================================
 
 // adminQuizList
@@ -350,7 +322,7 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
 });
 
 // ====================================================================
-//  ========================= QUESTION FUNCTIONS ======================
+//  ========================= QUESTION FUNCTIONS =====================
 // ====================================================================
 
 // adminQuestionCreate
@@ -457,11 +429,15 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
 //  ======================== OTHER FUNCTIONS =========================
 // ====================================================================
 
-// clear
+// clear: version 1
 app.delete('/v1/clear', (req: Request, res: Response) => {
-  const response = clear();
+  res.json(clear());
+  backupData();
+});
 
-  res.json(response);
+// clear: version 2
+app.delete('/v2/clear', (req: Request, res: Response) => {
+  res.json(clear());
   backupData();
 });
 
