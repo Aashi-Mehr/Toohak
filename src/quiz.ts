@@ -20,6 +20,8 @@ import {
   QuizAdd
 } from './dataStore';
 
+import HTTPError from 'http-errors';
+
 /** adminQuizList
   * Lists all of the quizzes belonging to a particular user
   *
@@ -28,10 +30,10 @@ import {
   * @returns { QuizList } - If the authUserId exists and is valid
   * @returns { ErrorObject } - If the authUserId is invalid
   */
-function adminQuizList(token: number): QuizList | ErrorObject {
+function adminQuizList(token: number): QuizList {
   // Checking if the user exists
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Gathering quizzes
   const allQuizzes = getData().quizzes;
@@ -146,15 +148,14 @@ function adminQuizRemove(token: number, quizId: number):
   * @returns { QuizInfo } - If the details given are valid
   * @returns { ErrorObject } - If the details given are invalid
   */
-function adminQuizInfo(token: number, quizId: number):
-  QuizInfo | ErrorObject {
+function adminQuizInfo(token: number, quizId: number): QuizInfo {
   // Ensuring the login session is valid
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Gathering the quiz
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Calculating the duration of the quiz
   let duration = 0;
@@ -177,7 +178,7 @@ function adminQuizInfo(token: number, quizId: number):
   }
 
   // If it gets through without returning, then it doesn't exist
-  return { error: unauth403 };
+  throw HTTPError(403, unauth403);
 }
 
 /** adminQuizNameUpdate

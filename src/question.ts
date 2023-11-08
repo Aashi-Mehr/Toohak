@@ -23,6 +23,8 @@ import {
   quesPos400
 } from './dataStore';
 
+import HTTPError from 'http-errors';
+
 const COLOUR = ['red', 'blue', 'green', 'yellow', 'purple', 'brown', 'orange'];
 
 /** validQuestionBody
@@ -148,15 +150,15 @@ export function adminQuestionCreate(token: number, quizId: number,
   * @returns { ErrorObject } - If any input error exists
   */
 export function adminQuestionMove(token: number, newPosition: number,
-  quesId: number, quizId: number): ErrorObject | Record<string, never> {
+  quesId: number, quizId: number): Record<string, never> {
   // Get data from database
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Ensuring the user owns the quiz
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
-  if (user.authUserId !== quiz.authId) return { error: unauth403 };
+  if (!user) throw HTTPError(401, token401);
+  if (user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);
 
   // Get the question asked for moving
   let currQues: Question;
@@ -169,9 +171,9 @@ export function adminQuestionMove(token: number, newPosition: number,
   }
 
   // Error check
-  if (!currQues) return { error: quesID400 };
+  if (!currQues) throw HTTPError(400, quesID400);
   if (newPosition < 0 || newPosition > quiz.questions.length ||
-      newPosition === currPos) return { error: quesPos400 };
+      newPosition === currPos) throw HTTPError(400, quesPos400);
 
   // Get the question at the new position
   const swithedQues = quiz.questions[newPosition];
@@ -287,30 +289,30 @@ export function deleteQuestion(token: number, quizId: number, quesId: number):
   * @returns { ErrorObject } - If any input error exists
   */
 export function adminQuestionDuplicate(token: number, quesId: number,
-  quizId: number): QuestionId | ErrorObject {
+  quizId: number): QuestionId {
   // Get data from database, ensure the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Ensuring the user exists with a valid token
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Ensuring the user owns the quiz
-  if (user.authUserId !== quiz.authId) return { error: unauth403 };
+  if (user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);
 
   // Get the question asked for moving, esnuring it exists
   let currQues: Question;
   for (const question of quiz.questions) {
     if (question.questionId === quesId) currQues = question;
   }
-  if (!currQues) return { error: quesID400 };
+  if (!currQues) throw HTTPError(400, quesID400);
 
   let durationSum = currQues.duration;
   for (const ques of quiz.questions) {
     durationSum += ques.duration;
   }
-  if (durationSum > 180) return { error: quizDur400 };
+  if (durationSum > 180) throw HTTPError(400, quizDur400);
 
   const newId = getUniqueID(getData());
   quiz.questions.push({
