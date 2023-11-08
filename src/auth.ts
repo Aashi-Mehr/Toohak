@@ -57,13 +57,11 @@ function detailsCheck(email: string, password: string,
   if (password.length < 8) return { error: passLen400 };
 
   // Name can only consist of letters, spaces and hyphens
-  const invalidnameFirst = /[^a-zA-Z -']/.test(nameFirst);
-  const invalidnameLast = /[^a-zA-Z -']/.test(nameLast);
+  const invalidnameFirst = /[^a-zA-Z \-']/.test(nameFirst);
+  const invalidnameLast = /[^a-zA-Z \-']/.test(nameLast);
 
-  if (invalidnameFirst === true || invalidnameLast === true) {
-    return { error: userChar400 };
-  }
-  if (nameFirst.length < 2 || nameFirst.length > 20 ||
+  if (invalidnameFirst || invalidnameLast ||
+      nameFirst.length < 2 || nameFirst.length > 20 ||
       nameLast.length < 2 || nameLast.length > 20) {
     return { error: userChar400 };
   }

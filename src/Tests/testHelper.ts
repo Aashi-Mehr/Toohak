@@ -16,25 +16,35 @@ import {
 
 const SERVER_URL = `${url}:${port}`;
 
-// DELETE CLEAR Define wrapper function
-export function requestClear() {
-  const res = request(
-    'DELETE',
-    SERVER_URL + '/v1/clear',
-    {
-      qs: {}
-    }
-  );
+// ====================================================================
+//  ======================== OTHER FUNCTIONS =========================
+// ====================================================================
 
+// DELETE CLEAR Define wrapper function: Version 1
+export function requestClearV1() {
+  const res = request('DELETE', SERVER_URL + '/v1/clear');
   return JSON.parse(res.body.toString());
 }
 
+// DELETE CLEAR Define wrapper function: Version 1
+export function requestClear() {
+  const res = request('DELETE', SERVER_URL + '/v2/clear');
+  return JSON.parse(res.body.toString());
+}
+
+// ====================================================================
+//  ========================= AUTH FUNCTIONS =========================
+// ====================================================================
+
 // POST REGISTER Define wrapper function
 export function requestRegister(email: string, password: string,
-  nameFirst: string, nameLast: string): Token {
+  nameFirst: string, nameLast: string, v1?:boolean): Token {
+  let compUrl: string;
+  if (v1) compUrl = SERVER_URL + '/v1/admin/auth/register';
+  else compUrl = SERVER_URL + '/v2/admin/auth/register';
+
   const res = request(
-    'POST',
-    SERVER_URL + '/v2/admin/auth/register',
+    'POST', compUrl,
     {
       json: {
         email: email,
@@ -55,10 +65,14 @@ export function requestRegister(email: string, password: string,
 }
 
 // POST LOGIN Define wrapper function
-export function requestLogin(email: string, password: string): Token {
+export function requestLogin(email: string, password: string, v1?:boolean):
+  Token {
+  let compUrl: string;
+  if (v1) compUrl = SERVER_URL + '/v1/admin/auth/login';
+  else compUrl = SERVER_URL + '/v2/admin/auth/login';
+
   const res = request(
-    'POST',
-    SERVER_URL + '/v2/admin/auth/login',
+    'POST', compUrl,
     {
       json: {
         email: email,
@@ -77,16 +91,22 @@ export function requestLogin(email: string, password: string): Token {
 }
 
 // GET DETAILS Define wrapper function
-export function requestDetails(token: number): Details | ErrorObject {
-  const res = request(
-    'GET',
-    SERVER_URL + '/v2/admin/user/details',
-    {
-      headers: {
-        token: token.toString()
-      }
-    }
-  );
+export function requestDetails(token: number, v1?:boolean): Details {
+  let res;
+
+  if (v1) {
+    res = request(
+      'GET',
+      SERVER_URL + '/v1/admin/user/details',
+      { qs: { token: token } }
+    );
+  } else {
+    res = request(
+      'GET',
+      SERVER_URL + '/v2/admin/user/details',
+      { headers: { token: token.toString() } }
+    );
+  }
 
   const result = JSON.parse(res.body.toString());
 
@@ -98,17 +118,23 @@ export function requestDetails(token: number): Details | ErrorObject {
 }
 
 // POST LOGOUT Define wrapper function
-export function requestLogout(token: number):
+export function requestLogout(token: number, v1?:boolean):
   ErrorObject | Record<string, never> {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v2/admin/auth/logout',
-    {
-      headers: {
-        token: token.toString(),
-      }
-    }
-  );
+  let res;
+
+  if (v1) {
+    res = request(
+      'POST',
+      SERVER_URL + '/v1/admin/auth/logout',
+      { json: { token: token } }
+    );
+  } else {
+    res = request(
+      'POST',
+      SERVER_URL + '/v2/admin/auth/logout',
+      { headers: { token: token.toString() } }
+    );
+  }
 
   const result = JSON.parse(res.body.toString());
 
@@ -121,21 +147,39 @@ export function requestLogout(token: number):
 
 // PUT EDIT DETAILS Define wrapper function
 export function requestDetailsEdit(token: number, email: string,
-  nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
-  const res = request(
-    'PUT',
-    SERVER_URL + '/v2/admin/user/details',
-    {
-      json: {
-        email: email,
-        nameFirst: nameFirst,
-        nameLast: nameLast
-      },
-      headers: {
-        token: token.toString()
+  nameFirst: string, nameLast: string, v1?: boolean):
+  ErrorObject | Record<string, never> {
+  let res;
+
+  if (v1) {
+    res = request(
+      'PUT',
+      SERVER_URL + '/v1/admin/user/details',
+      {
+        json: {
+          email: email,
+          nameFirst: nameFirst,
+          nameLast: nameLast,
+          token: token
+        }
       }
-    }
-  );
+    );
+  } else {
+    res = request(
+      'PUT',
+      SERVER_URL + '/v2/admin/user/details',
+      {
+        json: {
+          email: email,
+          nameFirst: nameFirst,
+          nameLast: nameLast
+        },
+        headers: {
+          token: token.toString()
+        }
+      }
+    );
+  }
 
   const result = JSON.parse(res.body.toString());
 
@@ -148,20 +192,36 @@ export function requestDetailsEdit(token: number, email: string,
 
 // PUT EDIT PASSWORD Define wrapper function
 export function requestPasswordEdit(token: number, oldPass: string,
-  newPass: string): ErrorObject | Record<string, never> {
-  const res = request(
-    'PUT',
-    SERVER_URL + '/v2/admin/user/password',
-    {
-      json: {
-        oldPassword: oldPass,
-        newPassword: newPass
-      },
-      headers: {
-        token: token.toString()
+  newPass: string, v1?: boolean): ErrorObject | Record<string, never> {
+  let res;
+
+  if (v1) {
+    res = request(
+      'PUT',
+      SERVER_URL + '/v1/admin/user/password',
+      {
+        json: {
+          oldPassword: oldPass,
+          newPassword: newPass,
+          token: token
+        }
       }
-    }
-  );
+    );
+  } else {
+    res = request(
+      'PUT',
+      SERVER_URL + '/v2/admin/user/password',
+      {
+        json: {
+          oldPassword: oldPass,
+          newPassword: newPass
+        },
+        headers: {
+          token: token.toString()
+        }
+      }
+    );
+  }
 
   const result = JSON.parse(res.body.toString());
 
@@ -171,6 +231,10 @@ export function requestPasswordEdit(token: number, oldPass: string,
 
   return result;
 }
+
+// ====================================================================
+//  ========================= QUIZ FUNCTIONS =========================
+// ====================================================================
 
 // POST QUIZ CREATE Define wrapper function
 export function requestQuizCreate(token: number, name: string,
@@ -282,22 +346,6 @@ export function requestQuizRemove(token: number, quizId: number):
   return JSON.parse(res.body.toString());
 }
 
-export function requestQuestionCreate(token: number | string,
-  quizId: number, questionBody: QuestionBody): QuestionId {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '/question',
-    {
-      json: {
-        token: token,
-        questionBody: questionBody,
-      }
-    }
-  );
-
-  return JSON.parse(res.body.toString());
-}
-
 export function requestQuizTransfer(token: number | string, quizId: number,
   userEmail: string) {
   const res = request(
@@ -339,6 +387,40 @@ export function requestQuizRestore(token: number, quizId: number):
       }
     }
   );
+  return JSON.parse(res.body.toString());
+}
+
+// DELETE EMPTY TRASH Define Wrapper Function
+export function requestQuizEmptyTrash(token: number, quizId: number[]):
+  ErrorObject | Record<string, never> {
+  const res = request(
+    'DELETE',
+    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId +
+      ']&token=' + token,
+    {
+      qs: { }
+    }
+  );
+  return JSON.parse(res.body.toString());
+}
+
+// ====================================================================
+//  ======================= QUESTION FUNCTIONS =======================
+// ====================================================================
+
+export function requestQuestionCreate(token: number | string,
+  quizId: number, questionBody: QuestionBody): QuestionId {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/question',
+    {
+      json: {
+        token: token,
+        questionBody: questionBody,
+      }
+    }
+  );
+
   return JSON.parse(res.body.toString());
 }
 
@@ -411,25 +493,8 @@ export function requestQuesDelete(token: number, quizId: number,
   quesId: number): ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
-    `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}?token=${token}`,
-    {
-      qs: { }
-    }
+    `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}?token=${token}`
   );
 
-  return JSON.parse(res.body.toString());
-}
-
-// DELETE EMPTY TRASH Define Wrapper Function
-export function requestQuizEmptyTrash(token: number, quizId: number[]):
-  ErrorObject | Record<string, never> {
-  const res = request(
-    'DELETE',
-    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId +
-      ']&token=' + token,
-    {
-      qs: { }
-    }
-  );
   return JSON.parse(res.body.toString());
 }
