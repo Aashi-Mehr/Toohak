@@ -380,6 +380,29 @@ function getUniqueID(allData: Datastore): number {
   return allIds[randomPos];
 }
 
+/** imgUrlValid
+  * Checks if an image is valid or not
+  * 
+  * @param { string } imgUrl - The URL for the image to check
+  *
+  * @returns { ErrorObject } - Error cases, i.e., invalid type / URL
+  * @returns { Record<string, never> } - Successful URLs
+  */
+function imgUrlValid(imgUrl: string): ErrorObject | Record<string, never> {
+  // Check if imgUrl when fetched returns a valid file
+  fetch(imgUrl)
+  .then((data) => {
+    // Check if imgUrl when fetched is a JPG or PNG image
+    if (!['image/jpg', 'image/jpeg', 'image/png'].includes(data['type'])) {
+      return { error: invType400 };
+    }
+  })
+  .catch((err) => { return { error: invFile400 + '\n' + err } });
+
+  // Return nothing if correct type and URL
+  return { };
+}
+
 export {
   getData,
   setData,
@@ -387,6 +410,7 @@ export {
   getQuiz,
   getSession,
   getUniqueID,
+  imgUrlValid,
   ErrorObject,
   AuthUserId,
   User,

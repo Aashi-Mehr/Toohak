@@ -404,6 +404,26 @@ export function requestQuizEmptyTrash(token: number, quizId: number[]):
   return JSON.parse(res.body.toString());
 }
 
+// DELETE EMPTY TRASH Define Wrapper Function
+export function requestQuizImageUpdate(token: number, quizId: number,
+  imgUrl: string): Record<string, never> {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/quiz/:' + quizId + '/thumbnail',
+    {
+      headers: { token: token.toString() }
+    }
+  );
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
+}
+
 // ====================================================================
 //  ======================= QUESTION FUNCTIONS =======================
 // ====================================================================

@@ -20,7 +20,8 @@ import {
   QuizAdd,
   DEFAULT_QUIZ_THUMBNAIL,
   invFile400,
-  invType400
+  invType400,
+  imgUrlValid
 } from './dataStore';
 
 import HTTPError from 'http-errors';

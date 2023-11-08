@@ -31,7 +31,8 @@ import {
   adminQuizNameUpdate,
   adminQuizTrash,
   adminQuizRestore,
-  adminQuizEmptyTrash
+  adminQuizEmptyTrash,
+  adminQuizUpdateImageURL
 } from './quiz';
 
 import {
@@ -396,6 +397,16 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
 // ====================================================================
 //  =========================== VERSION 1 ============================
 // ====================================================================
+
+// adminQuestionCreate
+app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  const quizId = parseInt(req.params.quizid);
+  const { imgUrl } = req.body;
+
+  res.json(adminQuizUpdateImageURL(token, quizId, imgUrl));
+  backupData();
+});
 
 // adminQuestionCreate
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
