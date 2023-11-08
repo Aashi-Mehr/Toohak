@@ -17,7 +17,10 @@ import {
   notUser400,
   currUser400,
   notBin400,
-  QuizAdd
+  QuizAdd,
+  DEFAULT_QUIZ_THUMBNAIL,
+  invFile400,
+  invType400
 } from './dataStore';
 
 import HTTPError from 'http-errors';
@@ -103,7 +106,8 @@ function adminQuizCreate(token: number, name: string, description: string):
     timeCreated: timestamp,
     timeLastEdited: timestamp,
     in_trash: false,
-    questions: []
+    questions: [],
+    thumbnailUrl: DEFAULT_QUIZ_THUMBNAIL
   });
 
   return { quizId: quizId };
@@ -173,7 +177,8 @@ function adminQuizInfo(token: number, quizId: number): QuizInfo {
       description: quiz.description,
       numQuestions: quiz.questions.length,
       questions: quiz.questions,
-      duration: duration
+      duration: duration,
+      thumbnailUrl: quiz.thumbnailUrl
     };
   }
 
@@ -423,6 +428,22 @@ function adminQuizEmptyTrash(token: number, quizId: number[]):
   return {};
 }
 
+/** adminQuizUpdateImageURL
+  * Updates the quiz's thumbnail URL
+  *
+  * @param { number } token - The user's token
+  * @param { number } quizId - The quizId for which the thumnail needs changing
+  * @param { string } imgUrl - The new thumbnail URL
+  *
+  * @returns { Record<string, never> } - If the details given are valid
+  * @throws { HTTPError } - If the details given are invalid
+  */
+function adminQuizUpdateImageURL(token: number, quizId: number, imgUrl: string):
+  Record<string, never> {
+
+  return { };
+}
+
 export {
   adminQuizList,
   adminQuizInfo,
@@ -433,5 +454,6 @@ export {
   adminQuizTrash,
   adminQuizRestore,
   adminQuizTransfer,
-  adminQuizEmptyTrash
+  adminQuizEmptyTrash,
+  adminQuizUpdateImageURL
 };
