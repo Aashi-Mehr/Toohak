@@ -88,7 +88,7 @@ function validQuestionBody(questionBody: QuestionBody):
   * @returns { ErrorObject } - If the token or the inputs is invalid
   */
 export function adminQuestionCreate(token: number, quizId: number,
-  questionBody: QuestionBody): QuestionId | ErrorObject {
+  questionBody: QuestionBody, thumbnailUrl?: string): QuestionId | ErrorObject {
   const data = getData();
 
   // Checking if the user exists
@@ -100,13 +100,20 @@ export function adminQuestionCreate(token: number, quizId: number,
   if (!quiz) return { error: unauth403 };
   if (quiz.authId !== user.authUserId) return { error: unauth403 };
 
+  // Checking the question body is valid
   const valid = validQuestionBody(questionBody);
   if (valid.error) { return valid; }
 
+  // Ensuring the duration is valid
   let durationSum = questionBody.duration;
   for (const ques of quiz.questions) durationSum += ques.duration;
   if (durationSum > 180) return { error: quizDur400 };
 
+  /// //////////////////////////////////////////////////////////////////////////
+  /// ///// ERROR CHECKING THUMBNAIL ///////////////////////////////////////////
+  /// //////////////////////////////////////////////////////////////////////////
+
+  // Creating answers
   const answers: Answer[] = [];
   for (const answer of questionBody.answers) {
     const answerId = getUniqueID(data);
@@ -119,22 +126,28 @@ export function adminQuestionCreate(token: number, quizId: number,
     });
   }
 
+  // Generating an ID
   const questionId = getUniqueID(data);
 
+  // Creating the question to push
   const newQuestion: Question = {
     questionId: questionId,
     question: questionBody.question,
     duration: questionBody.duration,
     points: questionBody.points,
     answers: answers,
+    thumbnailUrl: thumbnailUrl
   };
 
+  // Updating the time editted
   const timestamp = Math.floor(Date.now() / 1000);
   quiz.timeLastEdited = timestamp;
 
+  // Pushing to data
   quiz.questions.push(newQuestion);
   setData(data);
 
+  // Returning questionId
   return { questionId: questionId };
 }
 
@@ -320,7 +333,8 @@ export function adminQuestionDuplicate(token: number, quesId: number,
     question: currQues.question,
     duration: currQues.duration,
     points: currQues.points,
-    answers: currQues.answers
+    answers: currQues.answers,
+    thumbnailUrl: currQues.thumbnailUrl
   });
 
   // Update time last edit

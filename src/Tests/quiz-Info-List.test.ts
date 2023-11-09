@@ -14,7 +14,8 @@ import {
   ErrorObject,
   Token,
   QuizList,
-  QuizInfo
+  QuizInfo,
+  DEFAULT_QUIZ_THUMBNAIL
 } from '../dataStore';
 
 import {
@@ -144,7 +145,8 @@ describe('adminQuizInfo', () => {
       description: expect.any(String),
       numQuestions: 0,
       questions: [],
-      duration: 0
+      duration: 0,
+      thumbnailUrl: DEFAULT_QUIZ_THUMBNAIL
     });
   });
 
@@ -161,7 +163,8 @@ describe('adminQuizInfo', () => {
       description: expect.any(String),
       numQuestions: 0,
       questions: [],
-      duration: 0
+      duration: 0,
+      thumbnailUrl: DEFAULT_QUIZ_THUMBNAIL
     });
 
     // This will always be true if the above expect-test passes

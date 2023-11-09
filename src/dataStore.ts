@@ -1,3 +1,6 @@
+// Default Quiz Thumnail
+const DEFAULT_QUIZ_THUMBNAIL = '';
+
 // ERROR MESSAGES
 // 403 Errors
 const unauth403 = 'Valid token is provided, but user is unauthorised';
@@ -45,6 +48,56 @@ const passInv400 = 'Email or password is incorrect';
 const oldPass400 = 'Old Password is not the correct old password';
 const newPass400 = 'Old Password and New Password match exactly';
 
+// Image errors
+const invImg400 = 'When fetched, the URL doesn\'t return a valid file or type' +
+  ' is not JPG/JPEG or PNG.';
+
+// ENUM States
+export enum SessionState {
+  // Players can join in this state, and nothing has started
+  LOBBY = 'lobby',
+
+  // This is the question countdown period. It always exists before a question
+  // is open and the frontend makes the request to move to the open state
+  QUESTION_COUNTDOWN = 'question_countdown',
+
+  // This is when players can see the question and answers, and submit their
+  // answers (as many times as they like)
+  QUESTION_OPEN = 'question_open',
+
+  // This is when players can still see the question answers, but cannot submit
+  QUESTION_CLOSE = 'question_close',
+
+  // This is when players can see the correct answer, as well as everyone
+  // playings' performance in that question, whilst they typically wait to go to
+  // the next countdown
+  ANSWER_SHOW = 'answer_show',
+
+  // This is where the final results are displayed for all players and questions
+  FINAL_RESULTS = 'final_results',
+
+  // The game is now over and inactive
+  END = 'end'
+}
+
+// ENUM Actions
+export enum Actions {
+  // Move onto the countdown for the next question
+  NEXT_QUESTION = 'next_question',
+
+  // This is how to skip the question countdown period immediately.
+  SKIP_COUNTDOWN = 'skip_countdown',
+
+  // Go straight to the next most immediate answers show state
+  GO_TO_ANSWER = 'go_to_answer',
+
+  // Go straight to the final results state
+  GO_TO_FINAL_RESULTS = 'go_to_final_results',
+
+  // Go straight to the END state
+  END = 'end'
+}
+
 // INTERFACES Other
 interface ErrorObject { error: string }
 
@@ -87,6 +140,7 @@ interface Question {
   duration: number,
   points: number,
   answers: Answer[],
+  thumbnailUrl: string
 }
 
 interface AnswerBody {
@@ -101,18 +155,19 @@ interface QuestionBody {
   answers: AnswerBody[]
 }
 
+interface QuestionBodyV2 {
+  question: string,
+  duration: number,
+  points: number,
+  answers: AnswerBody[],
+  thumbnailUrl: string
+}
+
 interface QuestionId {
   questionId: number
 }
 
 // INTERFACES Quiz
-interface QuizId { quizId: number }
-
-interface QuizBrief {
-  quizId: number,
-  name: string
-}
-
 interface QuizInfo {
   quizId: number,
   name: string,
@@ -121,7 +176,13 @@ interface QuizInfo {
   description: string,
   numQuestions: number,
   questions: Question[],
-  duration: number
+  duration: number,
+  thumbnailUrl: string
+}
+
+interface QuizBrief {
+  quizId: number,
+  name: string
 }
 
 interface QuizList { quizzes: QuizBrief[] }
@@ -134,8 +195,11 @@ interface QuizAdd { // Need to add thumbnail URL component
   timeCreated: number,
   timeLastEdited: number,
   in_trash: boolean,
-  questions: Question[]
+  questions: Question[],
+  thumbnailUrl: string
 }
+
+interface QuizId { quizId: number }
 
 // INTERFACE Session
 interface SessionAdd {
@@ -339,8 +403,10 @@ export {
   Datastore,
   AnswerBody,
   QuestionBody,
+  QuestionBodyV2,
   QuestionId,
   Answer,
+  DEFAULT_QUIZ_THUMBNAIL,
   unauth403,
   token401,
   nameChar400,
@@ -367,5 +433,6 @@ export {
   passChar400,
   passInv400,
   oldPass400,
-  newPass400
+  newPass400,
+  invImg400
 };
