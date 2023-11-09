@@ -18,7 +18,7 @@ import {
   */
 export function playerViewChat(playerId: number): { messages: Message[] } {
   // Error 400 If player ID does not exist
-  let playerSession = getPlayerSession(playerId, getData());
+  const playerSession = getPlayerSession(playerId, getData());
   if (!playerSession) throw HTTPError(400, playerId400);
 
   // Message[] Otherwise
@@ -36,7 +36,7 @@ export function playerViewChat(playerId: number): { messages: Message[] } {
 export function playerMessageChat(playerId: number, message: MessageBody):
   Record<string, never> {
   // Error 400 If player ID does not exist
-  let playerSession = getPlayerSession(playerId, getData());
+  const playerSession = getPlayerSession(playerId, getData());
   if (!playerSession) throw HTTPError(400, playerId400);
 
   // Error 400 If message body is less than 1 or more than 100 characters

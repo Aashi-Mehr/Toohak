@@ -355,7 +355,7 @@ function getPlayerSession(playerId: number, data: Datastore):
         return {
           player: player,
           quizSession: quizSession
-        }
+        };
       }
     }
   }

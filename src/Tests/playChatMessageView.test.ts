@@ -34,7 +34,7 @@ beforeEach(() => {
 });
 
 describe('playerChatMessage', () => {
-  let result: Record<string, never>;
+  // let result: Record<string, never>;
 
   // 0 is never going to be generated as a playerId
   test('400: If player ID does not exist (Out of valid range)', () => {
