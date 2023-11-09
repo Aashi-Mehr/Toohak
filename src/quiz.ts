@@ -317,7 +317,7 @@ function adminQuizTrash(token: number):
   ErrorObject | QuizList {
   // Check if authUserId is a positive integer
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Gathering quizzes
   const allQuizzes = getData().quizzes;

@@ -1,14 +1,13 @@
-import request from 'sync-request-curl';
-import { port, url } from '../config.json';
 import {
   requestRegister,
   requestQuizTrash,
   requestQuizRemove,
-  requestQuizCreate
+  requestQuizCreate,
+  requestClear
 } from './testHelper';
 import { Token } from '../dataStore';
 
-const SERVER_URL = `${url}:${port}`;
+import HTTPError from 'http-errors';
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
@@ -16,14 +15,7 @@ const SERVER_URL = `${url}:${port}`;
 
 // Clear the dataBase before each test to avoid data interference
 beforeEach(() => {
-  const res = request(
-    'DELETE',
-    SERVER_URL + '/v1/clear',
-    {
-      qs: { }
-    }
-  );
-  return JSON.parse(res.body.toString());
+  requestClear();
 });
 
 // let result: QuizBrief | ErrorObject;
@@ -31,12 +23,10 @@ beforeEach(() => {
 // Test : Invalid AuthUserId Format
 test('Test Invalid AuthUserId Format', () => {
   // authUserId is empty
-  let result = requestQuizTrash(0);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(() => requestQuizTrash(0)).toThrow(HTTPError[401]);
 
   // authUserId contains out of range number
-  result = requestQuizTrash(-1);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(() => requestQuizTrash(-1)).toThrow(HTTPError[401]);
 });
 
 // Test : Non-Existing AuthUserId
@@ -45,8 +35,7 @@ test('Test Non-existing AuthUserId', () => {
     'first', 'last');
 
   // user with authUserId does not exist
-  const result = requestQuizTrash(userId.token + 1);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(() => requestQuizTrash(userId.token + 1)).toThrow(HTTPError[401]);
 });
 
 // Test : Valid Input
