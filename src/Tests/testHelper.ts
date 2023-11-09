@@ -370,9 +370,13 @@ export function requestQuizTrash(token: number): QuizList | ErrorObject {
     }
   );
   // return JSON.parse(res.body.toString());
-  const result = JSON.parse(res.body as string);
+  const result = JSON.parse(res.body.toString());
 
-  if ('error' in result) { return { error: 'error' }; } else { return result; }
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // POST QUIZ RESTORE Define wrapper function
