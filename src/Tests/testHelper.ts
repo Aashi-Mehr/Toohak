@@ -369,7 +369,6 @@ export function requestQuizTrash(token: number, v1?: boolean):
       SERVER_URL + '/v1/admin/quiz/trash',
       { qs: { token: token } }
     );
-
   } else {
     res = request(
       'GET',
@@ -377,7 +376,7 @@ export function requestQuizTrash(token: number, v1?: boolean):
       { headers: { token: token.toString() } }
     );
   }
-  
+
   const result = JSON.parse(res.body.toString());
 
   if (res.statusCode !== 200) {
