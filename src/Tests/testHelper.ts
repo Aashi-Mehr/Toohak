@@ -338,10 +338,8 @@ export function requestQuizRemove(token: number, quizId: number):
   ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '?token=' + token,
-    {
-      qs: { }
-    }
+    SERVER_URL + '/v1/admin/quiz/' + quizId,
+    { qs: { token: token } }
   );
   return JSON.parse(res.body.toString());
 }
@@ -358,21 +356,35 @@ export function requestQuizTransfer(token: number | string, quizId: number,
       }
     }
   );
+
   return JSON.parse(res.body.toString());
 }
 // GET QUIZ TRASH Define wrapper function
-export function requestQuizTrash(token: number): QuizList | ErrorObject {
-  const res = request(
-    'GET',
-    SERVER_URL + '/v1/admin/quiz/trash?token=' + token,
-    {
-      qs: { }
-    }
-  );
-  // return JSON.parse(res.body.toString());
-  const result = JSON.parse(res.body as string);
+export function requestQuizTrash(token: number, v1?: boolean):
+  QuizList | ErrorObject {
+  let res;
+  if (v1) {
+    res = request(
+      'GET',
+      SERVER_URL + '/v1/admin/quiz/trash',
+      { qs: { token: token } }
+    );
 
-  if ('error' in result) { return { error: 'error' }; } else { return result; }
+  } else {
+    res = request(
+      'GET',
+      SERVER_URL + '/v2/admin/quiz/trash',
+      { headers: { token: token.toString() } }
+    );
+  }
+  
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // POST QUIZ RESTORE Define wrapper function
@@ -395,11 +407,8 @@ export function requestQuizEmptyTrash(token: number, quizId: number[]):
   ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
-    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId +
-      ']&token=' + token,
-    {
-      qs: { }
-    }
+    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId + ']',
+    { qs: { token: token } }
   );
   return JSON.parse(res.body.toString());
 }
