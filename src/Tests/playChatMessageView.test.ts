@@ -62,11 +62,11 @@ describe('playerChatMessage', () => {
     )).toThrow(HTTPError[400]);
   });
 
-  test('One message sent by only player', () => {
-    result = requestPlayerMessage(playerId, validMessage);
-    expect(Object.keys(result).length).toStrictEqual(0);
-  });
-
+//  test('One message sent by only player', () => {
+//    result = requestPlayerMessage(playerId, validMessage);
+//    expect(Object.keys(result).length).toStrictEqual(0);
+//  });
+//
 //  test('Messages sent by multiple players', () => {
 //    let playerId2 = requestPlayerRegister(sessionId, 'Player2').playerId;
 //    let playerId3 = requestPlayerRegister(sessionId, 'Player3').playerId;

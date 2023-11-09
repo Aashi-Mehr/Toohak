@@ -1,8 +1,12 @@
-// import HttpError from "http-errors";
+import HTTPError from 'http-errors';
 
 import {
   Message,
-  MessageBody
+  MessageBody,
+  getData,
+  getPlayerSession,
+  message400,
+  playerId400
 } from './dataStore';
 
 /** playerViewChat
@@ -14,18 +18,11 @@ import {
   */
 export function playerViewChat(playerId: number): { messages: Message[] } {
   // Error 400 If player ID does not exist
-  // Message[] Otherwise
+  let playerSession = getPlayerSession(playerId, getData());
+  if (!playerSession) throw HTTPError(400, playerId400);
 
-  return {
-    messages: [
-      {
-        messageBody: 'This is a message body',
-        playerId: 5546,
-        playerName: 'Yuchao Jiang',
-        timeSent: 1683019484
-      }
-    ]
-  };
+  // Message[] Otherwise
+  return { messages: playerSession.quizSession.messages };
 }
 
 /** playerMessageChat
@@ -39,8 +36,22 @@ export function playerViewChat(playerId: number): { messages: Message[] } {
 export function playerMessageChat(playerId: number, message: MessageBody):
   Record<string, never> {
   // Error 400 If player ID does not exist
-  // Error 400 If message body is less than 1 or more than 100 characters
-  // Message[] Otherwise
+  let playerSession = getPlayerSession(playerId, getData());
+  if (!playerSession) throw HTTPError(400, playerId400);
 
+  // Error 400 If message body is less than 1 or more than 100 characters
+  if (message.messageBody.length < 1 || message.messageBody.length > 100) {
+    throw HTTPError(400, message400);
+  }
+
+  // Add message to chat
+  playerSession.quizSession.messages.push({
+    messageBody: message.messageBody,
+    playerId: playerId,
+    timeSent: Math.floor(Date.now()),
+    playerName: playerSession.player.name
+  });
+
+  // Empty Object Otherwise
   return { };
 }

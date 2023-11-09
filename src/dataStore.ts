@@ -48,6 +48,10 @@ const passInv400 = 'Email or password is incorrect';
 const oldPass400 = 'Old Password is not the correct old password';
 const newPass400 = 'Old Password and New Password match exactly';
 
+// Player errors
+const playerId400 = 'Player ID does not exist';
+const message400 = 'Message is less than 1 or more than 100 characters';
+
 // Image errors
 const invImg400 = 'When fetched, the URL doesn\'t return a valid file or type' +
   ' is not JPG/JPEG or PNG.';
@@ -224,7 +228,7 @@ interface MessageBody {
   messageBody: string
 }
 
-interface QuizSessionPlayers {
+interface QuizSessionPlayer {
   name: string,
   playerId: number
 }
@@ -234,7 +238,7 @@ interface QuizSessionAdd {
   state: string,
   atQuestion: number,
   quiz: QuizAdd,
-  players: QuizSessionPlayers[],
+  players: QuizSessionPlayer[],
   messages: Message[]
 }
 
@@ -328,6 +332,38 @@ function getSession(token: number, sessions: SessionAdd[]):
   return undefined;
 }
 
+interface PlayerSession {
+  player: QuizSessionPlayer,
+  quizSession: QuizSessionAdd
+}
+
+/** getPlayerSession
+  * Loops through all players and quizSessions to find the relevant quiz session
+  *
+  * @param { number } playerId - The playerId for the player
+  *
+  * @returns { PlayerSession } - If the player exists
+  * @returns { undefined } - If the playerIs is invalid
+  */
+function getPlayerSession(playerId: number, data: Datastore):
+  PlayerSession | undefined {
+  // Loops through all quizzes until it finds relevant, valid quiz
+  for (const quizSession of data.quizSessions) {
+    for (const player of quizSession.players) {
+      // Loops through all players of every quiz until it finds the one
+      if (player.playerId === playerId) {
+        return {
+          player: player,
+          quizSession: quizSession
+        }
+      }
+    }
+  }
+
+  // Invalid / Never existed
+  return undefined;
+}
+
 /** getUniqueID
   * Creates a unique ID (For authUserId, quizId, or token, answer ID, ques ID)
   *
@@ -399,6 +435,7 @@ export {
   getQuiz,
   getSession,
   getUniqueID,
+  getPlayerSession,
   ErrorObject,
   AuthUserId,
   User,
@@ -419,7 +456,7 @@ export {
   QuestionId,
   Answer,
   Message,
-  QuizSessionPlayers,
+  QuizSessionPlayer,
   QuizSessionAdd,
   MessageBody,
   DEFAULT_QUIZ_THUMBNAIL,
@@ -450,5 +487,7 @@ export {
   passInv400,
   oldPass400,
   newPass400,
+  playerId400,
+  message400,
   invImg400
 };
