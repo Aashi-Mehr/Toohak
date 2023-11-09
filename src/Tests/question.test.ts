@@ -2,8 +2,8 @@ import {
   requestClear,
   requestRegister,
   requestQuizCreate,
-  // requestQuizInfo,
-  requestQuestionCreate
+  requestQuestionCreate,
+  requestQuizInfo
 } from './testHelper';
 
 /// ////////////////////////////////////////////////////////////////////////////
@@ -296,6 +296,25 @@ describe('questionCreate', () => {
       expect(result).toMatchObject(ERROR);
     });
 
+    test('Sum of the question durations in the quiz will be 181 seconds', () => {
+      // question body has a length of 60 seconds
+      for (let i = 0; i < 3; i++) {
+        const result = requestQuestionCreate(token1, quizId1, questionBody);
+        expect(result).not.toMatchObject(ERROR);
+      }
+
+      const result = requestQuestionCreate(token1, quizId1, {
+        question: 'Who let the dogs out?',
+        duration: 1,
+        points: 10,
+        answers: [
+          { answer: 'who?', correct: false },
+          { answer: 'you?', correct: true }
+        ]
+      });
+      expect(result).toMatchObject(ERROR);
+    });
+
     test('The points awarded for the question are less than 1', () => {
       const result = requestQuestionCreate(token1, quizId1, questionBodyInvalidPoint1);
       expect(result).toMatchObject(ERROR);
@@ -369,32 +388,21 @@ describe('questionCreate', () => {
       const result2 = requestQuestionCreate(token1, quizId1, questionBody2);
       expect(result).not.toMatchObject(result2);
     });
-    /*
-test('successfully create the question with correct infos', () => {
-const questionId = requestQuestionCreate(token1, quizId1, questionBody).questionId;
-const result = requestQuizInfo(token1, quizId1);
-expect(result.questions[0]).toMatchObject({
-questionId: questionId,
-question: questionString,
-duration: 60,
-points: 5,
-answers: [
-{
-answerId: expect.any(Number),
-answer: "Nobody Knows",
-correct: true,
-colour: expect.any(String)
 
-},
-{
-answerId: expect.any(Number),
-answer: "Onebody Knows",
-correct: false,
-colour: expect.any(String)
-}
-]
-});
-});
-*/
+    test('successfully create the question with correct infos', () => {
+      const questionId = requestQuestionCreate(
+        token1,
+        quizId1,
+        questionBody
+      ).questionId;
+
+      const result = requestQuizInfo(token1, quizId1);
+
+      expect(result.questions[0].questionId).toStrictEqual(questionId);
+      expect(result.questions[0].question).toStrictEqual(questionString);
+      expect(result.questions[0].duration).toStrictEqual(60);
+      expect(result.questions[0].points).toStrictEqual(5);
+      expect(result.questions[0].answers.length).toStrictEqual(2);
+    });
   });
 });

@@ -3,14 +3,15 @@ import { QuizId, Token } from '../dataStore';
 import {
   requestClear,
   requestRegister,
-  requestQuizCreate
+  requestQuizCreate,
+  requestQuizRemove
 } from './testHelper';
 
 beforeEach(() => {
   requestClear();
 });
 
-// Invalid Tokens
+// Token is empty or invalid (does not refer to valid logged in user session)
 describe('INVALID Tokens', () => {
   let result: QuizId;
 
@@ -37,6 +38,9 @@ describe('INVALID Tokens', () => {
   });
 });
 
+// Name contains invalid (Not alphanumeric or spaces) characters
+// Name is either less than 3 characters or more than 30 characters long
+// Name is already used by the current logged in user for another active quiz
 describe('INVALID Quiz Name', () => {
   let result: QuizId;
   let authRegisterResult: Token;
@@ -115,7 +119,7 @@ describe('INVALID Quiz Name', () => {
   });
 });
 
-// Description Length
+// Description is more than 100 characters in length
 describe('INVALID Description', () => {
   test('Description Length Greater than 100', () => {
     const authRegisterResult: Token = requestRegister('validEmail@gmail.com',
@@ -181,11 +185,11 @@ describe('VALID Details', () => {
       'Val1dPassword', 'first', 'last');
     const authId2 = authRegisterResult2.token;
 
-    const authRegisterResult3 = requestRegister('validEmail2@gmail.com',
+    const authRegisterResult3 = requestRegister('validEmail3@gmail.com',
       'Val1dPassword', 'first', 'last');
     const authId3 = authRegisterResult3.token;
 
-    const authRegisterResult4 = requestRegister('validEmail2@gmail.com',
+    const authRegisterResult4 = requestRegister('validEmail4@gmail.com',
       'Val1dPassword', 'first', 'last');
     const authId4 = authRegisterResult4.token;
 
@@ -196,5 +200,14 @@ describe('VALID Details', () => {
 
     result = requestQuizCreate(authId2, 'COMP Quiz2', 'COMP1531 Quiz.');
     expect(result).toMatchObject({ quizId: expect.any(Number) });
+  });
+
+  test('Reusing the name of a deleted quiz', () => {
+    const quizId = requestQuizCreate(authId, 'quizName1', '').quizId;
+    requestQuizRemove(authId, quizId);
+
+    // Name is already used by the current logged in user for another quiz
+    const result = requestQuizCreate(authId, 'quizName1', '');
+    expect(result).toStrictEqual({ quizId: expect.any(Number) });
   });
 });

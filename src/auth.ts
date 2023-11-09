@@ -7,7 +7,30 @@ import {
   Details,
   getUniqueID,
   Token,
+  emailUsed400,
+  emailValid400,
+  userChar400,
+  passLen400,
+  passChar400,
+  passInv400,
+  oldPass400,
+  newPass400,
+  token401
 } from './dataStore';
+
+import HTTPError from 'http-errors';
+import crypto from 'crypto';
+
+/** hash
+  * Returns the hash of a given string (sha256 and hex)
+  *
+  * @param { string } plaintext - The string to hash
+  *
+  * @returns { string } - All cases
+  */
+function hash(plaintext: string): string {
+  return crypto.createHash('sha256').update(plaintext).digest('hex').toString();
+}
 
 /** adminDetailsCheck
   * Checks email, password, and name then returns its validity
@@ -30,42 +53,26 @@ function detailsCheck(email: string, password: string,
   const hasLetter = /[a-zA-Z]/.test(password);
   const hasNumber = /\d/.test(password);
 
-  if (hasLetter === false || hasNumber === false) {
-    return {
-      error: 'Password does not contain at least one number and at ' +
-      'least one letter'
-    };
-  }
-  if (password.length < 8) {
-    return { error: 'Password is less than 8 characters' };
-  }
+  if (hasLetter === false || hasNumber === false) return { error: passChar400 };
+  if (password.length < 8) return { error: passLen400 };
 
   // Name can only consist of letters, spaces and hyphens
-  const invalidnameFirst = /[^a-zA-Z -']/.test(nameFirst);
-  const invalidnameLast = /[^a-zA-Z -']/.test(nameLast);
+  const invalidnameFirst = /[^a-zA-Z \-']/.test(nameFirst);
+  const invalidnameLast = /[^a-zA-Z \-']/.test(nameLast);
 
-  if (invalidnameFirst === true || invalidnameLast === true) {
-    return {
-      error: 'Name contains characters other than lowercase letters, ' +
-      'uppercase letters, spaces, hyphens, or apostrophes'
-    };
-  }
-  if (nameFirst.length < 2 || nameFirst.length > 20 ||
+  if (invalidnameFirst || invalidnameLast ||
+      nameFirst.length < 2 || nameFirst.length > 20 ||
       nameLast.length < 2 || nameLast.length > 20) {
-    return { error: 'Name is less than 2 or more than 20 characters' };
+    return { error: userChar400 };
   }
 
   // Email needs to be valid
   const validator = require('validator');
-  if (!validator.isEmail(email)) {
-    return { error: 'Email does not satisfy validator' };
-  }
+  if (!validator.isEmail(email)) return { error: emailValid400 };
 
   // Email cannot be duplicated
   for (const user of users) {
-    if (user.email === email) {
-      return { error: 'Email is currently used by another user' };
-    }
+    if (user.email === email) return { error: emailUsed400 };
   }
 
   // No errors, hence details are valid
@@ -84,9 +91,9 @@ function detailsCheck(email: string, password: string,
   * @returns { ErrorObject } - If the details are invalid
   */
 export function adminAuthRegister(email: string, password: string,
-  nameFirst: string, nameLast: string): Token | ErrorObject {
+  nameFirst: string, nameLast: string): Token {
   const valid = detailsCheck(email, password, nameFirst, nameLast);
-  if ('error' in valid) return valid;
+  if ('error' in valid) throw HTTPError(400, valid.error);
 
   const data = getData();
 
@@ -101,10 +108,10 @@ export function adminAuthRegister(email: string, password: string,
     nameLast: nameLast,
     name: nameFirst + ' ' + nameLast,
     email: email,
-    password: password,
-    successful_log_time: 0,
+    password: hash(password),
+    successful_log_time: 1,
     failed_password_num: 0,
-    prev_passwords: [password]
+    prev_passwords: [hash(password)]
   });
 
   data.sessions.push({
@@ -125,26 +132,24 @@ export function adminAuthRegister(email: string, password: string,
   * @param { string } nameLast - The new last name
   *
   * @returns { Record<string, never> } - If the deails are valid
-  * @returns { ErrorObject } - If the details are invalid
   */
 export function adminUserDetailsEdit(token: number, email: string,
-  nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
-  // ERROR CHECKING
+  nameFirst: string, nameLast: string): Record<string, never> {
+  // Get user details
   const user = getUser(token, getData());
-  if (!user) {
-    return {
-      error: 'Token is empty or invalid (does not refer to ' +
-    'valid logged in user session)'
-    };
-  }
+  // If the token is invalid, return error
+  if (!user) throw HTTPError(401, token401);
 
+  // Get user details
   const users = getData().users;
+  // Removing 'user' from user details
   getData().users.splice(users.indexOf(user), 1);
 
+  // Checking the validity in user details
   const valid = detailsCheck(email, user.password, nameFirst, nameLast);
   if ('error' in valid) {
     users.push(user);
-    return valid;
+    throw HTTPError(400, valid.error);
   }
 
   // ALTERING DATA If no error, push the new user and return the token
@@ -165,30 +170,40 @@ export function adminUserDetailsEdit(token: number, email: string,
   * @param { number } newPass - The new first name
   *
   * @returns { Record<string, never> } - If the deails are valid
-  * @returns { ErrorObject } - If the details are invalid
   */
 export function adminUserPasswordEdit(token: number, oldPass: string,
-  newPass: string): ErrorObject | Record<string, never> {
+  newPass: string): Record<string, never> {
   // ERROR CHECKING
   // Ensuring the user is valid
   const user = getUser(token, getData());
-  if (!user) return { error: 'Invalid token' };
-  if (user.password !== oldPass) return { error: 'Incorrect password' };
+
+  // Return error message if token is invalid
+  if (!user) throw HTTPError(401, token401);
+
+  // Return error message if the password entered does not match old password
+  if (user.password !== hash(oldPass)) throw HTTPError(400, oldPass400);
 
   // Password needs to have letters and numbers, greater than 8 characters
   const hasLetter = /[a-zA-Z]/.test(newPass);
   const hasNumber = /\d/.test(newPass);
 
-  if (hasLetter === false) return { error: 'Password needs letters' };
-  if (hasNumber === false) return { error: 'Password needs numbers' };
-  if (newPass.length < 8) return { error: 'Password is too short' };
-
-  for (const pass of user.prev_passwords) {
-    if (newPass === pass) return { error: 'Cannot reuse old password' };
+  // Return error if password does not contain letters
+  if (hasLetter === false || hasNumber === false) {
+    throw HTTPError(400, passChar400);
   }
 
-  user.prev_passwords.push(newPass);
-  user.password = newPass;
+  // Return error if password is less than 8 characters
+  if (newPass.length < 8) throw HTTPError(400, passLen400);
+
+  // Loop through previous password and return error if the new password
+  // is the same as the old password
+  for (const pass of user.prev_passwords) {
+    if (hash(newPass) === pass) throw HTTPError(400, newPass400);
+  }
+
+  // Push newPass into user details and set newPass to password
+  user.prev_passwords.push(hash(newPass));
+  user.password = hash(newPass);
 
   return { };
 }
@@ -206,17 +221,18 @@ export function adminAuthLogin(email: string, password: string):
   Token | ErrorObject {
   const users = getData().users;
 
+  // Loop through users
   for (const user of users) {
     // If the password is incorrect, but the email is correct, then attempts
     // need to be increased
-    if (user.email === email && user.password !== password) {
+    if (user.email === email && user.password !== hash(password)) {
       user.failed_password_num++;
-    } else if (user.email === email && user.password === password) {
+    } else if (user.email === email && user.password === hash(password)) {
       // Both the password and email are correct, so the user is logged-in
       user.failed_password_num = 0;
       user.successful_log_time++;
 
-      // The sessions needs to be added
+      // Adding new session
       const token: number = getUniqueID(getData());
       getData().sessions.push({
         token: token,
@@ -231,7 +247,7 @@ export function adminAuthLogin(email: string, password: string):
 
   // If all of the above code ran, but the token wasn't returned, then the
   // details were incorrect
-  return { error: 'Email or password is incorrect' };
+  throw HTTPError(400, passInv400);
 }
 
 /** adminUserDetails
@@ -240,12 +256,12 @@ export function adminAuthLogin(email: string, password: string):
   * @param { number } token - The user's session token
   *
   * @returns { Details } - If the token is valid
-  * @returns { ErrorObject } - If the token is invalid
   */
-export function adminUserDetails(token: number): Details | ErrorObject {
+export function adminUserDetails(token: number): Details {
   // Finds the user using the token, undefined is returned if not found
   const user = getUser(token, getData());
-  if (!user) return { error: 'Invalid token' };
+  // Return error if token is invalid
+  if (!user) throw HTTPError(401, token401);
 
   // Return the user's details
   return {
@@ -268,17 +284,14 @@ export function adminUserDetails(token: number): Details | ErrorObject {
   * @returns { Record<string, never> } - If the token is valid
   * @returns { ErrorObject } - If the token is invalid
   */
-export function adminAuthLogout(token: number):
-  ErrorObject | Record<string, never> {
+export function adminAuthLogout(token: number): Record<string, never> {
   // Finds the user using the token, undefined is returned if not found
   const session = getSession(token, getData().sessions);
-  if (!session) {
-    return {
-      error: 'Token is empty or invalid (does not refer ' +
-    'to valid logged in user session)'
-    };
-  }
 
+  // If session is not valid or exist
+  if (!session) throw HTTPError(401, token401);
+
+  // Set the validity of session to be false
   session.is_valid = false;
   return { };
 }
