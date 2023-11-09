@@ -150,6 +150,16 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   res.json(response);
 });
 
+// adminQuizTrash
+app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizTrash(token);
+
+  if ('error' in response) return res.status(401).json(response);
+  res.json(response);
+});
+*/
+
 // ====================================================================
 //  ========================= QUESTION FUNCTIONS =====================
 // ====================================================================
@@ -279,12 +289,9 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
 });
 
 // adminQuizTrash
-app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
-  const response = adminQuizTrash(token);
-
-  if ('error' in response) return res.status(401).json(response);
-  res.json(response);
+app.get('/v2/admin/quiz/trash', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  res.json(adminQuizTrash(token));
 });
 
 // adminQuizRemove
