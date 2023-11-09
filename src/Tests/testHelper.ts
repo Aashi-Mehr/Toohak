@@ -258,7 +258,7 @@ export function requestQuizCreate(token: number, name: string,
 }
 
 // GET QUIZ INFO Define wrapper function
-export function requestQuizInfo(token: number | string, quizId: number, 
+export function requestQuizInfo(token: number | string, quizId: number,
   v1?: boolean): QuizInfo {
   // Return 'v1' to const ver if v1 is ture, else return 'v2'
   const ver = v1 ? 'v1' : 'v2';
@@ -267,11 +267,13 @@ export function requestQuizInfo(token: number | string, quizId: number,
     `${SERVER_URL}/${ver}/admin/quiz/${quizId}?token=${token}`,
     {
       // v1 ? {Ope1} : {Ope2}, include Ope1 if v1 is true else include Ope2
-      ...(v1 ? { 
-        qs: { token: token } 
-      } : { 
-        headers: { token: token.toString() } 
-      })
+      ...(v1
+        ? {
+            qs: { token: token }
+          }
+        : {
+            headers: { token: token.toString() }
+          })
     }
   );
 
@@ -285,18 +287,20 @@ export function requestQuizInfo(token: number | string, quizId: number,
 }
 
 // GET QUIZ LIST Define wrapper function
-export function requestQuizList(token: number | string, 
+export function requestQuizList(token: number | string,
   v1?: boolean): QuizList {
   const ver = v1 ? 'v1' : 'v2';
   const res = request(
     'GET',
     `${SERVER_URL}/${ver}/admin/quiz/list?token=${token}`,
     {
-      ...(v1 ? { 
-        qs: { token: token } 
-      } : { 
-        headers: { token: token.toString() } 
-      })
+      ...(v1
+        ? {
+            qs: { token: token }
+          }
+        : {
+            headers: { token: token.toString() }
+          })
     }
   );
 
@@ -470,15 +474,17 @@ export function requestQuesMove(token: number | string, newPosition: number,
     'PUT',
     `${SERVER_URL}/${ver}/admin/quiz/${quizId}/question/${quesId}/move`,
     {
-      ...(v1 ? {
-        json: {
-          token: token,
-          newPosition: newPosition
-        }
-      } : {
-        json: { newPosition: newPosition },
-        headers: { token: token.toString() }
-      })
+      ...(v1
+        ? {
+            json: {
+              token: token,
+              newPosition: newPosition
+            }
+          }
+        : {
+            json: { newPosition: newPosition },
+            headers: { token: token.toString() }
+          })
     }
   );
 
@@ -499,11 +505,13 @@ export function requestQuesDup(token: number, quizid: number,
     'POST',
     `${SERVER_URL}/${ver}/admin/quiz/${quizid}/question/${questionid}/duplicate`,
     {
-      ...(v1 ? {
-        json: { token: token }
-      } : {
-        headers: { token: token.toString() }
-      })
+      ...(v1
+        ? {
+            json: { token: token }
+          }
+        : {
+            headers: { token: token.toString() }
+          })
     }
   );
 
