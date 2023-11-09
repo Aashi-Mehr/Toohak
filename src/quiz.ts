@@ -19,9 +19,7 @@ import {
   notBin400,
   QuizAdd,
   DEFAULT_QUIZ_THUMBNAIL,
-  invFile400,
-  invType400,
-  imgUrlValid
+  invImg400
 } from './dataStore';
 
 import HTTPError from 'http-errors';
@@ -429,6 +427,28 @@ function adminQuizEmptyTrash(token: number, quizId: number[]):
   return {};
 }
 
+/** isImgUrl
+  * Check if imgUrl is a valid file of valid png/jpg/jpeg type
+  *
+  * @param { string } url - The URL to check
+  *
+  * @returns { Promise<boolean> } - All cases
+  */
+async function isImgUrl(url: string): Promise<boolean> {
+  return fetch(url, {method: 'HEAD'}).then(res => {
+    if (res.headers.get('Content-Type').startsWith('image')) {
+      if (res.headers.get('Content-Type').endsWith('png') ||
+          res.headers.get('Content-Type').endsWith('jpg') ||
+          res.headers.get('Content-Type').endsWith('jpeg')) {
+        return true;
+
+      } else { return false; }
+
+    } else { return false; }
+
+  }).catch(() => { return false; })
+}
+
 /** adminQuizUpdateImageURL
   * Updates the quiz's thumbnail URL
   *
@@ -439,10 +459,21 @@ function adminQuizEmptyTrash(token: number, quizId: number[]):
   * @returns { Record<string, never> } - If the details given are valid
   * @throws { HTTPError } - If the details given are invalid
   */
-function adminQuizUpdateImageURL(token: number, quizId: number, imgUrl: string):
-  Record<string, never> {
+async function adminQuizUpdateImageURL(token: number, quizId: number,
+  imgUrl: string): Promise<Record<string, never>> {
+  // Check if authUserId is a positive integer
+  const user = getUser(token, getData());
+  if (!user) throw HTTPError(401, token401);
 
-  return { };
+  // Check if the quiz is valid and belongs to the user
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz || quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
+
+  let fileExists: boolean;
+  await isImgUrl(imgUrl).then((res) => { fileExists = res; });
+
+  if (fileExists == false) throw HTTPError(400, invImg400);
+  else if (fileExists == true) return { };
 }
 
 export {

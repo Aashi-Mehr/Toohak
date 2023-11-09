@@ -409,10 +409,11 @@ export function requestQuizImageUpdate(token: number, quizId: number,
   imgUrl: string): Record<string, never> {
   const res = request(
     'PUT',
-    SERVER_URL + '/v1/admin/quiz/:' + quizId + '/thumbnail',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/thumbnail',
     {
-      headers: { token: token.toString() }
-    }
+      headers: { token: token.toString() },
+      json: { imgUrl: imgUrl }
+    },
   );
 
   const result = JSON.parse(res.body.toString());

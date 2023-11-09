@@ -4,16 +4,22 @@ import HTTPError from 'http-errors';
 import {
   requestClear,
   requestQuizCreate,
+  requestQuizDescriptionUpdate,
   requestQuizImageUpdate,
+  requestQuizInfo,
   requestRegister
 } from "./testHelper";
 
 // Defining base data
 const validUrl = 'https://img.freepik.com/free-vector/support-local-business-' +
   'concept_23-2148592675.jpg';
+const validUrl2 = 'https://img.freepik.com/free-vector/hand-drawn-iranian-wom' +
+  'en-illustration_23-2149855924.jpg';
+const validUrl3 = 'https://img.freepik.com/free-vector/people-analyzing-growt' +
+  'h-charts_23-2148866843.jpg';
 const invalidType = 'https://i0.wp.com/www.galvanizeaction.org/wp-content/upl' +
   'oads/2022/06/Wow-gif.gif';
-const invalidFile = 'ThisIsCompletelyInvalid';
+const invalidFile = 'ThisIsCompletelyInvalid.jpg';
 
 let token1: number;
 let quizId1: number;
@@ -55,28 +61,75 @@ describe('adminQuizImageUpdate Error Cases', () => {
     )).toThrow(HTTPError[401]);
   });
   
-  // 400: imgUrl when fetched does not return a valid file
-  test('400: imgUrl when fetched does not return a valid file', () => {
-    expect(() => requestQuizImageUpdate(
-      token1, quizId1, invalidFile
-    )).toThrow(HTTPError[400]);
-  });
-  
   // 400: imgUrl when fetch is not a JPG or PNG image
   test('400: imgUrl when fetch is not a JPG or PNG image', () => {
     expect(() => requestQuizImageUpdate(
       token1, quizId1, invalidType
     )).toThrow(HTTPError[400]);
   });
+  
+  // 400: imgUrl when fetched does not return a valid file
+  test('400: imgUrl when fetched does not return a valid file', () => {
+    expect(() => requestQuizImageUpdate(
+      token1, quizId1, invalidFile
+    )).toThrow(HTTPError[400]);
+  });
+
+  // Compounded errors, should return largest number
+  test('401: Token and image URL are invalid', () => {
+    expect(() => requestQuizImageUpdate(
+      token1 * token2, quizId1, invalidFile
+    )).toThrow(HTTPError[401]);
+  });
+
+  // Compounded errors, should return largest number
+  test('403: Quiz Id and image URL are invalid', () => {
+    expect(() => requestQuizImageUpdate(
+      token1, quizId2, invalidFile
+    )).toThrow(HTTPError[403]);
+  });
+
+  // Compounded errors, should return largest number
+  test('403: Quiz Id and token are invalid', () => {
+    expect(() => requestQuizImageUpdate(
+      token2, quizId1, invalidFile
+    )).toThrow(HTTPError[403]);
+  });
 });
 
 // Valid Updates
 describe('adminQuizImageUpdate Valid Cases', () => {
-  let result: Record<string, never>;
-
   // Valid token is provided, user authorised, and the URL is valid
   test('Simple Case 1', () => {
-    result = requestQuizImageUpdate(token1, quizId1, validUrl);
+    let result = requestQuizImageUpdate(token1, quizId1, validUrl);
     expect(Object.keys(result).length).toStrictEqual(0);
   });
+
+  // Valid token is provided, user authorised, and the URL is valid
+  test('Simple Case 2', () => {
+    let result = requestQuizImageUpdate(token1, quizId1, validUrl2);
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  // Valid token is provided, user authorised, and the URL is valid
+  test('Simple Case 3', () => {
+    let result = requestQuizImageUpdate(token1, quizId1, validUrl3);
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  // Valid token is provided, user authorised, and the URL is valid
+  test('Complex Case 1', () => {
+    requestQuizImageUpdate(token1, quizId1, validUrl);
+    let result = requestQuizImageUpdate(token1, quizId1, validUrl2);
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  // WILL WORK AFTER QUIZ UPDATE HAS BEEN FINISHED
+  // // Valid token is provided, user authorised, and the URL is valid
+  // test('Complex Case 2', () => {
+  //   requestQuizImageUpdate(token1, quizId1, validUrl);
+  //   requestQuizDescriptionUpdate(token1, quizId1, 'New Desc');
+  //   let result = requestQuizInfo(token1, quizId1);
+  //   expect(result.thumbnailUrl).toStrictEqual(validUrl);
+  // });
 });

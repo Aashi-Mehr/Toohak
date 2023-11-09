@@ -49,8 +49,8 @@ const oldPass400 = 'Old Password is not the correct old password';
 const newPass400 = 'Old Password and New Password match exactly';
 
 // Image errors
-const invFile400 = 'When fetched, the URL doesn\'t return a valid file.';
-const invType400 = 'The URL is not of type JPG or PNG.';
+const invImg400 = 'When fetched, the URL doesn\'t return a valid file or type' +
+  ' is not JPG/JPEG or PNG.';
 
 // ENUM States
 export enum SessionState {
@@ -380,29 +380,6 @@ function getUniqueID(allData: Datastore): number {
   return allIds[randomPos];
 }
 
-/** imgUrlValid
-  * Checks if an image is valid or not
-  * 
-  * @param { string } imgUrl - The URL for the image to check
-  *
-  * @returns { ErrorObject } - Error cases, i.e., invalid type / URL
-  * @returns { Record<string, never> } - Successful URLs
-  */
-function imgUrlValid(imgUrl: string): ErrorObject | Record<string, never> {
-  // Check if imgUrl when fetched returns a valid file
-  fetch(imgUrl)
-  .then((data) => {
-    // Check if imgUrl when fetched is a JPG or PNG image
-    if (!['image/jpg', 'image/jpeg', 'image/png'].includes(data['type'])) {
-      return { error: invType400 };
-    }
-  })
-  .catch((err) => { return { error: invFile400 + '\n' + err } });
-
-  // Return nothing if correct type and URL
-  return { };
-}
-
 export {
   getData,
   setData,
@@ -410,7 +387,6 @@ export {
   getQuiz,
   getSession,
   getUniqueID,
-  imgUrlValid,
   ErrorObject,
   AuthUserId,
   User,
@@ -458,6 +434,5 @@ export {
   passInv400,
   oldPass400,
   newPass400,
-  invFile400,
-  invType400
+  invImg400
 };

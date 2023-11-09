@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import config from './config.json';
 import cors from 'cors';
 import errorHandler from 'middleware-http-errors';
+import HTTPError from 'http-errors';
 import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
@@ -44,7 +45,12 @@ import {
 } from './question';
 
 import { clear } from './other';
-import { getData, setData, token401, unauth403 } from './dataStore';
+import {
+  getData,
+  setData,
+  token401,
+  unauth403
+} from './dataStore';
 
 // Set up web app
 const app = express();
@@ -129,7 +135,7 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
 //  ========================== ITERATION 2 ===========================
 // ====================================================================
 
-/* // adminQuizList
+// adminQuizList
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
   const response = adminQuizList(token);
@@ -149,7 +155,7 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
     return res.status(403).json(response);
   }
   res.json(response);
-}); */
+});
 
 // ====================================================================
 //  ========================= QUESTION FUNCTIONS =====================
@@ -402,9 +408,13 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
 app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
   const token = parseInt(req.headers.token as string);
   const quizId = parseInt(req.params.quizid);
-  const { imgUrl } = req.body;
+  let { imgUrl } = req.body;
 
-  res.json(adminQuizUpdateImageURL(token, quizId, imgUrl));
+  adminQuizUpdateImageURL(token, quizId, imgUrl).then((resp) => {
+    res.json(resp);
+  }).catch((reason) => {
+    res.status(reason.statusCode).json(reason);
+  });
   backupData();
 });
 
