@@ -131,34 +131,22 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
 // adminQuizList
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
-  const response = adminQuizList(token);
-
-  if ('error' in response) return res.status(401).json(response);
-  res.json(response);
+  res.json(adminQuizList(token));
 });
 
 // adminQuizInfo
 app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  const quizId = parseInt(req.params.quizid);
   const token = parseInt(req.query.token as string);
-  const response = adminQuizInfo(token, quizId);
-
-  if ('error' in response) {
-    if (response.error === token401) return res.status(401).json(response);
-    return res.status(403).json(response);
-  }
-  res.json(response);
+  const quizId = parseInt(req.params.quizid);
+  res.json(adminQuizInfo(token, quizId));
 });
 
 // adminQuizTrash
 app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
   const response = adminQuizTrash(token);
-
-  if ('error' in response) return res.status(401).json(response);
   res.json(response);
 });
-*/
 
 // ====================================================================
 //  ========================= QUESTION FUNCTIONS =====================
@@ -265,12 +253,12 @@ app.put('/v2/admin/user/password', (req: Request, res: Response) => {
 // ====================================================================
 //  ========================= QUIZ FUNCTIONS =========================
 // ====================================================================
-//  =========================== VERSION 1 ============================
+//  =========================== VERSION 2 ============================
 // ====================================================================
 
 // adminQuizList
-app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
+app.get('/v2/admin/quiz/list', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
   res.json(adminQuizList(token));
 });
 
@@ -310,8 +298,8 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
 });
 
 // adminQuizInfo
-app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
+app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
   const quizId = parseInt(req.params.quizid);
   res.json(adminQuizInfo(token, quizId));
 });

@@ -364,9 +364,11 @@ export function requestQuizTransfer(token: number | string, quizId: number,
 export function requestQuizTrash(token: number): QuizList | ErrorObject {
   const res = request(
     'GET',
-    SERVER_URL + '/v1/admin/quiz/trash?token=' + token,
+    SERVER_URL + '/v2/admin/quiz/trash?token=' + token,
     {
-      qs: { }
+      headers: {
+        token: token.toString()
+      }
     }
   );
   // return JSON.parse(res.body.toString());
