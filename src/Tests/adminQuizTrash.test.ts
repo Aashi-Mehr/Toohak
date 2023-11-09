@@ -27,7 +27,6 @@ test('Test Invalid AuthUserId Format', () => {
 
   // authUserId contains out of range number
   expect(() => requestQuizTrash(-1)).toThrow(HTTPError[401]);
-
 });
 
 // Test : Non-Existing AuthUserId
@@ -37,7 +36,6 @@ test('Test Non-existing AuthUserId', () => {
 
   // user with authUserId does not exist
   expect(() => requestQuizTrash(userId.token + 1)).toThrow(HTTPError[401]);
-
 });
 
 // Test : Valid Input
