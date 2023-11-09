@@ -29,30 +29,44 @@ function detailsCheck(email: string, password: string,
   // Password needs to have letters and numbers, greater than 8 characters
   const hasLetter = /[a-zA-Z]/.test(password);
   const hasNumber = /\d/.test(password);
-  // let hasUpperCase = /[A-Z]/.test(password);
-  // let hasLowerCase = /[a-z]/.test(password);
 
-  if (hasLetter === false) return { error: 'Password needs letters' };
-  if (hasNumber === false) return { error: 'Password needs numbers' };
-  if (password.length < 8) return { error: 'Password is too short' };
+  if (hasLetter === false || hasNumber === false) {
+    return {
+      error: 'Password does not contain at least one number and at ' +
+      'least one letter'
+    };
+  }
+  if (password.length < 8) {
+    return { error: 'Password is less than 8 characters' };
+  }
 
   // Name can only consist of letters, spaces and hyphens
   const invalidnameFirst = /[^a-zA-Z -']/.test(nameFirst);
   const invalidnameLast = /[^a-zA-Z -']/.test(nameLast);
 
-  if (invalidnameFirst === true) return { error: 'Invalid name' };
-  if (invalidnameLast === true) return { error: 'Invalid Name' };
+  if (invalidnameFirst === true || invalidnameLast === true) {
+    return {
+      error: 'Name contains characters other than lowercase letters, ' +
+      'uppercase letters, spaces, hyphens, or apostrophes'
+    };
+  }
   if (nameFirst.length < 2 || nameFirst.length > 20 ||
       nameLast.length < 2 || nameLast.length > 20) {
-    return { error: 'Invalid name length' };
+    return { error: 'Name is less than 2 or more than 20 characters' };
   }
 
   // Email needs to be valid
   const validator = require('validator');
-  if (!validator.isEmail(email)) return { error: 'Invalid Email' };
+  if (!validator.isEmail(email)) {
+    return { error: 'Email does not satisfy validator' };
+  }
 
   // Email cannot be duplicated
-  for (const user of users) if (user.email === email) return { error: 'Used' };
+  for (const user of users) {
+    if (user.email === email) {
+      return { error: 'Email is currently used by another user' };
+    }
+  }
 
   // No errors, hence details are valid
   return { token: -1 };
@@ -117,7 +131,12 @@ export function adminUserDetailsEdit(token: number, email: string,
   nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
   // ERROR CHECKING
   const user = getUser(token, getData());
-  if (!user) return { error: 'Invalid token' };
+  if (!user) {
+    return {
+      error: 'Token is empty or invalid (does not refer to ' +
+    'valid logged in user session)'
+    };
+  }
 
   const users = getData().users;
   getData().users.splice(users.indexOf(user), 1);
@@ -154,6 +173,7 @@ export function adminUserPasswordEdit(token: number, oldPass: string,
   // Ensuring the user is valid
   const user = getUser(token, getData());
   if (!user) return { error: 'Invalid token' };
+  if (user.password !== oldPass) return { error: 'Incorrect password' };
 
   // Password needs to have letters and numbers, greater than 8 characters
   const hasLetter = /[a-zA-Z]/.test(newPass);
@@ -252,7 +272,12 @@ export function adminAuthLogout(token: number):
   ErrorObject | Record<string, never> {
   // Finds the user using the token, undefined is returned if not found
   const session = getSession(token, getData().sessions);
-  if (!session) return { error: 'Invalid token' };
+  if (!session) {
+    return {
+      error: 'Token is empty or invalid (does not refer ' +
+    'to valid logged in user session)'
+    };
+  }
 
   session.is_valid = false;
   return { };

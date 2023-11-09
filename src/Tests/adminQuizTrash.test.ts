@@ -1,14 +1,3 @@
-/* adminQuizTrashTest
-* Test file for adminQuizTrash function
-** adminQuizTrash
-* View the quizzes that are currently in the trash for the logged in user
-*
-* @param { number } token - The authUserId for the user
-*
-* @returns { QuizBrief } - If the details given are valid
-* @returns { ErrorObject } - If the details given are invalid
-*/
-
 import request from 'sync-request-curl';
 import { port, url } from '../config.json';
 import {
@@ -52,7 +41,8 @@ test('Test Invalid AuthUserId Format', () => {
 
 // Test : Non-Existing AuthUserId
 test('Test Non-existing AuthUserId', () => {
-  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last');
+  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+    'first', 'last');
 
   // user with authUserId does not exist
   const result = requestQuizTrash(userId.token + 1);
@@ -61,24 +51,22 @@ test('Test Non-existing AuthUserId', () => {
 
 // Test : Valid Input
 test('Test Valid Input', () => {
-  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last');
-  const quizId: number = requestQuizCreate(userId.token, 'Quiz1', 'This is Quiz 1').quizId;
+  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+    'first', 'last');
+  requestQuizCreate(userId.token, 'Quiz1', 'This is Quiz 1');
 
   const result = requestQuizTrash(userId.token);
   expect(result).toMatchObject({
-    quizzes: [
-      {
-        quizId: quizId,
-        name: 'first last',
-      },
-    ],
+    quizzes: [],
   });
 });
 
 // Test : Viewing Removed Quiz
 test('Test Viewing Removed Quiz', () => {
-  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword', 'first', 'last');
-  const quizId: number = requestQuizCreate(userId.token, 'Quiz 1', 'This is Quiz 1').quizId;
+  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+    'first', 'last');
+  const quizId: number = requestQuizCreate(userId.token, 'Quiz 1',
+    'This is Quiz 1').quizId;
 
   // Remove the quiz
   requestQuizRemove(userId.token, quizId);
@@ -89,7 +77,7 @@ test('Test Viewing Removed Quiz', () => {
     quizzes: [
       {
         quizId: quizId,
-        name: 'first last',
+        name: 'Quiz 1',
       },
     ],
   });
