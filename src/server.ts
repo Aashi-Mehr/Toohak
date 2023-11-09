@@ -125,10 +125,10 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
 // ====================================================================
 //  ========================= QUIZ FUNCTIONS =========================
 // ====================================================================
-//  ========================== ITERATION 2 ===========================
+//  =========================== Version 1 ============================
 // ====================================================================
 
-/* // adminQuizList
+// adminQuizList
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
   const response = adminQuizList(token);
@@ -148,7 +148,7 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
     return res.status(403).json(response);
   }
   res.json(response);
-}); */
+});
 
 // ====================================================================
 //  ========================= QUESTION FUNCTIONS =====================
@@ -259,8 +259,8 @@ app.put('/v2/admin/user/password', (req: Request, res: Response) => {
 // ====================================================================
 
 // adminQuizList
-app.get('/v2/admin/quiz/list', (req: Request, res: Response) => {
-  const token = parseInt(req.headers.token as string);
+app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
   res.json(adminQuizList(token));
 });
 
@@ -303,8 +303,8 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
 });
 
 // adminQuizInfo
-app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
-  const token = parseInt(req.headers.token as string);
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
   const quizId = parseInt(req.params.quizid);
   res.json(adminQuizInfo(token, quizId));
 });
@@ -389,6 +389,25 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
 
   res.json(response);
   backupData();
+});
+
+// ====================================================================
+//  ========================= QUIZ FUNCTIONS =========================
+// ====================================================================
+//  =========================== VERSION 2 ============================
+// ====================================================================
+
+// adminQuizList
+app.get('/v2/admin/quiz/list', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  res.json(adminQuizList(token));
+});
+
+// adminQuizInfo
+app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  const quizId = parseInt(req.params.quizid);
+  res.json(adminQuizInfo(token, quizId));
 });
 
 // ====================================================================
