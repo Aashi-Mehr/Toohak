@@ -1,5 +1,5 @@
 // Default Quiz Thumnail
-const DEFAULT_QUIZ_THUMBNAIL = "";
+const DEFAULT_QUIZ_THUMBNAIL = '';
 
 // ERROR MESSAGES
 // 403 Errors
@@ -56,23 +56,23 @@ const invImg400 = 'When fetched, the URL doesn\'t return a valid file or type' +
 export enum SessionState {
   // Players can join in this state, and nothing has started
   LOBBY = 'lobby',
-  
+
   // This is the question countdown period. It always exists before a question
   // is open and the frontend makes the request to move to the open state
   QUESTION_COUNTDOWN = 'question_countdown',
-  
+
   // This is when players can see the question and answers, and submit their
   // answers (as many times as they like)
   QUESTION_OPEN = 'question_open',
-  
+
   // This is when players can still see the question answers, but cannot submit
   QUESTION_CLOSE = 'question_close',
-  
+
   // This is when players can see the correct answer, as well as everyone
   // playings' performance in that question, whilst they typically wait to go to
   // the next countdown
   ANSWER_SHOW = 'answer_show',
-  
+
   // This is where the final results are displayed for all players and questions
   FINAL_RESULTS = 'final_results',
 

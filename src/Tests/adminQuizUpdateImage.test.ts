@@ -4,11 +4,9 @@ import HTTPError from 'http-errors';
 import {
   requestClear,
   requestQuizCreate,
-  requestQuizDescriptionUpdate,
   requestQuizImageUpdate,
-  requestQuizInfo,
   requestRegister
-} from "./testHelper";
+} from './testHelper';
 
 // Defining base data
 const validUrl = 'https://img.freepik.com/free-vector/support-local-business-' +
@@ -60,14 +58,14 @@ describe('adminQuizImageUpdate Error Cases', () => {
       9999999, quizId1, validUrl
     )).toThrow(HTTPError[401]);
   });
-  
+
   // 400: imgUrl when fetch is not a JPG or PNG image
   test('400: imgUrl when fetch is not a JPG or PNG image', () => {
     expect(() => requestQuizImageUpdate(
       token1, quizId1, invalidType
     )).toThrow(HTTPError[400]);
   });
-  
+
   // 400: imgUrl when fetched does not return a valid file
   test('400: imgUrl when fetched does not return a valid file', () => {
     expect(() => requestQuizImageUpdate(
@@ -101,26 +99,26 @@ describe('adminQuizImageUpdate Error Cases', () => {
 describe('adminQuizImageUpdate Valid Cases', () => {
   // Valid token is provided, user authorised, and the URL is valid
   test('Simple Case 1', () => {
-    let result = requestQuizImageUpdate(token1, quizId1, validUrl);
+    const result = requestQuizImageUpdate(token1, quizId1, validUrl);
     expect(Object.keys(result).length).toStrictEqual(0);
   });
 
   // Valid token is provided, user authorised, and the URL is valid
   test('Simple Case 2', () => {
-    let result = requestQuizImageUpdate(token1, quizId1, validUrl2);
+    const result = requestQuizImageUpdate(token1, quizId1, validUrl2);
     expect(Object.keys(result).length).toStrictEqual(0);
   });
 
   // Valid token is provided, user authorised, and the URL is valid
   test('Simple Case 3', () => {
-    let result = requestQuizImageUpdate(token1, quizId1, validUrl3);
+    const result = requestQuizImageUpdate(token1, quizId1, validUrl3);
     expect(Object.keys(result).length).toStrictEqual(0);
   });
 
   // Valid token is provided, user authorised, and the URL is valid
   test('Complex Case 1', () => {
     requestQuizImageUpdate(token1, quizId1, validUrl);
-    let result = requestQuizImageUpdate(token1, quizId1, validUrl2);
+    const result = requestQuizImageUpdate(token1, quizId1, validUrl2);
     expect(Object.keys(result).length).toStrictEqual(0);
   });
 

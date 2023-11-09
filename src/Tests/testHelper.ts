@@ -413,7 +413,7 @@ export function requestQuizImageUpdate(token: number, quizId: number,
     {
       headers: { token: token.toString() },
       json: { imgUrl: imgUrl }
-    },
+    }
   );
 
   const result = JSON.parse(res.body.toString());

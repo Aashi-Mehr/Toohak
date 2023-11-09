@@ -4,7 +4,6 @@ import morgan from 'morgan';
 import config from './config.json';
 import cors from 'cors';
 import errorHandler from 'middleware-http-errors';
-import HTTPError from 'http-errors';
 import YAML from 'yaml';
 import sui from 'swagger-ui-express';
 import fs from 'fs';
@@ -408,7 +407,7 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
 app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
   const token = parseInt(req.headers.token as string);
   const quizId = parseInt(req.params.quizid);
-  let { imgUrl } = req.body;
+  const { imgUrl } = req.body;
 
   adminQuizUpdateImageURL(token, quizId, imgUrl).then((resp) => {
     res.json(resp);

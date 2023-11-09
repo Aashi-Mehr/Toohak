@@ -435,18 +435,15 @@ function adminQuizEmptyTrash(token: number, quizId: number[]):
   * @returns { Promise<boolean> } - All cases
   */
 async function isImgUrl(url: string): Promise<boolean> {
-  return fetch(url, {method: 'HEAD'}).then(res => {
+  return fetch(url, { method: 'HEAD' }).then(res => {
     if (res.headers.get('Content-Type').startsWith('image')) {
       if (res.headers.get('Content-Type').endsWith('png') ||
           res.headers.get('Content-Type').endsWith('jpg') ||
           res.headers.get('Content-Type').endsWith('jpeg')) {
         return true;
-
       } else { return false; }
-
     } else { return false; }
-
-  }).catch(() => { return false; })
+  }).catch(() => { return false; });
 }
 
 /** adminQuizUpdateImageURL
@@ -472,8 +469,8 @@ async function adminQuizUpdateImageURL(token: number, quizId: number,
   let fileExists: boolean;
   await isImgUrl(imgUrl).then((res) => { fileExists = res; });
 
-  if (fileExists == false) throw HTTPError(400, invImg400);
-  else if (fileExists == true) return { };
+  if (!fileExists) throw HTTPError(400, invImg400);
+  return { };
 }
 
 export {
