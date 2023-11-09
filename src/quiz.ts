@@ -347,15 +347,15 @@ function adminQuizTrash(token: number):
   * @returns { Record<string, never>  } - If the details given are valid
   * @returns { ErrorObject } - If the details given are invalid
   */
-function adminQuizRestore(token: number, quizId: number):
-  ErrorObject | Record<string, any> {
+function adminQuizRestore(token: number, quizId: number): Record<string, any> {
+  // ErrorObject | Record<string, any> {
   // Check if authUserId is valid
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Check if quizId is valid
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Loop through quizzes to check for existingQuizzes
   const existingQuizzes = getData().quizzes;
@@ -366,7 +366,8 @@ function adminQuizRestore(token: number, quizId: number):
       activeQuiz.quizId !== quizId) {
       // Return error if quiz name of the restored quiz is already used
       // by another active quiz or quiz is not in trash
-      return { error: nameUsed400 };
+      // return { error: nameUsed400 };
+      throw HTTPError(400, nameUsed400);
     }
   }
 
@@ -377,7 +378,8 @@ function adminQuizRestore(token: number, quizId: number):
     quiz.in_trash = false;
 
     return { };
-  } else return { error: notBin400 };
+  // } else return { error: notBin400 };
+  } throw HTTPError(400, notBin400);
 }
 
 /** adminQuizEmptyTrash

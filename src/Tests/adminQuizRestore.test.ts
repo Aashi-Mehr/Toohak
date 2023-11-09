@@ -1,4 +1,8 @@
-import { Token } from '../dataStore';
+import { 
+  Token,
+  ErrorObject
+} from '../dataStore';
+
 import {
   requestQuizRestore,
   requestClear,
@@ -6,6 +10,9 @@ import {
   requestQuizCreate,
   requestQuizRemove
 } from './testHelper';
+
+import HTTPError from 'http-errors';
+
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
@@ -15,6 +22,8 @@ import {
 beforeEach(() => {
   requestClear();
 });
+
+let result: ErrorObject | Record<string, any>;
 
 // Test 400 : Quiz Name of restored quiz is already used by another active quiz
 test('Test Restored Quiz Name', () => {
@@ -33,7 +42,7 @@ test('Test Restored Quiz Name', () => {
 
   // Restore the quiz with same name
   const result = requestQuizRestore(userId.token, quizId);
-  expect(result).toHaveProperty('error');
+  expect(result).toThrow(HTTPError[400]);
 });
 
 // Test 400 : Quiz ID refers to a quiz thats not in trash
@@ -48,7 +57,7 @@ test('Test Restored Quiz Not In Trash', () => {
 
   // Restore the quiz that has not been removed
   const result = requestQuizRestore(userId.token, quizId);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(result).toThrow(HTTPError[400]);
 });
 
 test('Quiz ID does not exist', () => {
@@ -61,7 +70,7 @@ test('Quiz ID does not exist', () => {
 
   // Restore a quiz with non-existing or wrongly inputted quizId
   const result = requestQuizRestore(userId.token, quizId + 1);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(result).toThrow(HTTPError[400]);
 });
 
 test('Quiz not in trash', () => {
@@ -73,18 +82,18 @@ test('Quiz not in trash', () => {
 
   // Restore a quiz with non-existing or wrongly inputted quizId
   const result = requestQuizRestore(userId, quizId);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(result).toThrow(HTTPError[400]);
 });
 
 // Test 401 : Invalid AuthUserId Format
 test('Test Invalid AuthUserId Format', () => {
   // authUserId is empty
   let result = requestQuizRestore(0, 11);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(result).toThrow(HTTPError[401]);
 
   // authUserId contains out of range number
   result = requestQuizRestore(-1, 11);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(result).toThrow(HTTPError[401]);
 });
 
 test('Test Invalid AuthUserId', () => {
@@ -100,7 +109,7 @@ test('Test Invalid AuthUserId', () => {
 
   // Restore the quiz with invalid userId
   const result = requestQuizRestore(userId.token + 1, quizId);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(result).toThrow(HTTPError[401]);
 });
 
 // Test 403 : Valid token but user is not the owner of the quiz
@@ -117,7 +126,7 @@ test('Quiz ID does not owned by user', () => {
 
   // Restoring the quiz from user 1 using userId of user 2
   const result = requestQuizRestore(userId2.token, quizId);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(result).toThrow(HTTPError[403]);
 });
 
 // Test 200 : Perfect Case
@@ -132,7 +141,9 @@ test('Perfect Case', () => {
   // Remove the quiz
   requestQuizRemove(userId.token, quizId);
 
-  // Restore the quiz with invalid userId
+  // Restore the quiz with valid userId
   const result = requestQuizRestore(userId.token, quizId);
-  expect(result).not.toHaveProperty('error');
+  // expect(result).toMatchObject({ quizId: expect.any(Number) });
+  // expect(result).not.toThrow(HTTPError[401]);
+  expect(result).toMatchObject( {} );
 });
