@@ -12,6 +12,8 @@ import {
   ErrorObject,
   Details,
   QuizList,
+  Message,
+  MessageBody,
 } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
@@ -526,4 +528,34 @@ export function requestQuesDelete(token: number, quizId: number,
   );
 
   return JSON.parse(res.body.toString());
+}
+
+// ====================================================================
+//  ======================== PLAYER FUNCTIONS ========================
+// ====================================================================
+export function requestPlayerMessage(playerId: number, message: MessageBody):
+  Record<string, never> {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/player/' + playerId + '/chat',
+    { json: { message: message } }
+  );
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
+}
+
+export function requestPlayerChat(playerId: number): { messages: Message[] } {
+  const res = request('GET', SERVER_URL + '/v1/player/' + playerId + '/chat');
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }

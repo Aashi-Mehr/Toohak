@@ -213,17 +213,29 @@ interface Token {
 }
 
 // INTERFACE Quiz Sessions
-interface quizSessionPlayers {
+interface Message {
+  messageBody: string,
+  playerId: number,
+  playerName: string,
+  timeSent: number
+}
+
+interface MessageBody {
+  messageBody: string
+}
+
+interface QuizSessionPlayers {
   name: string,
   playerId: number
 }
 
-interface quizSessionAdd {
+interface QuizSessionAdd {
   sessionId: number,
   state: string,
   atQuestion: number,
   quiz: QuizAdd,
-  players: quizSessionPlayers[]
+  players: QuizSessionPlayers[],
+  messages: Message[]
 }
 
 // INTERFACE Datastore
@@ -231,7 +243,7 @@ interface Datastore {
   users: UserAdd[],
   quizzes: QuizAdd[],
   sessions: SessionAdd[],
-  quizSessions: quizSessionAdd[]
+  quizSessions: QuizSessionAdd[]
 }
 
 // Datastore, initially set in server.ts on startup
@@ -406,6 +418,10 @@ export {
   QuestionBodyV2,
   QuestionId,
   Answer,
+  Message,
+  QuizSessionPlayers,
+  QuizSessionAdd,
+  MessageBody,
   DEFAULT_QUIZ_THUMBNAIL,
   unauth403,
   token401,

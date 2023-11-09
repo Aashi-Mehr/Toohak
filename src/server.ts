@@ -50,6 +50,7 @@ import {
   token401,
   unauth403
 } from './dataStore';
+import { playerMessageChat, playerViewChat } from './player';
 
 // Set up web app
 const app = express();
@@ -317,7 +318,6 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
 // adminQuizTrash
 app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
-  console.log('is this error');
   const response = adminQuizTrash(token);
 
   if ('error' in response) return res.status(401).json(response);
@@ -355,17 +355,21 @@ app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
 //  =========================== VERSION 1 ============================
 // ====================================================================
 
-// adminQuestionCreate
+// adminQuizUpdateImageURL ============================== ITERATION 3 ==========
 app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
   const token = parseInt(req.headers.token as string);
   const quizId = parseInt(req.params.quizid);
   const { imgUrl } = req.body;
 
-  adminQuizUpdateImageURL(token, quizId, imgUrl).then((resp) => {
-    res.json(resp);
-  }).catch((reason) => {
-    res.status(reason.statusCode).json(reason);
-  });
+  adminQuizUpdateImageURL(token, quizId, imgUrl)
+    .then((resp) => { res.json(resp); })
+    .catch((resp) => { res.status(resp.statusCode).json(resp); });
+  // .catch((resp) => {
+  //   if (resp.statusCode === 400) { res.json(throwInvImg400()); }
+  //   else if (resp.statusCode === 401) { res.json(throwToken401()); }
+  //   else if (resp.statusCode === 403) { res.json(throwUnauth403()); }
+  // });
+
   backupData();
 });
 
@@ -477,6 +481,24 @@ app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate',
     res.json(adminQuestionDuplicate(token, quesId, quizId));
     backupData();
   });
+
+// ====================================================================
+//  ======================== PLAYER FUNCTIONS ========================
+// ====================================================================
+//  =========================== VERSION 2 ============================
+// ====================================================================
+app.get('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  res.json(playerViewChat(playerId));
+  backupData();
+});
+
+app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const message = req.body.message;
+  res.json(playerMessageChat(playerId, message));
+  backupData();
+});
 
 // ====================================================================
 //  ======================== OTHER FUNCTIONS =========================

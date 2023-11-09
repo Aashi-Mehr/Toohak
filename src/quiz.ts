@@ -471,6 +471,10 @@ async function adminQuizUpdateImageURL(token: number, quizId: number,
   return { };
 }
 
+// function throwUnauth403() { throw HTTPError(403, unauth403); }
+// function throwToken401() { throw HTTPError(401, token401); }
+// function throwInvImg400() { throw HTTPError(400, invImg400); }
+
 export {
   adminQuizList,
   adminQuizInfo,
@@ -482,5 +486,8 @@ export {
   adminQuizRestore,
   adminQuizTransfer,
   adminQuizEmptyTrash,
-  adminQuizUpdateImageURL
+  adminQuizUpdateImageURL,
+  // throwUnauth403,
+  // throwToken401,
+  // throwInvImg400
 };
