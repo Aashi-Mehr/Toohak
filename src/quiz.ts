@@ -247,17 +247,16 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
   description: string): ErrorObject | Record<string, never> {
   // Ensuring the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
-
+  if (!quiz) throw HTTPError(400, 'quiz doesnt exist to edit description');
   // Ensuring the token is valid
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Ensuring the user owns the quiz
-  if (user.authUserId !== quiz.authId) return { error: unauth403 };
+  if (user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);
 
   // Dexcriotion must be within 100 characters
-  if (description.length > 100) return { error: desc400 };
+  if (description.length > 100) throw HTTPError(400, desc400);
 
   // Quiz is valid
   if (quiz.in_trash === false) {
@@ -266,7 +265,7 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
     return { };
   } else {
     // Exit with an error message if the quiz is invalid
-    return { error: unauth403 };
+    throw HTTPError(400, 'quiz is invalid');
   }
 }
 
@@ -285,21 +284,21 @@ function adminQuizTransfer(token: number, quizId: number,
   const data = getData();
   // Checking if the user exists
   const user = getUser(token, data);
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Checking if the quiz exists
   const quiz = getQuiz(quizId, data.quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(400, 'invalid quiz');
 
   // Checking the user owns the quiz
-  if (quiz.authId !== user.authUserId) return { error: unauth403 };
+  if (quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
 
   const newUser = data.users.find(user => user.email === userEmail);
   if (!newUser) return { error: notUser400 };
   else if (user.email === userEmail) return { error: currUser400 };
   else if (data.quizzes.some(quiz2 => quiz2.authId === newUser.authUserId &&
                              quiz2.name === quiz.name)) {
-    return { error: nameUsed400 };
+    throw HTTPError(400, nameUsed400);
   }
 
   quiz.authId = newUser.authUserId;
@@ -307,7 +306,6 @@ function adminQuizTransfer(token: number, quizId: number,
 
   return {};
 }
-
 // last edit: 18/10/2023 by Zhejun Gu
 /** adminQuizTrash
   * View the quizzes that are currently in the trash for the logged in user

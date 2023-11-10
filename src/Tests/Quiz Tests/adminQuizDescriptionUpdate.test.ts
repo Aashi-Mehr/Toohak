@@ -21,7 +21,7 @@ beforeEach(() => {
 test('token is not a valid user', () => {
   // token is not invalid, out of range integer
   const result = requestQuizDescriptionUpdate(invalidUser, quizId, description);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(result).toStrictEqual(400);
 });
 
 test('Token is invalid, but quiz exists', () => {
@@ -30,7 +30,7 @@ test('Token is invalid, but quiz exists', () => {
     'last').token;
   const quizId1 = requestQuizCreate(token2, 'first last', 'fist_test').quizId;
   const result = requestQuizDescriptionUpdate(token2 + 1, quizId1, description);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(result).toStrictEqual(401);
 });
 
 test('Quiz is in trash', () => {
@@ -40,15 +40,14 @@ test('Quiz is in trash', () => {
   const quizId1 = requestQuizCreate(token2, 'first last', 'fist_test').quizId;
   requestQuizRemove(token2, quizId1);
   const result = requestQuizDescriptionUpdate(token2, quizId1, description);
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(result).toStrictEqual(400);
 });
 
 test('Quiz ID does not refer to a valid quiz', () => {
   const token1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first',
     'last').token;
   const result = requestQuizDescriptionUpdate(token1, quizId, description);
-
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(result).toStrictEqual(400);
 });
 
 test('Quiz ID does not refer to a quiz that this user owns', () => {
@@ -60,7 +59,7 @@ test('Quiz ID does not refer to a quiz that this user owns', () => {
 
   const result = requestQuizDescriptionUpdate(token1, quizId1, description);
 
-  expect(result).toMatchObject({ error: expect.any(String) });
+  expect(result).toStrictEqual(403);
 });
 
 test('Description is more than 100 characters in length', () => {
@@ -72,7 +71,8 @@ test('Description is more than 100 characters in length', () => {
   for (let i = 0; i <= 100; i++) longDescription += 'a';
 
   const result = requestQuizDescriptionUpdate(token1, quizId1, longDescription);
-  expect(result).toMatchObject({ error: expect.any(String) });
+
+  expect(result).toStrictEqual(400);
 });
 
 describe('VALID Tests', () => {
