@@ -596,3 +596,17 @@ export function requestPlayerChat(playerId: number): { messages: Message[] } {
 
   return result;
 }
+
+export function requestguestJoinSession(
+  sessionId: number, name: string) {
+  return requestHelper('POST', '/v1/player/join', { sessionId, name });
+}
+
+export function requestguestQuestionAnswer(answerIds: number[],
+  playerId: number, questionPosition: number): Record<string, never> {
+  return requestHelper('PUT', '/v1/player/' + playerId + '/question/' + questionPosition + '/answer', { answerIds, playerId, questionPosition });
+}
+
+export function requestguestSessionResult(playerId: number) {
+  return requestHelper('GET', '/v1/player/:playerid/results', { playerId });
+}
