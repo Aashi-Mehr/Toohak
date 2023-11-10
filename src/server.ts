@@ -51,6 +51,7 @@ import {
   unauth403
 } from './dataStore';
 import { playerMessageChat, playerViewChat } from './player';
+import { quizSessionStart } from './sessions';
 
 // Set up web app
 const app = express();
@@ -325,6 +326,21 @@ app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
 });
 
 // ====================================================================
+//  ======================= SESSION FUNCTIONS ========================
+// ====================================================================
+//  =========================== VERSION 1 ============================
+// ====================================================================
+app.post('/v1/admin/quiz/:quizid/session/start',
+  (req: Request, res: Response) => {
+    const quizId = parseInt(req.params.quizid);
+    const token = parseInt(req.query.token as string);
+    const autoStart = parseInt(req.body.autoStartNum);
+
+    res.json(quizSessionStart(token, quizId, autoStart));
+    backupData();
+  });
+
+// ====================================================================
 //  ========================= QUIZ FUNCTIONS =========================
 // ====================================================================
 //  =========================== VERSION 2 ============================
@@ -354,36 +370,6 @@ app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
 // ====================================================================
 //  =========================== VERSION 1 ============================
 // ====================================================================
-
-// adminQuizUpdateImageURL ============================== ITERATION 3 ==========
-app.put('/v1/admin/quiz/:quizid/thumbnail',
-  async (req: Request, res: Response) => {
-    const token = parseInt(req.headers.token as string);
-    const quizId = parseInt(req.params.quizid);
-    let { imgUrl } = req.body;
-
-    let validUrl = true;
-
-    // Check if imgUrl is a valid file of valid png/jpg/jpeg type
-    await fetch(imgUrl, { method: 'HEAD' }).then(res => {
-      if (res.headers.get('Content-Type').startsWith('image')) {
-        if (!res.headers.get('Content-Type').endsWith('png') &&
-          !res.headers.get('Content-Type').endsWith('jpg') &&
-          !res.headers.get('Content-Type').endsWith('jpeg')) {
-        // Checks the type is correct
-          validUrl = false;
-        }
-      } else { validUrl = false; }
-    }).catch(() => { validUrl = false; });
-
-    if (!validUrl) imgUrl = '';
-
-    try {
-      res.json(adminQuizUpdateImageURL(token, quizId, imgUrl));
-    } catch (error) { res.status(error.statusCode).json(error); }
-
-    backupData();
-  });
 
 // adminQuestionCreate
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
@@ -460,6 +446,36 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
     const token = parseInt(req.body.token as string);
 
     res.json(adminQuestionDuplicate(token, quesId, quizId));
+    backupData();
+  });
+
+// adminQuizUpdateImageURL
+app.put('/v1/admin/quiz/:quizid/thumbnail',
+  async (req: Request, res: Response) => {
+    const token = parseInt(req.headers.token as string);
+    const quizId = parseInt(req.params.quizid);
+    let { imgUrl } = req.body;
+
+    let validUrl = true;
+
+    // Check if imgUrl is a valid file of valid png/jpg/jpeg type
+    await fetch(imgUrl, { method: 'HEAD' }).then(res => {
+      if (res.headers.get('Content-Type').startsWith('image')) {
+        if (!res.headers.get('Content-Type').endsWith('png') &&
+          !res.headers.get('Content-Type').endsWith('jpg') &&
+          !res.headers.get('Content-Type').endsWith('jpeg')) {
+        // Checks the type is correct
+          validUrl = false;
+        }
+      } else { validUrl = false; }
+    }).catch(() => { validUrl = false; });
+
+    if (!validUrl) imgUrl = '';
+
+    try {
+      res.json(adminQuizUpdateImageURL(token, quizId, imgUrl));
+    } catch (error) { res.status(error.statusCode).json(error); }
+
     backupData();
   });
 

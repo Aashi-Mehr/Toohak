@@ -250,6 +250,10 @@ interface Datastore {
   quizSessions: QuizSessionAdd[]
 }
 
+interface QuizSessionId {
+  sessionId: number
+}
+
 // Datastore, initially set in server.ts on startup
 let data: Datastore = {
   users: [],
@@ -454,6 +458,7 @@ export {
   QuestionBody,
   QuestionBodyV2,
   QuestionId,
+  QuizSessionId,
   Answer,
   Message,
   QuizSessionPlayer,

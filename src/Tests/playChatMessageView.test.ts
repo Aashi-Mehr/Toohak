@@ -29,7 +29,7 @@ beforeEach(() => {
 
   // token = requestRegister('am@gmail.com', 'Val1Pass', 'fir', 'las').token;
   // quizId = requestQuizCreate(token, 'Quiz1', '').quizId;
-  // sessionId = requestSessionStart(quizId, token, 3).sessionId;
+  // sessionId = requestSessionStart(token, quizId, 3).sessionId;
   // playerId = requestPlayerRegister(sessionId, 'Player1').playerId;
 });
 

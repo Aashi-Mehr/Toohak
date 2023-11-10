@@ -14,6 +14,7 @@ import {
   QuizList,
   Message,
   MessageBody,
+  QuizSessionId,
 } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
@@ -423,6 +424,30 @@ export function requestQuizImageUpdate(token: number, quizId: number,
     {
       headers: { token: token.toString() },
       json: { imgUrl: imgUrl }
+    }
+  );
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
+}
+
+// ====================================================================
+//  ======================== SESSION FUNCTIONS =======================
+// ====================================================================
+// POST START SESSION Define Wrapper Function
+export function requestQuizSessionStart(token: number, quizId: number,
+  autoStart: number): QuizSessionId {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/session/start',
+    {
+      headers: { token: token.toString() },
+      json: { autoStart: autoStart }
     }
   );
 
