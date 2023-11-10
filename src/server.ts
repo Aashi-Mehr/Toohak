@@ -386,7 +386,6 @@ app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   backupData();
 });
 
-
 // adminQuizUpdateQuestion
 app.put('/v1/admin/quiz/:quizid/question/:questionid',
   (req: Request, res: Response) => {
@@ -553,7 +552,6 @@ app.get('/v1/player/:playerid/results', (req: Request, res: Response) => {
   res.json(ret);
   backupData();
 });
-
 
 // ====================================================================
 //  ======================== OTHER FUNCTIONS =========================

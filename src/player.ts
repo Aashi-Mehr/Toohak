@@ -30,7 +30,7 @@ import {
     interface PlayerIdObject {
       playerId: number
   }
-  
+
   interface EmptyReturn {
       [key: string]: never;
     }
@@ -81,7 +81,6 @@ export function playerMessageChat(playerId: number, message: MessageBody):
   // Empty Object Otherwise
   return { };
 }
-
 
 /**
  * Generate a random name with 5 letters and 3 numbers with
@@ -143,7 +142,7 @@ export const guestJoinSession = (sessionId: number, name: string): PlayerIdObjec
 
   session.players.push(player);
 
-  const token = data.users.find(t => t.authUserId === session.quiz.authId);
+  // const token = data.users.find(t => t.authUserId === session.quiz.authId);
 
   setData(data);
 
