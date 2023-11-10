@@ -12,6 +12,9 @@ import {
   ErrorObject,
   Details,
   QuizList,
+  Message,
+  MessageBody,
+  QuizSessionId,
 } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
@@ -258,15 +261,22 @@ export function requestQuizCreate(token: number, name: string,
 }
 
 // GET QUIZ INFO Define wrapper function
-export function requestQuizInfo(token: number | string, quizId: number):
-  QuizInfo {
+export function requestQuizInfo(token: number | string, quizId: number,
+  v1?: boolean): QuizInfo {
+  // Return 'v1' to const ver if v1 is ture, else return 'v2'
+  const ver = v1 ? 'v1' : 'v2';
   const res = request(
     'GET',
-    SERVER_URL + '/v2/admin/quiz/' + quizId + '?token=' + token,
+    `${SERVER_URL}/${ver}/admin/quiz/${quizId}?token=${token}`,
     {
-      headers: {
-        token: token.toString()
-      }
+      // v1 ? {Ope1} : {Ope2}, include Ope1 if v1 is true else include Ope2
+      ...(v1
+        ? {
+            qs: { token: token }
+          }
+        : {
+            headers: { token: token.toString() }
+          })
     }
   );
 
@@ -280,14 +290,20 @@ export function requestQuizInfo(token: number | string, quizId: number):
 }
 
 // GET QUIZ LIST Define wrapper function
-export function requestQuizList(token: number | string): QuizList {
+export function requestQuizList(token: number | string,
+  v1?: boolean): QuizList {
+  const ver = v1 ? 'v1' : 'v2';
   const res = request(
     'GET',
-    SERVER_URL + '/v2/admin/quiz/list?token=' + token,
+    `${SERVER_URL}/${ver}/admin/quiz/list?token=${token}`,
     {
-      headers: {
-        token: token.toString()
-      }
+      ...(v1
+        ? {
+            qs: { token: token }
+          }
+        : {
+            headers: { token: token.toString() }
+          })
     }
   );
 
@@ -338,10 +354,8 @@ export function requestQuizRemove(token: number, quizId: number):
   ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '?token=' + token,
-    {
-      qs: { }
-    }
+    SERVER_URL + '/v1/admin/quiz/' + quizId,
+    { qs: { token: token } }
   );
   return JSON.parse(res.body.toString());
 }
@@ -358,30 +372,25 @@ export function requestQuizTransfer(token: number | string, quizId: number,
       }
     }
   );
+
   return JSON.parse(res.body.toString());
 }
 // GET QUIZ TRASH Define wrapper function
-export function requestQuizTrash(token: number, v1?: boolean): QuizList | ErrorObject {
-  let res;
 
+export function requestQuizTrash(token: number, v1?: boolean):
+  QuizList | ErrorObject {
+  let res;
   if (v1) {
     res = request(
       'GET',
-      SERVER_URL + '/v1/admin/quiz/trash?token=' + token,
-      {
-        qs: { token: token }
-      }
-
+      SERVER_URL + '/v1/admin/quiz/trash',
+      { qs: { token: token } }
     );
   } else {
     res = request(
       'GET',
-      SERVER_URL + '/v2/admin/quiz/trash?token=' + token,
-      {
-        headers: {
-          token: token.toString()
-        }
-      }
+      SERVER_URL + '/v2/admin/quiz/trash',
+      { headers: { token: token.toString() } }
     );
   }
 
@@ -430,13 +439,55 @@ export function requestQuizEmptyTrash(token: number, quizId: number[]):
   ErrorObject | Record<string, never> {
   const res = request(
     'DELETE',
-    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId +
-      ']&token=' + token,
-    {
-      qs: { }
-    }
+    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId + ']',
+    { qs: { token: token } }
   );
   return JSON.parse(res.body.toString());
+}
+
+// DELETE EMPTY TRASH Define Wrapper Function
+export function requestQuizImageUpdate(token: number, quizId: number,
+  imgUrl: string): Record<string, never> {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/thumbnail',
+    {
+      headers: { token: token.toString() },
+      json: { imgUrl: imgUrl }
+    }
+  );
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
+}
+
+// ====================================================================
+//  ======================== SESSION FUNCTIONS =======================
+// ====================================================================
+// POST START SESSION Define Wrapper Function
+export function requestQuizSessionStart(token: number, quizId: number,
+  autoStart: number): QuizSessionId {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/session/start',
+    {
+      headers: { token: token.toString() },
+      json: { autoStartNum: autoStart }
+    }
+  );
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // ====================================================================
@@ -461,17 +512,23 @@ export function requestQuestionCreate(token: number | string,
 
 // QUESTION MOVE Define wrapper function
 export function requestQuesMove(token: number | string, newPosition: number,
-  quesId: number, quizId: number): Record<string, never> {
+  quesId: number, quizId: number, v1?: boolean): Record<string, never> {
+  const ver = v1 ? 'v1' : 'v2';
   const res = request(
     'PUT',
-    `${SERVER_URL}/v2/admin/quiz/${quizId}/question/${quesId}/move`,
+    `${SERVER_URL}/${ver}/admin/quiz/${quizId}/question/${quesId}/move`,
     {
-      json: {
-        newPosition: newPosition
-      },
-      headers: {
-        token: token.toString()
-      }
+      ...(v1
+        ? {
+            json: {
+              token: token,
+              newPosition: newPosition
+            }
+          }
+        : {
+            json: { newPosition: newPosition },
+            headers: { token: token.toString() }
+          })
     }
   );
 
@@ -486,14 +543,19 @@ export function requestQuesMove(token: number | string, newPosition: number,
 
 // QUESTION Duplicate Define wrapper function
 export function requestQuesDup(token: number, quizid: number,
-  questionid: number): QuestionId {
+  questionid: number, v1?: boolean): QuestionId {
+  const ver = v1 ? 'v1' : 'v2';
   const res = request(
     'POST',
-    `${SERVER_URL}/v2/admin/quiz/${quizid}/question/${questionid}/duplicate`,
+    `${SERVER_URL}/${ver}/admin/quiz/${quizid}/question/${questionid}/duplicate`,
     {
-      headers: {
-        token: token.toString()
-      }
+      ...(v1
+        ? {
+            json: { token: token }
+          }
+        : {
+            headers: { token: token.toString() }
+          })
     }
   );
 
@@ -532,4 +594,34 @@ export function requestQuesDelete(token: number, quizId: number,
   );
 
   return JSON.parse(res.body.toString());
+}
+
+// ====================================================================
+//  ======================== PLAYER FUNCTIONS ========================
+// ====================================================================
+export function requestPlayerMessage(playerId: number, message: MessageBody):
+  Record<string, never> {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/player/' + playerId + '/chat',
+    { json: { message: message } }
+  );
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
+}
+
+export function requestPlayerChat(playerId: number): { messages: Message[] } {
+  const res = request('GET', SERVER_URL + '/v1/player/' + playerId + '/chat');
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }

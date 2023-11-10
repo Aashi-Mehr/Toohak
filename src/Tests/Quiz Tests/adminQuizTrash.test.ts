@@ -1,18 +1,16 @@
+import HTTPError from 'http-errors';
+import { Token } from '../../dataStore';
+
 import {
   requestRegister,
   requestQuizTrash,
   requestQuizRemove,
   requestQuizCreate,
   requestClear
-} from './testHelper';
-import { Token } from '../dataStore';
-
-import HTTPError from 'http-errors';
+} from '../testHelper';
 
 // Clear the dataBase before each test to avoid data interference
-beforeEach(() => {
-  requestClear();
-});
+beforeEach(() => { requestClear(); });
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// ////////////////////////////// Tests V2 ////////////////////////////////////

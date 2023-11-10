@@ -1,4 +1,4 @@
-import { Token } from '../dataStore';
+import { Token } from '../../dataStore';
 
 import {
   requestQuizRestore,
@@ -6,7 +6,7 @@ import {
   requestRegister,
   requestQuizCreate,
   requestQuizRemove
-} from './testHelper';
+} from '../testHelper';
 
 import HTTPError from 'http-errors';
 

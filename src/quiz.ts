@@ -17,7 +17,9 @@ import {
   notUser400,
   currUser400,
   notBin400,
-  QuizAdd
+  QuizAdd,
+  DEFAULT_QUIZ_THUMBNAIL,
+  invImg400
 } from './dataStore';
 
 import HTTPError from 'http-errors';
@@ -103,7 +105,8 @@ function adminQuizCreate(token: number, name: string, description: string):
     timeCreated: timestamp,
     timeLastEdited: timestamp,
     in_trash: false,
-    questions: []
+    questions: [],
+    thumbnailUrl: DEFAULT_QUIZ_THUMBNAIL
   });
 
   return { quizId: quizId };
@@ -173,7 +176,8 @@ function adminQuizInfo(token: number, quizId: number): QuizInfo {
       description: quiz.description,
       numQuestions: quiz.questions.length,
       questions: quiz.questions,
-      duration: duration
+      duration: duration,
+      thumbnailUrl: quiz.thumbnailUrl
     };
   }
 
@@ -311,10 +315,8 @@ function adminQuizTransfer(token: number, quizId: number,
   * @param { number } token - The authUserId for the user
   *
   * @returns { QuizList } - If the details given are valid
-  * @returns { ErrorObject } - If the details given are invalid
   */
-function adminQuizTrash(token: number):
-  ErrorObject | QuizList {
+function adminQuizTrash(token: number): QuizList {
   // Check if authUserId is a positive integer
   const user = getUser(token, getData());
   if (!user) throw HTTPError(401, token401);
@@ -426,6 +428,32 @@ function adminQuizEmptyTrash(token: number, quizId: number[]):
   return {};
 }
 
+/** adminQuizUpdateImageURL
+  * Updates the quiz's thumbnail URL, assuming the ingURL is valid
+  *
+  * @param { number } token - The user's token
+  * @param { number } quizId - The quizId for which the thumnail needs changing
+  * @param { string } imgUrl - The new thumbnail URL
+  *
+  * @returns { Record<string, never> } - If the details given are valid
+  * @throws { HTTPError } - If the details given are invalid
+  */
+function adminQuizUpdateImageURL(token: number, quizId: number,
+  imgUrl: string): Record<string, never> {
+  // Check if authUserId is a positive integer
+  const user = getUser(token, getData());
+  if (!user) throw HTTPError(401, token401);
+
+  // Check if the quiz is valid and belongs to the user
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz || quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
+
+  // Checking the image is of a valid type and can be fetched (Done in server)
+  if (!imgUrl) throw HTTPError(400, invImg400);
+
+  return { };
+}
+
 export {
   adminQuizList,
   adminQuizInfo,
@@ -436,5 +464,6 @@ export {
   adminQuizTrash,
   adminQuizRestore,
   adminQuizTransfer,
-  adminQuizEmptyTrash
+  adminQuizEmptyTrash,
+  adminQuizUpdateImageURL
 };
