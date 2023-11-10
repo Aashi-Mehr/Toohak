@@ -425,27 +425,8 @@ function adminQuizEmptyTrash(token: number, quizId: number[]):
   return {};
 }
 
-/** isImgUrl
-  * Check if imgUrl is a valid file of valid png/jpg/jpeg type
-  *
-  * @param { string } url - The URL to check
-  *
-  * @returns { Promise<boolean> } - All cases
-  */
-async function isImgUrl(url: string): Promise<boolean> {
-  return fetch(url, { method: 'HEAD' }).then(res => {
-    if (res.headers.get('Content-Type').startsWith('image')) {
-      if (res.headers.get('Content-Type').endsWith('png') ||
-          res.headers.get('Content-Type').endsWith('jpg') ||
-          res.headers.get('Content-Type').endsWith('jpeg')) {
-        return true;
-      } else { return false; }
-    } else { return false; }
-  }).catch(() => { return false; });
-}
-
 /** adminQuizUpdateImageURL
-  * Updates the quiz's thumbnail URL
+  * Updates the quiz's thumbnail URL, assuming the ingURL is valid
   *
   * @param { number } token - The user's token
   * @param { number } quizId - The quizId for which the thumnail needs changing
@@ -454,8 +435,8 @@ async function isImgUrl(url: string): Promise<boolean> {
   * @returns { Record<string, never> } - If the details given are valid
   * @throws { HTTPError } - If the details given are invalid
   */
-async function adminQuizUpdateImageURL(token: number, quizId: number,
-  imgUrl: string): Promise<Record<string, never>> {
+function adminQuizUpdateImageURL(token: number, quizId: number,
+  imgUrl: string): Record<string, never> {
   // Check if authUserId is a positive integer
   const user = getUser(token, getData());
   if (!user) throw HTTPError(401, token401);
@@ -464,16 +445,11 @@ async function adminQuizUpdateImageURL(token: number, quizId: number,
   const quiz = getQuiz(quizId, getData().quizzes);
   if (!quiz || quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
 
-  let fileExists: boolean;
-  await isImgUrl(imgUrl).then((res) => { fileExists = res; });
+  // Checking the image is of a valid type and can be fetched (Done in server)
+  if (!imgUrl) throw HTTPError(400, invImg400);
 
-  if (!fileExists) throw HTTPError(400, invImg400);
   return { };
 }
-
-// function throwUnauth403() { throw HTTPError(403, unauth403); }
-// function throwToken401() { throw HTTPError(401, token401); }
-// function throwInvImg400() { throw HTTPError(400, invImg400); }
 
 export {
   adminQuizList,
@@ -486,8 +462,5 @@ export {
   adminQuizRestore,
   adminQuizTransfer,
   adminQuizEmptyTrash,
-  adminQuizUpdateImageURL,
-  // throwUnauth403,
-  // throwToken401,
-  // throwInvImg400
+  adminQuizUpdateImageURL
 };

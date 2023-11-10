@@ -356,19 +356,30 @@ app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
 // ====================================================================
 
 // adminQuizUpdateImageURL ============================== ITERATION 3 ==========
-app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
+app.put('/v1/admin/quiz/:quizid/thumbnail',
+  async (req: Request, res: Response) => {
   const token = parseInt(req.headers.token as string);
   const quizId = parseInt(req.params.quizid);
-  const { imgUrl } = req.body;
+  let { imgUrl } = req.body;
 
-  adminQuizUpdateImageURL(token, quizId, imgUrl)
-    .then((resp) => { res.json(resp); })
-    .catch((resp) => { res.status(resp.statusCode).json(resp); });
-  // .catch((resp) => {
-  //   if (resp.statusCode === 400) { res.json(throwInvImg400()); }
-  //   else if (resp.statusCode === 401) { res.json(throwToken401()); }
-  //   else if (resp.statusCode === 403) { res.json(throwUnauth403()); }
-  // });
+  let validUrl = true;
+
+  // Check if imgUrl is a valid file of valid png/jpg/jpeg type
+  await fetch(imgUrl, { method: 'HEAD' }).then(res => {
+    if (res.headers.get('Content-Type').startsWith('image')) {
+      if (!res.headers.get('Content-Type').endsWith('png') &&
+          !res.headers.get('Content-Type').endsWith('jpg') &&
+          !res.headers.get('Content-Type').endsWith('jpeg')) {
+        // Checks the type is correct
+        validUrl = false;
+      }
+    } else { validUrl = false; }
+  }).catch(() => { validUrl = false; });
+
+  if (!validUrl) imgUrl = '';
+  
+  try { res.json(adminQuizUpdateImageURL(token, quizId, imgUrl)); }
+  catch (error) { res.status(error.statusCode).json(error); };
 
   backupData();
 });
