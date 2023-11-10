@@ -230,15 +230,9 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
 
 // adminQuizInfo
 app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
-  const quizId = parseInt(req.params.quizid);
   const token = parseInt(req.query.token as string);
-  const response = adminQuizInfo(token, quizId);
-
-  if ('error' in response) {
-    if (response.error === token401) return res.status(401).json(response);
-    return res.status(403).json(response);
-  }
-  res.json(response);
+  const quizId = parseInt(req.params.quizid);
+  res.json(adminQuizInfo(token, quizId));
 });
 
 // adminQuizNameUpdate
