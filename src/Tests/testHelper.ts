@@ -447,7 +447,7 @@ export function requestQuizSessionStart(token: number, quizId: number,
     SERVER_URL + '/v1/admin/quiz/' + quizId + '/session/start',
     {
       headers: { token: token.toString() },
-      json: { autoStart: autoStart }
+      json: { autoStartNum: autoStart }
     }
   );
 

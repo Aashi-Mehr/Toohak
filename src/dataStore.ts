@@ -48,6 +48,11 @@ const passInv400 = 'Email or password is incorrect';
 const oldPass400 = 'Old Password is not the correct old password';
 const newPass400 = 'Old Password and New Password match exactly';
 
+// Session errors
+const auto400 = 'autoStartNum is a number greater than 50';
+const tooMany400 = 'A maximum of 10 sessions not in END state currently exist';
+const noQs400 = 'The quiz does not have any questions in it';
+
 // Player errors
 const playerId400 = 'Player ID does not exist';
 const message400 = 'Message is less than 1 or more than 100 characters';
@@ -369,7 +374,7 @@ function getPlayerSession(playerId: number, data: Datastore):
 }
 
 /** getUniqueID
-  * Creates a unique ID (For authUserId, quizId, or token, answer ID, ques ID)
+  * Creates a unique ID (For and Id in dataStore)
   *
   * @returns { number } - All cases
   */
@@ -378,6 +383,9 @@ function getUniqueID(allData: Datastore): number {
   // List of used authUserIds, quizIds, tokens, answerIds, and questionIds
   const usedIds: number[] = [];
   const allIds: number[] = [];
+
+  // Adding used sessionIds
+  for (const sess of allData.quizSessions) usedIds.push(sess.sessionId);
 
   // Adding used authUserIds
   for (const user of allData.users) usedIds.push(user.authUserId);
@@ -492,6 +500,9 @@ export {
   passInv400,
   oldPass400,
   newPass400,
+  auto400,
+  tooMany400,
+  noQs400,
   playerId400,
   message400,
   invImg400

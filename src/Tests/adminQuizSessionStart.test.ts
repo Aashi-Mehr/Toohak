@@ -14,7 +14,7 @@ import HTTPError from 'http-errors';
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 
-const questionBody1 = {
+const questionBody = {
   question: 'What is the first letter of the alphabet?',
   duration: 10,
   points: 5,
@@ -38,12 +38,12 @@ beforeEach(() => {
   // User 1 and their quiz
   token1 = requestRegister('am@gmail.com', 'Val1Pass', 'fir', 'las').token;
   quizId1 = requestQuizCreate(token1, 'New Quiz', '').quizId;
-  requestQuestionCreate(token1, quizId1, questionBody1);
+  requestQuestionCreate(token1, quizId1, questionBody);
 
   // User 2 and their quiz
-  token2 = requestRegister('am@gmail.com', 'Val1Pass', 'fir', 'las').token;
+  token2 = requestRegister('ab@gmail.com', 'Val1Pass', 'fir', 'las').token;
   quizId2 = requestQuizCreate(token2, 'New Quiz', '').quizId;
-  requestQuestionCreate(token2, quizId2, questionBody1);
+  requestQuestionCreate(token2, quizId2, questionBody);
 });
 
 describe('Error Cases', () => {
@@ -86,6 +86,7 @@ describe('Error Cases', () => {
   test('Error 400: A maximum of 10 active sessions currently exist', () => {
     for (let i = 0; i < 10; i++) {
       const quizId = requestQuizCreate(token1, 'Quiz ' + i, '').quizId;
+      requestQuestionCreate(token1, quizId, questionBody);
       requestQuizSessionStart(token1, quizId, 0);
     }
 
@@ -109,19 +110,19 @@ describe('Valid Cases', () => {
   // Simple case where user 1 starts the session
   test('Simple Case 1', () => {
     result = requestQuizSessionStart(token1, quizId1, 0);
-    expect(Object.keys(result).length).toStrictEqual(0);
+    expect(result).toMatchObject({ sessionId: expect.any(Number) });
   });
 
   // Simple case where user 2 starts the session
   test('Simple Case 2', () => {
     result = requestQuizSessionStart(token2, quizId2, 0);
-    expect(Object.keys(result).length).toStrictEqual(0);
+    expect(result).toMatchObject({ sessionId: expect.any(Number) });
   });
 
   // Simple case where users 1 and 2 both start sessions
   test('Simple Case 3', () => {
     requestQuizSessionStart(token1, quizId1, 0);
     result = requestQuizSessionStart(token2, quizId2, 0);
-    expect(Object.keys(result).length).toStrictEqual(0);
+    expect(result).toMatchObject({ sessionId: expect.any(Number) });
   });
 });

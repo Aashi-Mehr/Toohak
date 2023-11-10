@@ -333,7 +333,7 @@ app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
 app.post('/v1/admin/quiz/:quizid/session/start',
   (req: Request, res: Response) => {
     const quizId = parseInt(req.params.quizid);
-    const token = parseInt(req.query.token as string);
+    const token = parseInt(req.headers.token as string);
     const autoStart = parseInt(req.body.autoStartNum);
 
     res.json(quizSessionStart(token, quizId, autoStart));

@@ -3,15 +3,31 @@ import HTTPError from 'http-errors';
 import {
   requestClear,
   requestPlayerChat,
-  requestPlayerMessage
+  requestPlayerMessage,
+  requestQuestionCreate,
+  requestQuizCreate,
+  requestQuizSessionStart,
+  requestRegister
 } from './testHelper';
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 
-// let token: number;
-// let quizId: number;
+const questionBody = {
+  question: 'What is the first letter of the alphabet?',
+  duration: 10,
+  points: 5,
+  answers: [
+    { answer: 'a', correct: true },
+    { answer: 'b', correct: false },
+    { answer: 'c', correct: false },
+    { answer: 'd', correct: false }
+  ]
+};
+
+let token: number;
+let quizId: number;
 // let sessionId: number;
 let playerId: number;
 
@@ -27,9 +43,12 @@ const tooLong = {
 beforeEach(() => {
   requestClear();
 
-  // token = requestRegister('am@gmail.com', 'Val1Pass', 'fir', 'las').token;
-  // quizId = requestQuizCreate(token, 'Quiz1', '').quizId;
-  // sessionId = requestSessionStart(token, quizId, 3).sessionId;
+  token = requestRegister('am@gmail.com', 'Val1Pass', 'fir', 'las').token;
+  quizId = requestQuizCreate(token, 'Quiz1', '').quizId;
+  requestQuestionCreate(token, quizId, questionBody);
+
+  requestQuizSessionStart(token, quizId, 3);
+  // sessionId = requestQuizSessionStart(token, quizId, 3).sessionId;
   // playerId = requestPlayerRegister(sessionId, 'Player1').playerId;
 });
 
