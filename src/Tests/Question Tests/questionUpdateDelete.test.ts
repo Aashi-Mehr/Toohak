@@ -2,7 +2,7 @@ import {
   AnswerBody,
   ErrorObject,
   QuestionBody
-} from '../dataStore';
+} from '../../dataStore';
 
 import {
   requestClear,
@@ -15,7 +15,7 @@ import {
   requestQuizInfo,
   requestQuizTransfer,
   requestRegister
-} from './testHelper';
+} from '../testHelper';
 
 /** questionBody
   * Returns a questionBody object with given values

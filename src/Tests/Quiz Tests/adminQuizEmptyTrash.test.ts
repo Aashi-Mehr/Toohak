@@ -1,12 +1,12 @@
 // Test for adminQuizEmptyTrash
-import { Token } from '../dataStore';
+import { Token } from '../../dataStore';
 import {
   requestQuizEmptyTrash,
   requestClear,
   requestRegister,
   requestQuizCreate,
   requestQuizRemove,
-} from './testHelper';
+} from '../testHelper';
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////

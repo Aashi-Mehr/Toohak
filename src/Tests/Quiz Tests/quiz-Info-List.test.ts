@@ -16,7 +16,7 @@ import {
   QuizList,
   QuizInfo,
   DEFAULT_QUIZ_THUMBNAIL
-} from '../dataStore';
+} from '../../dataStore';
 
 import {
   requestRegister,
@@ -25,7 +25,7 @@ import {
   requestQuizInfo,
   requestQuizRemove,
   requestClear
-} from './testHelper';
+} from '../testHelper';
 
 import HTTPError from 'http-errors';
 

@@ -6,7 +6,7 @@ import {
   requestQuizCreate,
   requestQuizList,
   requestQuizInfo
-} from './testHelper';
+} from '../testHelper';
 
 import HTTPError from 'http-errors';
 

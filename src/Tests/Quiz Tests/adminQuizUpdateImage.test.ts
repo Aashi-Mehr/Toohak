@@ -6,7 +6,7 @@ import {
   requestQuizCreate,
   requestQuizImageUpdate,
   requestRegister
-} from './testHelper';
+} from '../testHelper';
 
 // Defining base data
 const validUrl = 'https://img.freepik.com/free-vector/support-local-business-' +

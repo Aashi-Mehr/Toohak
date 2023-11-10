@@ -1,11 +1,11 @@
 // Import interfaces, requests
-import { QuizId, Token } from '../dataStore';
+import { QuizId, Token } from '../../dataStore';
 import {
   requestClear,
   requestRegister,
   requestQuizCreate,
   requestQuizRemove
-} from './testHelper';
+} from '../testHelper';
 
 beforeEach(() => {
   requestClear();
