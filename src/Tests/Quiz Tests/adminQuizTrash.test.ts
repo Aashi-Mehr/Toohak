@@ -1,5 +1,5 @@
 import HTTPError from 'http-errors';
-import { Token } from '../dataStore';
+import { Token } from '../../dataStore';
 
 import {
   requestRegister,
@@ -7,7 +7,7 @@ import {
   requestQuizRemove,
   requestQuizCreate,
   requestClear
-} from './testHelper';
+} from '../testHelper';
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////

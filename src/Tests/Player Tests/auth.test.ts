@@ -2,7 +2,7 @@ import {
   Token,
   ErrorObject,
   Details,
-} from '../dataStore';
+} from '../../dataStore';
 
 import {
   requestRegister,
@@ -12,7 +12,7 @@ import {
   requestDetailsEdit,
   requestPasswordEdit,
   requestClear
-} from './testHelper';
+} from '../testHelper';
 
 import HTTPError from 'http-errors';
 

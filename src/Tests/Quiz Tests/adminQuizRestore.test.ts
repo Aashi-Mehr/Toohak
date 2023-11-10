@@ -1,11 +1,11 @@
-import { Token } from '../dataStore';
+import { Token } from '../../dataStore';
 import {
   requestQuizRestore,
   requestClear,
   requestRegister,
   requestQuizCreate,
   requestQuizRemove
-} from './testHelper';
+} from '../testHelper';
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////

@@ -1,12 +1,12 @@
 // Import requests
-import { QuizSessionId } from '../dataStore';
+import { QuizSessionId } from '../../dataStore';
 import {
   requestClear,
   requestRegister,
   requestQuizCreate,
   requestQuizSessionStart,
   requestQuestionCreate
-} from './testHelper';
+} from '../testHelper';
 
 import HTTPError from 'http-errors';
 
@@ -99,7 +99,7 @@ describe('Error Cases', () => {
   test('Error 400: The quiz does not have any questions in it', () => {
     const quizId = requestQuizCreate(token1, 'Quiz 1', '').quizId;
     expect(() => requestQuizSessionStart(
-      token1, quizId, 51
+      token1, quizId, 0
     )).toThrow(HTTPError[400]);
   });
 });

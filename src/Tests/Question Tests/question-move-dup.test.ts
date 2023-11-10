@@ -14,7 +14,7 @@
 /// ////////////////////////// Wrapper Functions ///////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 
-import { Token } from '../dataStore';
+import { Token } from '../../dataStore';
 
 import {
   requestRegister,
@@ -23,7 +23,7 @@ import {
   requestQuesMove,
   requestQuesDup,
   requestClear
-} from './testHelper';
+} from '../testHelper';
 
 import HTTPError from 'http-errors';
 
