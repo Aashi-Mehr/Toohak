@@ -12,6 +12,9 @@ import {
   ErrorObject,
   Details,
   QuizList,
+  Message,
+  MessageBody,
+  QuizSessionId,
 } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
@@ -447,6 +450,30 @@ export function requestQuizImageUpdate(token: number, quizId: number,
 }
 
 // ====================================================================
+//  ======================== SESSION FUNCTIONS =======================
+// ====================================================================
+// POST START SESSION Define Wrapper Function
+export function requestQuizSessionStart(token: number, quizId: number,
+  autoStart: number): QuizSessionId {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/session/start',
+    {
+      headers: { token: token.toString() },
+      json: { autoStartNum: autoStart }
+    }
+  );
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
+}
+
+// ====================================================================
 //  ======================= QUESTION FUNCTIONS =======================
 // ====================================================================
 
@@ -550,4 +577,34 @@ export function requestQuesDelete(token: number, quizId: number,
   );
 
   return JSON.parse(res.body.toString());
+}
+
+// ====================================================================
+//  ======================== PLAYER FUNCTIONS ========================
+// ====================================================================
+export function requestPlayerMessage(playerId: number, message: MessageBody):
+  Record<string, never> {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/player/' + playerId + '/chat',
+    { json: { message: message } }
+  );
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
+}
+
+export function requestPlayerChat(playerId: number): { messages: Message[] } {
+  const res = request('GET', SERVER_URL + '/v1/player/' + playerId + '/chat');
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }

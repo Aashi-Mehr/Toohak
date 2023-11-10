@@ -50,6 +50,8 @@ import {
   token401,
   unauth403
 } from './dataStore';
+import { playerMessageChat, playerViewChat } from './player';
+import { quizSessionStart } from './sessions';
 
 // Set up web app
 const app = express();
@@ -311,12 +313,26 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
 // adminQuizTrash
 app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
-  console.log('is this error');
   const response = adminQuizTrash(token);
 
   if ('error' in response) return res.status(401).json(response);
   res.json(response);
 });
+
+// ====================================================================
+//  ======================= SESSION FUNCTIONS ========================
+// ====================================================================
+//  =========================== VERSION 1 ============================
+// ====================================================================
+app.post('/v1/admin/quiz/:quizid/session/start',
+  (req: Request, res: Response) => {
+    const quizId = parseInt(req.params.quizid);
+    const token = parseInt(req.headers.token as string);
+    const autoStart = parseInt(req.body.autoStartNum);
+
+    res.json(quizSessionStart(token, quizId, autoStart));
+    backupData();
+  });
 
 // ====================================================================
 //  ========================= QUIZ FUNCTIONS =========================
@@ -348,20 +364,6 @@ app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
 // ====================================================================
 //  =========================== VERSION 1 ============================
 // ====================================================================
-
-// adminQuestionCreate
-app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
-  const token = parseInt(req.headers.token as string);
-  const quizId = parseInt(req.params.quizid);
-  const { imgUrl } = req.body;
-
-  adminQuizUpdateImageURL(token, quizId, imgUrl).then((resp) => {
-    res.json(resp);
-  }).catch((reason) => {
-    res.status(reason.statusCode).json(reason);
-  });
-  backupData();
-});
 
 // adminQuestionCreate
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
@@ -441,6 +443,36 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
     backupData();
   });
 
+// adminQuizUpdateImageURL
+app.put('/v1/admin/quiz/:quizid/thumbnail',
+  async (req: Request, res: Response) => {
+    const token = parseInt(req.headers.token as string);
+    const quizId = parseInt(req.params.quizid);
+    let { imgUrl } = req.body;
+
+    let validUrl = true;
+
+    // Check if imgUrl is a valid file of valid png/jpg/jpeg type
+    await fetch(imgUrl, { method: 'HEAD' }).then(res => {
+      if (res.headers.get('Content-Type').startsWith('image')) {
+        if (!res.headers.get('Content-Type').endsWith('png') &&
+          !res.headers.get('Content-Type').endsWith('jpg') &&
+          !res.headers.get('Content-Type').endsWith('jpeg')) {
+        // Checks the type is correct
+          validUrl = false;
+        }
+      } else { validUrl = false; }
+    }).catch(() => { validUrl = false; });
+
+    if (!validUrl) imgUrl = '';
+
+    try {
+      res.json(adminQuizUpdateImageURL(token, quizId, imgUrl));
+    } catch (error) { res.status(error.statusCode).json(error); }
+
+    backupData();
+  });
+
 // ====================================================================
 //  ======================= QUESTION FUNCTIONS =======================
 // ====================================================================
@@ -471,6 +503,24 @@ app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate',
     res.json(adminQuestionDuplicate(token, quesId, quizId));
     backupData();
   });
+
+// ====================================================================
+//  ======================== PLAYER FUNCTIONS ========================
+// ====================================================================
+//  =========================== VERSION 2 ============================
+// ====================================================================
+app.get('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  res.json(playerViewChat(playerId));
+  backupData();
+});
+
+app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const message = req.body.message;
+  res.json(playerMessageChat(playerId, message));
+  backupData();
+});
 
 // ====================================================================
 //  ======================== OTHER FUNCTIONS =========================
