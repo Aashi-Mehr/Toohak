@@ -357,6 +357,9 @@ function adminQuizRestore(token: number, quizId: number): Record<string, any> {
   const quiz = getQuiz(quizId, getData().quizzes);
   if (!quiz) throw HTTPError(403, unauth403);
 
+  // Ensuring the user owns the quiz
+  if (user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);
+
   // Loop through quizzes to check for existingQuizzes
   const existingQuizzes = getData().quizzes;
   for (const activeQuiz of existingQuizzes) {
@@ -366,7 +369,6 @@ function adminQuizRestore(token: number, quizId: number): Record<string, any> {
       activeQuiz.quizId !== quizId) {
       // Return error if quiz name of the restored quiz is already used
       // by another active quiz or quiz is not in trash
-      // return { error: nameUsed400 };
       throw HTTPError(400, nameUsed400);
     }
   }
@@ -378,7 +380,6 @@ function adminQuizRestore(token: number, quizId: number): Record<string, any> {
     quiz.in_trash = false;
 
     return { };
-  // } else return { error: notBin400 };
   } throw HTTPError(400, notBin400);
 }
 

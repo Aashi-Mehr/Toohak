@@ -361,15 +361,30 @@ export function requestQuizTransfer(token: number | string, quizId: number,
   return JSON.parse(res.body.toString());
 }
 // GET QUIZ TRASH Define wrapper function
-export function requestQuizTrash(token: number): QuizList | ErrorObject {
-  const res = request(
-    'GET',
-    SERVER_URL + '/v1/admin/quiz/trash?token=' + token,
-    {
-      qs: { }
-    }
-  );
-  // return JSON.parse(res.body.toString());
+export function requestQuizTrash(token: number, v1?: boolean): QuizList | ErrorObject {
+  let res;
+
+  if (v1) {
+    res = request(
+      'GET',
+      SERVER_URL + '/v1/admin/quiz/trash?token=' + token,
+      {
+        qs: { token: token }
+      }
+
+    );
+  } else {
+    res = request(
+      'GET',
+      SERVER_URL + '/v2/admin/quiz/trash?token=' + token,
+      {
+        headers: {
+          token: token.toString()
+        }
+      }
+    );
+  }
+
   const result = JSON.parse(res.body.toString());
 
   if (res.statusCode !== 200) {
@@ -380,18 +395,34 @@ export function requestQuizTrash(token: number): QuizList | ErrorObject {
 }
 
 // POST QUIZ RESTORE Define wrapper function
-export function requestQuizRestore(token: number, quizId: number):
+export function requestQuizRestore(token: number, quizId: number, v1?: boolean):
   ErrorObject | Record<string, never> {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '/restore',
-    {
-      json: {
-        token: token,
+  let res;
+
+  if (v1) {
+    res = request(
+      'POST',
+      SERVER_URL + '/v1/admin/quiz/' + quizId + '/restore',
+      {
+        json: { token: token }
       }
-    }
-  );
-  return JSON.parse(res.body.toString());
+    );
+  } else {
+    res = request(
+      'POST',
+      SERVER_URL + '/v2/admin/quiz/' + quizId + '/restore',
+      {
+        headers: { token: token.toString() }
+      }
+    );
+  }
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // DELETE EMPTY TRASH Define Wrapper Function

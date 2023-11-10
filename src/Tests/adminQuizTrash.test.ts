@@ -9,65 +9,122 @@ import { Token } from '../dataStore';
 
 import HTTPError from 'http-errors';
 
-/// ////////////////////////////////////////////////////////////////////////////
-/// //////////////////////////////// Tests /////////////////////////////////////
-/// ////////////////////////////////////////////////////////////////////////////
-
 // Clear the dataBase before each test to avoid data interference
 beforeEach(() => {
   requestClear();
 });
 
-// let result: QuizBrief | ErrorObject;
+/// ////////////////////////////////////////////////////////////////////////////
+/// ////////////////////////////// Tests V2 ////////////////////////////////////
+/// ////////////////////////////////////////////////////////////////////////////
 
-// Test : Invalid AuthUserId Format
-test('Test Invalid AuthUserId Format', () => {
-  // authUserId is empty
-  expect(() => requestQuizTrash(0)).toThrow(HTTPError[401]);
+describe('adminQuizTrash Version 2', () => {
+  // Test : Invalid AuthUserId Format
+  test('Test Invalid AuthUserId Format', () => {
+    // authUserId is empty
+    expect(() => requestQuizTrash(0)).toThrow(HTTPError[401]);
 
-  // authUserId contains out of range number
-  expect(() => requestQuizTrash(-1)).toThrow(HTTPError[401]);
-});
+    // authUserId contains out of range number
+    expect(() => requestQuizTrash(-1)).toThrow(HTTPError[401]);
+  });
 
-// Test : Non-Existing AuthUserId
-test('Test Non-existing AuthUserId', () => {
-  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
-    'first', 'last');
+  // Test : Non-Existing AuthUserId
+  test('Test Non-existing AuthUserId', () => {
+    const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+      'first', 'last');
 
-  // user with authUserId does not exist
-  expect(() => requestQuizTrash(userId.token + 1)).toThrow(HTTPError[401]);
-});
+    // user with authUserId does not exist
+    expect(() => requestQuizTrash(userId.token + 1)).toThrow(HTTPError[401]);
+  });
 
-// Test : Valid Input
-test('Test Valid Input', () => {
-  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
-    'first', 'last');
-  requestQuizCreate(userId.token, 'Quiz1', 'This is Quiz 1');
+  // Test : Valid Input
+  test('Test Valid Input', () => {
+    const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+      'first', 'last');
+    requestQuizCreate(userId.token, 'Quiz1', 'This is Quiz 1');
 
-  const result = requestQuizTrash(userId.token);
-  expect(result).toMatchObject({
-    quizzes: [],
+    const result = requestQuizTrash(userId.token);
+    expect(result).toMatchObject({
+      quizzes: [],
+    });
+  });
+
+  // Test : Viewing Removed Quiz
+  test('Test Viewing Removed Quiz', () => {
+    const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+      'first', 'last');
+    const quizId: number = requestQuizCreate(userId.token, 'Quiz 1',
+      'This is Quiz 1').quizId;
+
+    // Remove the quiz
+    requestQuizRemove(userId.token, quizId);
+
+    // Attempt to view the removed quiz
+    const result = requestQuizTrash(userId.token);
+    expect(result).toMatchObject({
+      quizzes: [
+        {
+          quizId: quizId,
+          name: 'Quiz 1',
+        },
+      ],
+    });
   });
 });
 
-// Test : Viewing Removed Quiz
-test('Test Viewing Removed Quiz', () => {
-  const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
-    'first', 'last');
-  const quizId: number = requestQuizCreate(userId.token, 'Quiz 1',
-    'This is Quiz 1').quizId;
+/// ////////////////////////////////////////////////////////////////////////////
+/// ////////////////////////////// Tests V1 ////////////////////////////////////
+/// ////////////////////////////////////////////////////////////////////////////
+describe('adminQuizTrash Version 1', () => {
+  // Test : Invalid AuthUserId Format
+  test('Test Invalid AuthUserId Format', () => {
+    // authUserId is empty
+    expect(() => requestQuizTrash(0, true)).toThrow(HTTPError[401]);
 
-  // Remove the quiz
-  requestQuizRemove(userId.token, quizId);
+    // authUserId contains out of range number
+    expect(() => requestQuizTrash(-1, true)).toThrow(HTTPError[401]);
+  });
 
-  // Attempt to view the removed quiz
-  const result = requestQuizTrash(userId.token);
-  expect(result).toMatchObject({
-    quizzes: [
-      {
-        quizId: quizId,
-        name: 'Quiz 1',
-      },
-    ],
+  // Test : Non-Existing AuthUserId
+  test('Test Non-existing AuthUserId', () => {
+    const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+      'first', 'last');
+
+    // user with authUserId does not exist
+    expect(() => requestQuizTrash(userId.token + 1, true)).toThrow(HTTPError[401]);
+  });
+
+  // Test : Valid Input
+  test('Test Valid Input', () => {
+    const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+      'first', 'last');
+    requestQuizCreate(userId.token, 'Quiz1', 'This is Quiz 1');
+
+    const result = requestQuizTrash(userId.token, true);
+    expect(result).toMatchObject({
+      quizzes: [],
+    });
+  });
+
+  // Test : Viewing Removed Quiz
+  test('Test Viewing Removed Quiz', () => {
+    const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
+      'first', 'last');
+    const quizId: number = requestQuizCreate(userId.token, 'Quiz 1',
+      'This is Quiz 1').quizId;
+
+    // Remove the quiz
+    requestQuizRemove(userId.token, quizId);
+
+    // Attempt to view the removed quiz
+    const result = requestQuizTrash(userId.token, true);
+    expect(result).toMatchObject({
+      quizzes: [
+        {
+          quizId: quizId,
+          name: 'Quiz 1',
+        },
+      ],
+    });
   });
 });
