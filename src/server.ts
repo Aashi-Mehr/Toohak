@@ -157,33 +157,7 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   }
   res.json(response);
 });
-
 */
-
-// adminQuizTrash
-app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
-  const response = adminQuizTrash(token);
-
-  if ('error' in response) return res.status(401).json(response);
-  res.json(response);
-});
-
-// adminQuizRestore
-app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
-  const token = parseInt(req.body.token);
-  const quizId = parseInt(req.params.quizid);
-  const response = adminQuizRestore(token, quizId);
-
-  if ('error' in response) {
-    if (response.error === token401) return res.status(401).json(response);
-    if (response.error === unauth403) return res.status(403).json(response);
-    return res.status(400).json(response);
-  }
-
-  res.json(response);
-  backupData();
-});
 
 // ====================================================================
 //  ========================= QUESTION FUNCTIONS =====================
@@ -234,7 +208,7 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
 
     res.json(response);
     backupData();
-  }); 
+  });
   */
 
 // ====================================================================
@@ -306,12 +280,6 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
 
   res.json(response);
   backupData();
-});
-
-// adminQuizTrash
-app.get('/v2/admin/quiz/trash', (req: Request, res: Response) => {
-  const token = parseInt(req.headers.token as string);
-  res.json(adminQuizTrash(token));
 });
 
 // adminQuizRemove
@@ -392,11 +360,29 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   backupData();
 });
 
+// adminQuizTrash
+app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizTrash(token);
+
+  if ('error' in response) return res.status(401).json(response);
+  res.json(response);
+});
+
 // adminQuizRestore
-app.post('/v2/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
-  const token = parseInt(req.headers.token as string);
+app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
+  const token = parseInt(req.body.token);
   const quizId = parseInt(req.params.quizid);
-  res.json(adminQuizRestore(token, quizId));
+  const response = adminQuizRestore(token, quizId);
+
+  if ('error' in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    if (response.error === unauth403) return res.status(403).json(response);
+    return res.status(400).json(response);
+  }
+
+  res.json(response);
+  backupData();
 });
 
 // adminQuizEmptyTrash
@@ -406,15 +392,6 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
 
   res.json(adminQuizEmptyTrash(token, quizId));
   backupData();
-});
-
-// adminQuizTrash
-app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
-  const response = adminQuizTrash(token);
-
-  if ('error' in response) return res.status(401).json(response);
-  res.json(response);
 });
 
 // ====================================================================
@@ -444,17 +421,32 @@ app.get('/v2/admin/quiz/list', (req: Request, res: Response) => {
   res.json(adminQuizList(token));
 });
 
+// adminQuizInfo
+app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  const quizId = parseInt(req.params.quizid);
+  res.json(adminQuizInfo(token, quizId));
+});
+
 // adminQuizTrash
 app.get('/v2/admin/quiz/trash', (req: Request, res: Response) => {
   const token = parseInt(req.headers.token as string);
   res.json(adminQuizTrash(token));
 });
 
-// adminQuizInfo
-app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
+// adminQuizRestore
+app.post('/v2/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   const token = parseInt(req.headers.token as string);
   const quizId = parseInt(req.params.quizid);
-  res.json(adminQuizInfo(token, quizId));
+  res.json(adminQuizRestore(token, quizId));
+});
+
+// adminQuizEmptyTrash
+app.delete('/v2/admin/quiz/trash/empty', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  const quizIds = JSON.parse(req.query.quizIds as string);
+  res.json(adminQuizEmptyTrash(token, quizIds));
+  backupData();
 });
 
 // ====================================================================

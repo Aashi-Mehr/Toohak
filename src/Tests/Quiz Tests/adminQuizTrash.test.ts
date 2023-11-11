@@ -37,10 +37,12 @@ describe('adminQuizTrash Version 2', () => {
 
   // Test : Valid Input
   test('Test Valid Input', () => {
+    // Resgister a user
     const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
       'first', 'last');
+    // Create a quiz
     requestQuizCreate(userId.token, 'Quiz1', 'This is Quiz 1');
-
+    // Try viewing trash
     const result = requestQuizTrash(userId.token);
     expect(result).toMatchObject({
       quizzes: [],
@@ -49,14 +51,13 @@ describe('adminQuizTrash Version 2', () => {
 
   // Test : Viewing Removed Quiz
   test('Test Viewing Removed Quiz', () => {
+    // Register a user
     const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
       'first', 'last');
     const quizId: number = requestQuizCreate(userId.token, 'Quiz 1',
       'This is Quiz 1').quizId;
-
     // Remove the quiz
     requestQuizRemove(userId.token, quizId);
-
     // Attempt to view the removed quiz
     const result = requestQuizTrash(userId.token);
     expect(result).toMatchObject({
@@ -94,10 +95,12 @@ describe('adminQuizTrash Version 1', () => {
 
   // Test : Valid Input
   test('Test Valid Input', () => {
+    // Register a user
     const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
       'first', 'last');
+    // Create a quiz
     requestQuizCreate(userId.token, 'Quiz1', 'This is Quiz 1');
-
+    // Attempt to view trash
     const result = requestQuizTrash(userId.token, true);
     expect(result).toMatchObject({
       quizzes: [],
@@ -106,14 +109,14 @@ describe('adminQuizTrash Version 1', () => {
 
   // Test : Viewing Removed Quiz
   test('Test Viewing Removed Quiz', () => {
+    // Register a user
     const userId: Token = requestRegister('validEmail@gmail.com', 'Val1dPassword',
       'first', 'last');
+    // Create a quiz
     const quizId: number = requestQuizCreate(userId.token, 'Quiz 1',
       'This is Quiz 1').quizId;
-
     // Remove the quiz
     requestQuizRemove(userId.token, quizId);
-
     // Attempt to view the removed quiz
     const result = requestQuizTrash(userId.token, true);
     expect(result).toMatchObject({
