@@ -156,9 +156,8 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
     return res.status(403).json(response);
   }
   res.json(response);
-}); 
+});
 */
-
 
 // ====================================================================
 //  ========================= QUESTION FUNCTIONS =====================
@@ -209,7 +208,7 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
 
     res.json(response);
     backupData();
-  }); 
+  });
   */
 
 // ====================================================================
@@ -395,8 +394,6 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   backupData();
 });
 
-
-
 // ====================================================================
 //  ======================= SESSION FUNCTIONS ========================
 // ====================================================================
@@ -447,8 +444,8 @@ app.post('/v2/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
 // adminQuizEmptyTrash
 app.delete('/v2/admin/quiz/trash/empty', (req: Request, res: Response) => {
   const token = parseInt(req.headers.token as string);
-  const quizId = parseInt(req.params.quizid);
-  res.json(adminQuizEmptyTrash(token, quizId));
+  const quizIds = JSON.parse(req.query.quizIds as string);
+  res.json(adminQuizEmptyTrash(token, quizIds));
   backupData();
 });
 
