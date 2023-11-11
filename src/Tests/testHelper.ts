@@ -527,18 +527,15 @@ export function requestQuesMove(token: number | string, newPosition: number,
 // QUESTION Duplicate Define wrapper function
 export function requestQuesDup(token: number, quizid: number,
   questionid: number, v1?: boolean): QuestionId {
-  const ver = v1 ? 'v1' : 'v2';
+  const v = v1 ? 'v1' : 'v2';
   const res = request(
     'POST',
-    `${SERVER_URL}/${ver}/admin/quiz/${quizid}/question/${questionid}/duplicate`,
+    `${SERVER_URL}/${v}/admin/quiz/${quizid}/question/${questionid}/duplicate`,
     {
       ...(v1
-        ? {
-            json: { token: token }
-          }
-        : {
-            headers: { token: token.toString() }
-          })
+        ? { json: { token: token } }
+        : { headers: { token: token.toString() } }
+      )
     }
   );
 

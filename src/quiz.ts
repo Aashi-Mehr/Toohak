@@ -1,3 +1,5 @@
+import request from 'sync-request-curl';
+
 import {
   ErrorObject,
   QuizId,
@@ -445,8 +447,21 @@ function adminQuizUpdateImageURL(token: number, quizId: number,
   const quiz = getQuiz(quizId, getData().quizzes);
   if (!quiz || quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
 
-  // Checking the image is of a valid type and can be fetched (Done in server)
-  if (!imgUrl) throw HTTPError(400, invImg400);
+  // Check if imgUrl is a valid file
+  let res;
+  try { res = request('GET', imgUrl, { }); } catch { throw HTTPError(400, invImg400); }
+
+  if (res.headers['content-type'].toString().startsWith('image')) {
+    if (!res.headers['content-type'].toString().endsWith('png') &&
+        !res.headers['content-type'].toString().endsWith('jpg') &&
+        !res.headers['content-type'].toString().endsWith('jpeg')) {
+      // Checks the content-type is correct
+      throw HTTPError(400, invImg400);
+    }
+  } else { throw HTTPError(400, invImg400); }
+
+  // Updating the image itself
+  quiz.thumbnailUrl = imgUrl;
 
   return { };
 }
