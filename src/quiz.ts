@@ -319,7 +319,6 @@ function adminQuizTransfer(token: number, quizId: number,
   */
 function adminQuizTrash(token: number): QuizList {
   // Check if authUserId is a positive integer
-  console.log(token);
   const user = getUser(token, getData());
   if (!user) throw HTTPError(401, token401);
 
