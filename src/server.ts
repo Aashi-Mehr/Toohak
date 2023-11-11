@@ -444,34 +444,14 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
   });
 
 // adminQuizUpdateImageURL
-app.put('/v1/admin/quiz/:quizid/thumbnail',
-  async (req: Request, res: Response) => {
-    const token = parseInt(req.headers.token as string);
-    const quizId = parseInt(req.params.quizid);
-    let { imgUrl } = req.body;
+app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  const quizId = parseInt(req.params.quizid);
+  const { imgUrl } = req.body;
 
-    let validUrl = true;
-
-    // Check if imgUrl is a valid file of valid png/jpg/jpeg type
-    await fetch(imgUrl, { method: 'HEAD' }).then(res => {
-      if (res.headers.get('Content-Type').startsWith('image')) {
-        if (!res.headers.get('Content-Type').endsWith('png') &&
-          !res.headers.get('Content-Type').endsWith('jpg') &&
-          !res.headers.get('Content-Type').endsWith('jpeg')) {
-        // Checks the type is correct
-          validUrl = false;
-        }
-      } else { validUrl = false; }
-    }).catch(() => { validUrl = false; });
-
-    if (!validUrl) imgUrl = '';
-
-    try {
-      res.json(adminQuizUpdateImageURL(token, quizId, imgUrl));
-    } catch (error) { res.status(error.statusCode).json(error); }
-
-    backupData();
-  });
+  res.json(adminQuizUpdateImageURL(token, quizId, imgUrl));
+  backupData();
+});
 
 // ====================================================================
 //  ======================= QUESTION FUNCTIONS =======================
