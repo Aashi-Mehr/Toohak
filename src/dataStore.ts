@@ -1,3 +1,6 @@
+// Default Quiz Thumnail
+const DEFAULT_QUIZ_THUMBNAIL = '';
+
 // ERROR MESSAGES
 // 403 Errors
 const unauth403 = 'Valid token is provided, but user is unauthorised';
@@ -45,6 +48,65 @@ const passInv400 = 'Email or password is incorrect';
 const oldPass400 = 'Old Password is not the correct old password';
 const newPass400 = 'Old Password and New Password match exactly';
 
+// Session errors
+const auto400 = 'autoStartNum is a number greater than 50';
+const tooMany400 = 'A maximum of 10 sessions not in END state currently exist';
+const noQs400 = 'The quiz does not have any questions in it';
+
+// Player errors
+const playerId400 = 'Player ID does not exist';
+const message400 = 'Message is less than 1 or more than 100 characters';
+
+// Image errors
+const invImg400 = 'When fetched, the URL doesn\'t return a valid file or type' +
+  ' is not JPG/JPEG or PNG.';
+
+// ENUM States
+export enum SessionState {
+  // Players can join in this state, and nothing has started
+  LOBBY = 'lobby',
+
+  // This is the question countdown period. It always exists before a question
+  // is open and the frontend makes the request to move to the open state
+  QUESTION_COUNTDOWN = 'question_countdown',
+
+  // This is when players can see the question and answers, and submit their
+  // answers (as many times as they like)
+  QUESTION_OPEN = 'question_open',
+
+  // This is when players can still see the question answers, but cannot submit
+  QUESTION_CLOSE = 'question_close',
+
+  // This is when players can see the correct answer, as well as everyone
+  // playings' performance in that question, whilst they typically wait to go to
+  // the next countdown
+  ANSWER_SHOW = 'answer_show',
+
+  // This is where the final results are displayed for all players and questions
+  FINAL_RESULTS = 'final_results',
+
+  // The game is now over and inactive
+  END = 'end'
+}
+
+// ENUM Actions
+export enum Actions {
+  // Move onto the countdown for the next question
+  NEXT_QUESTION = 'next_question',
+
+  // This is how to skip the question countdown period immediately.
+  SKIP_COUNTDOWN = 'skip_countdown',
+
+  // Go straight to the next most immediate answers show state
+  GO_TO_ANSWER = 'go_to_answer',
+
+  // Go straight to the final results state
+  GO_TO_FINAL_RESULTS = 'go_to_final_results',
+
+  // Go straight to the END state
+  END = 'end'
+}
+
 // INTERFACES Other
 interface ErrorObject { error: string }
 
@@ -87,6 +149,7 @@ interface Question {
   duration: number,
   points: number,
   answers: Answer[],
+  thumbnailUrl: string
 }
 
 interface AnswerBody {
@@ -101,18 +164,19 @@ interface QuestionBody {
   answers: AnswerBody[]
 }
 
+interface QuestionBodyV2 {
+  question: string,
+  duration: number,
+  points: number,
+  answers: AnswerBody[],
+  thumbnailUrl: string
+}
+
 interface QuestionId {
   questionId: number
 }
 
 // INTERFACES Quiz
-interface QuizId { quizId: number }
-
-interface QuizBrief {
-  quizId: number,
-  name: string
-}
-
 interface QuizInfo {
   quizId: number,
   name: string,
@@ -121,7 +185,13 @@ interface QuizInfo {
   description: string,
   numQuestions: number,
   questions: Question[],
-  duration: number
+  duration: number,
+  thumbnailUrl: string
+}
+
+interface QuizBrief {
+  quizId: number,
+  name: string
 }
 
 interface QuizList { quizzes: QuizBrief[] }
@@ -134,8 +204,11 @@ interface QuizAdd { // Need to add thumbnail URL component
   timeCreated: number,
   timeLastEdited: number,
   in_trash: boolean,
-  questions: Question[]
+  questions: Question[],
+  thumbnailUrl: string
 }
+
+interface QuizId { quizId: number }
 
 // INTERFACE Session
 interface SessionAdd {
@@ -149,17 +222,29 @@ interface Token {
 }
 
 // INTERFACE Quiz Sessions
-interface quizSessionPlayers {
+interface Message {
+  messageBody: string,
+  playerId: number,
+  playerName: string,
+  timeSent: number
+}
+
+interface MessageBody {
+  messageBody: string
+}
+
+interface QuizSessionPlayer {
   name: string,
   playerId: number
 }
 
-interface quizSessionAdd {
+interface QuizSessionAdd {
   sessionId: number,
   state: string,
   atQuestion: number,
   quiz: QuizAdd,
-  players: quizSessionPlayers[]
+  players: QuizSessionPlayer[],
+  messages: Message[]
 }
 
 // INTERFACE Datastore
@@ -167,7 +252,11 @@ interface Datastore {
   users: UserAdd[],
   quizzes: QuizAdd[],
   sessions: SessionAdd[],
-  quizSessions: quizSessionAdd[]
+  quizSessions: QuizSessionAdd[]
+}
+
+interface QuizSessionId {
+  sessionId: number
 }
 
 // Datastore, initially set in server.ts on startup
@@ -252,8 +341,40 @@ function getSession(token: number, sessions: SessionAdd[]):
   return undefined;
 }
 
+interface PlayerSession {
+  player: QuizSessionPlayer,
+  quizSession: QuizSessionAdd
+}
+
+/** getPlayerSession
+  * Loops through all players and quizSessions to find the relevant quiz session
+  *
+  * @param { number } playerId - The playerId for the player
+  *
+  * @returns { PlayerSession } - If the player exists
+  * @returns { undefined } - If the playerIs is invalid
+  */
+function getPlayerSession(playerId: number, data: Datastore):
+  PlayerSession | undefined {
+  // Loops through all quizzes until it finds relevant, valid quiz
+  for (const quizSession of data.quizSessions) {
+    for (const player of quizSession.players) {
+      // Loops through all players of every quiz until it finds the one
+      if (player.playerId === playerId) {
+        return {
+          player: player,
+          quizSession: quizSession
+        };
+      }
+    }
+  }
+
+  // Invalid / Never existed
+  return undefined;
+}
+
 /** getUniqueID
-  * Creates a unique ID (For authUserId, quizId, or token, answer ID, ques ID)
+  * Creates a unique ID (For and Id in dataStore)
   *
   * @returns { number } - All cases
   */
@@ -262,6 +383,9 @@ function getUniqueID(allData: Datastore): number {
   // List of used authUserIds, quizIds, tokens, answerIds, and questionIds
   const usedIds: number[] = [];
   const allIds: number[] = [];
+
+  // Adding used sessionIds
+  for (const sess of allData.quizSessions) usedIds.push(sess.sessionId);
 
   // Adding used authUserIds
   for (const user of allData.users) usedIds.push(user.authUserId);
@@ -323,6 +447,7 @@ export {
   getQuiz,
   getSession,
   getUniqueID,
+  getPlayerSession,
   ErrorObject,
   AuthUserId,
   User,
@@ -339,8 +464,15 @@ export {
   Datastore,
   AnswerBody,
   QuestionBody,
+  QuestionBodyV2,
   QuestionId,
+  QuizSessionId,
   Answer,
+  Message,
+  QuizSessionPlayer,
+  QuizSessionAdd,
+  MessageBody,
+  DEFAULT_QUIZ_THUMBNAIL,
   unauth403,
   token401,
   nameChar400,
@@ -367,5 +499,11 @@ export {
   passChar400,
   passInv400,
   oldPass400,
-  newPass400
+  newPass400,
+  auto400,
+  tooMany400,
+  noQs400,
+  playerId400,
+  message400,
+  invImg400
 };

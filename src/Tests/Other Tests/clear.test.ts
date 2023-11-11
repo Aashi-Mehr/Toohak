@@ -1,9 +1,9 @@
-import { getData } from '../dataStore';
+import { getData } from '../../dataStore';
 import {
   requestClear,
   requestRegister,
   requestQuizCreate
-} from './testHelper';
+} from '../testHelper';
 
 beforeEach(() => { requestClear(); });
 

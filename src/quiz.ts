@@ -1,3 +1,5 @@
+import request from 'sync-request-curl';
+
 import {
   ErrorObject,
   QuizId,
@@ -17,7 +19,9 @@ import {
   notUser400,
   currUser400,
   notBin400,
-  QuizAdd
+  QuizAdd,
+  DEFAULT_QUIZ_THUMBNAIL,
+  invImg400
 } from './dataStore';
 
 import HTTPError from 'http-errors';
@@ -103,7 +107,8 @@ function adminQuizCreate(token: number, name: string, description: string):
     timeCreated: timestamp,
     timeLastEdited: timestamp,
     in_trash: false,
-    questions: []
+    questions: [],
+    thumbnailUrl: DEFAULT_QUIZ_THUMBNAIL
   });
 
   return { quizId: quizId };
@@ -173,7 +178,8 @@ function adminQuizInfo(token: number, quizId: number): QuizInfo {
       description: quiz.description,
       numQuestions: quiz.questions.length,
       questions: quiz.questions,
-      duration: duration
+      duration: duration,
+      thumbnailUrl: quiz.thumbnailUrl
     };
   }
 
@@ -311,13 +317,11 @@ function adminQuizTransfer(token: number, quizId: number,
   * @param { number } token - The authUserId for the user
   *
   * @returns { QuizList } - If the details given are valid
-  * @returns { ErrorObject } - If the details given are invalid
   */
-function adminQuizTrash(token: number):
-  ErrorObject | QuizList {
+function adminQuizTrash(token: number): QuizList {
   // Check if authUserId is a positive integer
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Gathering quizzes
   const allQuizzes = getData().quizzes;
@@ -347,15 +351,18 @@ function adminQuizTrash(token: number):
   * @returns { Record<string, never>  } - If the details given are valid
   * @returns { ErrorObject } - If the details given are invalid
   */
-function adminQuizRestore(token: number, quizId: number):
-  ErrorObject | Record<string, any> {
+function adminQuizRestore(token: number, quizId: number): Record<string, any> {
+  // ErrorObject | Record<string, any> {
   // Check if authUserId is valid
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Check if quizId is valid
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
+
+  // Ensuring the user owns the quiz
+  if (user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);
 
   // Loop through quizzes to check for existingQuizzes
   const existingQuizzes = getData().quizzes;
@@ -366,7 +373,7 @@ function adminQuizRestore(token: number, quizId: number):
       activeQuiz.quizId !== quizId) {
       // Return error if quiz name of the restored quiz is already used
       // by another active quiz or quiz is not in trash
-      return { error: nameUsed400 };
+      throw HTTPError(400, nameUsed400);
     }
   }
 
@@ -377,7 +384,7 @@ function adminQuizRestore(token: number, quizId: number):
     quiz.in_trash = false;
 
     return { };
-  } else return { error: notBin400 };
+  } throw HTTPError(400, notBin400);
 }
 
 /** adminQuizEmptyTrash
@@ -423,6 +430,45 @@ function adminQuizEmptyTrash(token: number, quizId: number[]):
   return {};
 }
 
+/** adminQuizUpdateImageURL
+  * Updates the quiz's thumbnail URL, assuming the ingURL is valid
+  *
+  * @param { number } token - The user's token
+  * @param { number } quizId - The quizId for which the thumnail needs changing
+  * @param { string } imgUrl - The new thumbnail URL
+  *
+  * @returns { Record<string, never> } - If the details given are valid
+  * @throws { HTTPError } - If the details given are invalid
+  */
+function adminQuizUpdateImageURL(token: number, quizId: number,
+  imgUrl: string): Record<string, never> {
+  // Check if authUserId is a positive integer
+  const user = getUser(token, getData());
+  if (!user) throw HTTPError(401, token401);
+
+  // Check if the quiz is valid and belongs to the user
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz || quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
+
+  // Check if imgUrl is a valid file
+  let res;
+  try { res = request('GET', imgUrl, { }); } catch { throw HTTPError(400, invImg400); }
+
+  if (res.headers['content-type'].toString().startsWith('image')) {
+    if (!res.headers['content-type'].toString().endsWith('png') &&
+        !res.headers['content-type'].toString().endsWith('jpg') &&
+        !res.headers['content-type'].toString().endsWith('jpeg')) {
+      // Checks the content-type is correct
+      throw HTTPError(400, invImg400);
+    }
+  } else { throw HTTPError(400, invImg400); }
+
+  // Updating the image itself
+  quiz.thumbnailUrl = imgUrl;
+
+  return { };
+}
+
 export {
   adminQuizList,
   adminQuizInfo,
@@ -433,5 +479,6 @@ export {
   adminQuizTrash,
   adminQuizRestore,
   adminQuizTransfer,
-  adminQuizEmptyTrash
+  adminQuizEmptyTrash,
+  adminQuizUpdateImageURL
 };
