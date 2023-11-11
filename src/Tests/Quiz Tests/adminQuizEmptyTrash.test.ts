@@ -102,7 +102,7 @@ describe('adminQuizEmptyTrash Version 1', () => {
     const quizId: number = requestQuizCreate(userId1.token, 'Quiz 1',
       'This is Quiz 1').quizId;
     // Move the quizzes to the trash
-    const remove = requestQuizRemove(userId1.token, quizId);
+    requestQuizRemove(userId1.token, quizId);
     // Permanently delete the quizzes that is not owned by user
     expect(() => requestQuizEmptyTrash(userId2.token, [quizId], true)).toThrow(HTTPError[403]);
   });

@@ -406,30 +406,23 @@ function adminQuizEmptyTrash(token: number, quizId: number[]):
   for (const quizID of quizId) {
     // Finding matching quizId
     const index = allQuizzes.findIndex((quiz) => quiz.quizId === quizID);
-    // Error 403: If index returns -1, quiz is not owned by user
-    if (index === -1) {
-      throw HTTPError(403, unauth403);
-    }
-
     const quiz = allQuizzes[index];
-    if (user.authUserId !== quiz.authId) {
+    // Error 403: If index returns -1, quiz is not owned by user
+    if (index === -1 || user.authUserId !== quiz.authId) {
       throw HTTPError(403, unauth403);
     }
 
     // Looping through the quizzes owned by user
-    // const quiz = allQuizzes[index];
     // Looping through quizzes to find quiz that is in trash
     if (user.authUserId === quiz.authId && quiz.in_trash === true) {
       // Remove the quiz from the data permanently
       allQuizzes.splice(index, 1);
       return {};
-      
-      // Error 403: Return an error for quizzes that are not in trash
-    } throw HTTPError(400, notBin400);
-    
+    }
   }
+  // Error 403: Return an error for quizzes that are not in trash
+  throw HTTPError(400, notBin400);
 }
-
 
 /** adminQuizUpdateImageURL
   * Updates the quiz's thumbnail URL, assuming the ingURL is valid

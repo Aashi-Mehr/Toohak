@@ -394,7 +394,7 @@ export function requestQuizTrash(token: number | string, v1?: boolean):
     );
   }
   const result = JSON.parse(res.body.toString());
-  
+
   if (res.statusCode !== 200) {
     throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
   }
