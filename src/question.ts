@@ -1,3 +1,4 @@
+import request from 'sync-request-curl';
 import {
   ErrorObject,
   Answer,
@@ -88,32 +89,46 @@ function validQuestionBody(questionBody: QuestionBody):
   * @returns { ErrorObject } - If the token or the inputs is invalid
   */
 export function adminQuestionCreate(token: number, quizId: number,
-  questionBody: QuestionBody, thumbnailUrl?: string): QuestionId | ErrorObject {
+  questionBody: QuestionBody): QuestionId | ErrorObject {
   const data = getData();
 
   // Checking if the user exists
+  // console.log(token);
   const user = getUser(token, data);
-  if (!user) return { error: token401 };
+  // console.log(user);
+  if (!user) throw HTTPError(401, token401);
 
   // Checking if user owns the quiz
   const quiz = getQuiz(quizId, data.quizzes);
-  if (!quiz) return { error: unauth403 };
-  if (quiz.authId !== user.authUserId) return { error: unauth403 };
+  if (!quiz) throw HTTPError(400, "quiz didn't exist");
+  if (quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
 
-  // Checking the question body is valid
   const valid = validQuestionBody(questionBody);
-  if (valid.error) { return valid; }
+  if (valid.error) throw HTTPError(400, valid);
 
-  // Ensuring the duration is valid
   let durationSum = questionBody.duration;
   for (const ques of quiz.questions) durationSum += ques.duration;
-  if (durationSum > 180) return { error: quizDur400 };
+  if (durationSum > 180) throw HTTPError(400, quizDur400);
 
-  /// //////////////////////////////////////////////////////////////////////////
-  /// ///// ERROR CHECKING THUMBNAIL ///////////////////////////////////////////
-  /// //////////////////////////////////////////////////////////////////////////
+  const url = questionBody.thumbnailUrl;
+  if (url === '') throw HTTPError(400, 'The thumbnailUrl is an empty string');
 
-  // Creating answers
+  let downloadedImage;
+  try {
+    downloadedImage = request('GET', url);
+    if (downloadedImage != null) {
+      // no action for lint
+    }
+  } catch (error) {
+    throw HTTPError(400, 'The thumbnailUrl does not return to a valid file');
+  }
+
+  const fileExtension = url.split('.').pop().toLowerCase();
+
+  if (fileExtension !== 'jpg' && fileExtension !== 'jpeg' && fileExtension !== 'png') {
+    throw HTTPError(400, 'The thumbnailUrl is not a JPG or PNG file type');
+  }
+
   const answers: Answer[] = [];
   for (const answer of questionBody.answers) {
     const answerId = getUniqueID(data);
@@ -126,28 +141,23 @@ export function adminQuestionCreate(token: number, quizId: number,
     });
   }
 
-  // Generating an ID
   const questionId = getUniqueID(data);
 
-  // Creating the question to push
   const newQuestion: Question = {
     questionId: questionId,
     question: questionBody.question,
     duration: questionBody.duration,
     points: questionBody.points,
     answers: answers,
-    thumbnailUrl: thumbnailUrl
+    thumbnailUrl: url
   };
 
-  // Updating the time editted
   const timestamp = Math.floor(Date.now() / 1000);
   quiz.timeLastEdited = timestamp;
 
-  // Pushing to data
   quiz.questions.push(newQuestion);
   setData(data);
 
-  // Returning questionId
   return { questionId: questionId };
 }
 

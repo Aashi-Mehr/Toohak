@@ -9,6 +9,7 @@ import sui from 'swagger-ui-express';
 import fs from 'fs';
 import path from 'path';
 import process from 'process';
+import HTTPError from 'http-errors';
 
 import data from '../data.json';
 
@@ -336,16 +337,17 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
 });
 
 // adminQuizDescriptionUpdate
-app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
-  const { token, description } = req.body;
+app.put('/v2/admin/quiz/:quizid/description', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const { description } = req.body;
   const quizId = parseInt(req.params.quizid);
   const response = adminQuizDescriptionUpdate(parseInt(token), quizId,
     description);
 
   if ('error' in response) {
-    if (response.error === token401) return res.status(401).json(response);
-    else if (response.error === unauth403) return res.status(403).json(response);
-    else return res.status(400).json(response);
+    if (response.error === token401) throw HTTPError(401, token401);
+    else if (response.error === unauth403) throw HTTPError(403, unauth403);
+    else throw HTTPError(400, 'Description is more than 100 characters in length');
   }
 
   res.json(response);
@@ -353,16 +355,17 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
 });
 
 // adminQuizTransfer
-app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
-  let { token, userEmail } = req.body;
-  token = parseInt(token);
+app.post('/v2/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const { userEmail } = req.body;
+  // token = parseInt(token);
   const quizId = parseInt(req.params.quizid);
-  const response = adminQuizTransfer(token, quizId, userEmail);
+  const response = adminQuizTransfer(parseInt(token), quizId, userEmail);
 
   if ('error' in response) {
-    if (response.error === token401) return res.status(401).json(response);
-    if (response.error === unauth403) return res.status(403).json(response);
-    return res.status(400).json(response);
+    if (response.error === token401) throw HTTPError(401, token401);
+    if (response.error === unauth403) throw HTTPError(403, unauth403);
+    throw HTTPError(400, response.error);
   }
 
   res.json(response);
@@ -456,20 +459,23 @@ app.post('/v2/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
 // ====================================================================
 
 // adminQuestionCreate
-app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
-  const { token, questionBody } = req.body;
+app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  // console.log(token);
+  const { questionBody } = req.body;
   const quizId = parseInt(req.params.quizid);
   const response = adminQuestionCreate(parseInt(token), quizId, questionBody);
 
   if ('error' in response) {
-    if (response.error === token401) return res.status(401).json(response);
-    if (response.error === unauth403) return res.status(403).json(response);
+    if (response.error === token401) throw HTTPError(401, token401);
+    if (response.error === unauth403) throw HTTPError(403, unauth403);
     return res.status(400).json(response);
   }
 
   res.json(response);
   backupData();
 });
+
 
 // adminQuizUpdateQuestion
 app.put('/v1/admin/quiz/:quizid/question/:questionid',
