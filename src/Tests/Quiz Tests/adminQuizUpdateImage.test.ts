@@ -4,7 +4,9 @@ import HTTPError from 'http-errors';
 import {
   requestClear,
   requestQuizCreate,
+  requestQuizDescriptionUpdate,
   requestQuizImageUpdate,
+  requestQuizInfo,
   requestRegister
 } from '../testHelper';
 
@@ -122,12 +124,11 @@ describe('adminQuizImageUpdate Valid Cases', () => {
     expect(Object.keys(result).length).toStrictEqual(0);
   });
 
-  // WILL WORK AFTER QUIZ UPDATE HAS BEEN FINISHED
-  // // Valid token is provided, user authorised, and the URL is valid
-  // test('Complex Case 2', () => {
-  //   requestQuizImageUpdate(token1, quizId1, validUrl);
-  //   requestQuizDescriptionUpdate(token1, quizId1, 'New Desc');
-  //   let result = requestQuizInfo(token1, quizId1);
-  //   expect(result.thumbnailUrl).toStrictEqual(validUrl);
-  // });
+  // Valid token is provided, user authorised, and the URL is valid
+  test('Complex Case 2', () => {
+    requestQuizImageUpdate(token1, quizId1, validUrl);
+    requestQuizDescriptionUpdate(token1, quizId1, 'New Desc');
+    const result = requestQuizInfo(token1, quizId1);
+    expect(result.thumbnailUrl).toStrictEqual(validUrl);
+  });
 });
