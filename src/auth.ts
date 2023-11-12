@@ -117,7 +117,19 @@ export function adminAuthRegister(email: string, password: string,
   data.sessions.push({
     token: token,
     authUserId: authUserId,
-    is_valid: true
+    is_valid: true,
+    sessionId: 0,
+    state: '',
+    players: [],
+    playerNum: 0,
+    quiz: undefined,
+    autoStartNum: 0,
+    questionNow: 0,
+    finalResult: undefined,
+    csvOutputs: [],
+    questionStartTime: 0,
+    currentQuestionResult: undefined,
+    messages: []
   });
 
   return { token: token };
@@ -237,7 +249,19 @@ export function adminAuthLogin(email: string, password: string):
       getData().sessions.push({
         token: token,
         authUserId: user.authUserId,
-        is_valid: true
+        is_valid: true,
+        sessionId: 0,
+        state: '',
+        players: [],
+        playerNum: 0,
+        quiz: undefined,
+        autoStartNum: 0,
+        questionNow: 0,
+        finalResult: undefined,
+        csvOutputs: [],
+        questionStartTime: 0,
+        currentQuestionResult: undefined,
+        messages: []
       });
 
       // Token needs to be returned

@@ -52,7 +52,7 @@ import {
   unauth403
 } from './dataStore';
 import { guestJoinSession, guestQuestionAnswer, guestSessionResult, playerMessageChat, playerViewChat } from './player';
-import { quizSessionStart } from './sessions';
+import { quizSessionStart} from './sessions';
 
 // Set up web app
 const app = express();

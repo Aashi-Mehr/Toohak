@@ -224,6 +224,16 @@ interface SessionAdd {
   autoStartNum: number,
   questionNow: number,
   finalResult: Result,
+  csvOutputs: csvOutput[],
+  questionStartTime: number,
+  currentQuestionResult: QuestionResult,
+  messages: Message[],
+}
+
+export interface csvOutput {
+  playerName: string,
+  questionScore: number[],
+  questionRank: number[],
 }
 
 // INTERFACE Player
