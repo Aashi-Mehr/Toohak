@@ -375,7 +375,8 @@ export function requestQuizTransfer(token: number | string, quizId: number,
 }
 
 // GET QUIZ TRASH Define wrapper function
-export function requestQuizTrash(token: number, v1?: boolean):
+
+export function requestQuizTrash(token: number | string, v1?: boolean):
   QuizList | ErrorObject {
   let res;
   if (v1) {
@@ -391,7 +392,6 @@ export function requestQuizTrash(token: number, v1?: boolean):
       { headers: { token: token.toString() } }
     );
   }
-
   const result = JSON.parse(res.body.toString());
 
   if (res.statusCode !== 200) {
@@ -402,29 +402,60 @@ export function requestQuizTrash(token: number, v1?: boolean):
 }
 
 // POST QUIZ RESTORE Define wrapper function
-export function requestQuizRestore(token: number, quizId: number):
+export function requestQuizRestore(token: number, quizId: number, v1?: boolean):
   ErrorObject | Record<string, never> {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '/restore',
-    {
-      json: {
-        token: token,
+  let res;
+
+  if (v1) {
+    res = request(
+      'POST',
+      SERVER_URL + '/v1/admin/quiz/' + quizId + '/restore',
+      {
+        json: { token: token }
       }
-    }
-  );
-  return JSON.parse(res.body.toString());
+    );
+  } else {
+    res = request(
+      'POST',
+      SERVER_URL + '/v2/admin/quiz/' + quizId + '/restore',
+      {
+        headers: { token: token.toString() }
+      }
+    );
+  }
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // DELETE EMPTY TRASH Define Wrapper Function
-export function requestQuizEmptyTrash(token: number, quizId: number[]):
+export function requestQuizEmptyTrash(token: number, quizId: number[], v1?: boolean):
   ErrorObject | Record<string, never> {
-  const res = request(
-    'DELETE',
-    SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId + ']',
-    { qs: { token: token } }
-  );
-  return JSON.parse(res.body.toString());
+  let res;
+  if (v1) {
+    res = request(
+      'DELETE',
+      SERVER_URL + '/v1/admin/quiz/trash/empty?quizIds=[' + quizId + ']',
+      { qs: { token: token } }
+    );
+  } else {
+    res = request(
+      'DELETE',
+      SERVER_URL + '/v2/admin/quiz/trash/empty?quizIds=[' + quizId + ']',
+      { headers: { token: token.toString() } }
+    );
+  }
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // DELETE EMPTY TRASH Define Wrapper Function
@@ -515,18 +546,15 @@ export function requestQuesMove(token: number | string, newPosition: number,
 // QUESTION Duplicate Define wrapper function
 export function requestQuesDup(token: number, quizid: number,
   questionid: number, v1?: boolean): QuestionId {
-  const ver = v1 ? 'v1' : 'v2';
+  const v = v1 ? 'v1' : 'v2';
   const res = request(
     'POST',
-    `${SERVER_URL}/${ver}/admin/quiz/${quizid}/question/${questionid}/duplicate`,
+    `${SERVER_URL}/${v}/admin/quiz/${quizid}/question/${questionid}/duplicate`,
     {
       ...(v1
-        ? {
-            json: { token: token }
-          }
-        : {
-            headers: { token: token.toString() }
-          })
+        ? { json: { token: token } }
+        : { headers: { token: token.toString() } }
+      )
     }
   );
 

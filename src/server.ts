@@ -132,6 +132,87 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
 });
 
 // ====================================================================
+//  ========================= QUIZ FUNCTIONS =========================
+// ====================================================================
+//  ========================== ITERATION 2 ===========================
+// ====================================================================
+
+/* // adminQuizList
+app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizList(token);
+
+  if ('error' in response) return res.status(401).json(response);
+  res.json(response);
+});
+
+// adminQuizInfo
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const token = parseInt(req.query.token as string);
+  const response = adminQuizInfo(token, quizId);
+
+  if ('error' in response) {
+    if (response.error === token401) return res.status(401).json(response);
+    return res.status(403).json(response);
+  }
+  res.json(response);
+});
+*/
+
+// ====================================================================
+//  ========================= QUESTION FUNCTIONS =====================
+// ====================================================================
+//  ========================== ITERATION 2 ===========================
+// ====================================================================
+
+/* // adminQuestionMove
+app.put('/v1/admin/quiz/:quizid/question/:questionid/move',
+  (req: Request, res: Response) => {
+    let { token, newPosition } = req.body;
+    const quesId = parseInt(req.params.questionid);
+    const quizId = parseInt(req.params.quizid);
+
+    token = parseInt(token);
+    newPosition = parseInt(newPosition);
+
+    const response = adminQuestionMove(token, newPosition, quesId, quizId);
+
+    if ('error' in response) {
+      if (response.error === token401) return res.status(401).json(response);
+      else if (response.error === unauth403) return res.status(403).json(response);
+      else return res.status(400).json(response);
+    }
+
+    res.json(response);
+    backupData();
+  });
+
+// adminQuestionDuplicate
+app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
+  (req: Request, res: Response) => {
+    const { token } = req.body;
+    const quiz = req.params.quizid;
+    const question = req.params.questionid;
+
+    const token1 = parseInt(token);
+    const quesId = parseInt(question);
+    const quizId = parseInt(quiz);
+
+    const response = adminQuestionDuplicate(token1, quesId, quizId);
+
+    if ('error' in response) {
+      if (response.error === token401) return res.status(401).json(response);
+      else if (response.error === unauth403) return res.status(403).json(response);
+      else return res.status(400).json(response);
+    }
+
+    res.json(response);
+    backupData();
+  });
+  */
+
+// ====================================================================
 //  ========================= AUTH FUNCTIONS =========================
 // ====================================================================
 //  =========================== VERSION 2 ============================
@@ -205,7 +286,10 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
 // adminQuizTrash
 app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
   const token = parseInt(req.query.token as string);
-  res.json(adminQuizTrash(token));
+  const response = adminQuizTrash(token);
+
+  if ('error' in response) return res.status(401).json(response);
+  res.json(response);
 });
 
 // adminQuizRemove
@@ -313,15 +397,6 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   backupData();
 });
 
-// adminQuizTrash
-app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
-  const token = parseInt(req.query.token as string);
-  const response = adminQuizTrash(token);
-
-  if ('error' in response) return res.status(401).json(response);
-  res.json(response);
-});
-
 // ====================================================================
 //  ======================= SESSION FUNCTIONS ========================
 // ====================================================================
@@ -355,11 +430,26 @@ app.get('/v2/admin/quiz/trash', (req: Request, res: Response) => {
   res.json(adminQuizTrash(token));
 });
 
+// adminQuizEmptyTrash
+app.delete('/v2/admin/quiz/trash/empty', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  const quizIds = JSON.parse(req.query.quizIds as string);
+  res.json(adminQuizEmptyTrash(token, quizIds));
+  backupData();
+});
+
 // adminQuizInfo
 app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = parseInt(req.headers.token as string);
   const quizId = parseInt(req.params.quizid);
   res.json(adminQuizInfo(token, quizId));
+});
+
+// adminQuizRestore
+app.post('/v2/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  const quizId = parseInt(req.params.quizid);
+  res.json(adminQuizRestore(token, quizId));
 });
 
 // ====================================================================
@@ -449,34 +539,14 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate',
   });
 
 // adminQuizUpdateImageURL
-app.put('/v1/admin/quiz/:quizid/thumbnail',
-  async (req: Request, res: Response) => {
-    const token = parseInt(req.headers.token as string);
-    const quizId = parseInt(req.params.quizid);
-    let { imgUrl } = req.body;
+app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
+  const token = parseInt(req.headers.token as string);
+  const quizId = parseInt(req.params.quizid);
+  const { imgUrl } = req.body;
 
-    let validUrl = true;
-
-    // Check if imgUrl is a valid file of valid png/jpg/jpeg type
-    await fetch(imgUrl, { method: 'HEAD' }).then(res => {
-      if (res.headers.get('Content-Type').startsWith('image')) {
-        if (!res.headers.get('Content-Type').endsWith('png') &&
-          !res.headers.get('Content-Type').endsWith('jpg') &&
-          !res.headers.get('Content-Type').endsWith('jpeg')) {
-        // Checks the type is correct
-          validUrl = false;
-        }
-      } else { validUrl = false; }
-    }).catch(() => { validUrl = false; });
-
-    if (!validUrl) imgUrl = '';
-
-    try {
-      res.json(adminQuizUpdateImageURL(token, quizId, imgUrl));
-    } catch (error) { res.status(error.statusCode).json(error); }
-
-    backupData();
-  });
+  res.json(adminQuizUpdateImageURL(token, quizId, imgUrl));
+  backupData();
+});
 
 // ====================================================================
 //  ======================= QUESTION FUNCTIONS =======================
