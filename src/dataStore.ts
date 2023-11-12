@@ -216,6 +216,43 @@ interface SessionAdd {
   token: number,
   authUserId: number,
   is_valid: boolean,
+  sessionId: number,
+  state: string,
+  players: Player[],
+  playerNum: number,
+  quiz: QuizAdd,
+  autoStartNum: number,
+  questionNow: number,
+  finalResult: Result,
+}
+
+// INTERFACE Player
+export interface Player {
+  playerId: number;
+  playerName: string;
+  answerIds: number[];
+  answerTime: number;
+  currentScore: number;
+}
+
+// INTERFACE Result
+export interface Result {
+  usersRankedByScore: Score[];
+  questionResults: QuestionResult[];
+}
+
+// INTERFACE Score
+export interface Score {
+  name: string;
+  score: number;
+}
+
+// INTERFACE QuestionResults
+export interface QuestionResult {
+  questionId: number;
+  playersCorrentList: string[];
+  averageAnswerTime: number;
+  percentCorrect: number;
 }
 
 interface Token {

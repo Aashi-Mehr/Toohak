@@ -51,7 +51,7 @@ import {
   token401,
   unauth403
 } from './dataStore';
-import { playerMessageChat, playerViewChat } from './player';
+import { guestJoinSession, guestQuestionAnswer, guestSessionResult, playerMessageChat, playerViewChat } from './player';
 import { quizSessionStart } from './sessions';
 
 // Set up web app
@@ -476,7 +476,6 @@ app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   backupData();
 });
 
-
 // adminQuizUpdateQuestion
 app.put('/v1/admin/quiz/:quizid/question/:questionid',
   (req: Request, res: Response) => {
@@ -595,6 +594,32 @@ app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
   const message = req.body.message;
   res.json(playerMessageChat(playerId, message));
+  backupData();
+});
+
+app.post('/v1/player/join', (req: Request, res: Response) => {
+  const { sessionId, name } = req.body;
+
+  const ret = guestJoinSession(sessionId, name);
+  res.json(ret);
+  backupData();
+});
+
+app.put('/v1/player/:playerid/question/:questionposition/answer', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const questionPosition = parseInt(req.params.questionposition);
+  const { answerIds } = req.body;
+
+  const ret = guestQuestionAnswer(answerIds, playerId, questionPosition);
+  res.json(ret);
+  backupData();
+});
+
+app.get('/v1/player/:playerid/results', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+
+  const ret = guestSessionResult(playerId);
+  res.json(ret);
   backupData();
 });
 
