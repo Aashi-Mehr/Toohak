@@ -3,6 +3,7 @@ import HTTPError from 'http-errors';
 import {
   Message,
   MessageBody,
+  PlayerId,
   getData,
   getPlayerSession,
   message400,
@@ -54,4 +55,23 @@ export function playerMessageChat(playerId: number, message: MessageBody):
 
   // Empty Object Otherwise
   return { };
+}
+
+/** playerJoinSession
+  * Allows a guest player to join a session
+  *
+  * @param { number } sessionId - The sessionId that the player is joining
+  * @param { string } name - The player's name
+  *
+  * @returns { PlayerId } - If the player's message is accepted
+  */
+export function playerJoinSession(sessionId: number, name: string): PlayerId {
+  // Error 400: Name of user entered is not unique
+  
+  // Error 400: Session is not in LOBBY state
+
+  // If the name entered is an empty string, a name must be randomly generated
+  // Structure: "[5 letters][3 numbers]" (e.g. valid123, ifjru483, ofijr938)
+  // where there are no repetitions of numbers or characters within the name
+  return { playerId: 0 };
 }

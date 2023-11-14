@@ -247,6 +247,10 @@ interface QuizSessionAdd {
   messages: Message[]
 }
 
+interface PlayerId {
+  playerId: number
+}
+
 // INTERFACE Datastore
 interface Datastore {
   users: UserAdd[],
@@ -471,6 +475,7 @@ export {
   Message,
   QuizSessionPlayer,
   QuizSessionAdd,
+  PlayerId,
   MessageBody,
   DEFAULT_QUIZ_THUMBNAIL,
   unauth403,
