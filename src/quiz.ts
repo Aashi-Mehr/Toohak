@@ -249,16 +249,17 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
   description: string): ErrorObject | Record<string, never> {
   // Ensuring the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) throw HTTPError(400, 'quiz doesnt exist to edit description');
+  if (!quiz) return { error: unauth403 };
+
   // Ensuring the token is valid
   const user = getUser(token, getData());
-  if (!user) throw HTTPError(401, token401);
+  if (!user) return { error: token401 };
 
   // Ensuring the user owns the quiz
-  if (user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);
+  if (user.authUserId !== quiz.authId) return { error: unauth403 };
 
   // Dexcriotion must be within 100 characters
-  if (description.length > 100) throw HTTPError(400, desc400);
+  if (description.length > 100) return { error: desc400 };
 
   // Quiz is valid
   if (quiz.in_trash === false) {
@@ -267,7 +268,7 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
     return { };
   } else {
     // Exit with an error message if the quiz is invalid
-    throw HTTPError(400, 'quiz is invalid');
+    return { error: unauth403 };
   }
 }
 
@@ -286,21 +287,21 @@ function adminQuizTransfer(token: number, quizId: number,
   const data = getData();
   // Checking if the user exists
   const user = getUser(token, data);
-  if (!user) throw HTTPError(401, token401);
+  if (!user) return { error: token401 };
 
   // Checking if the quiz exists
   const quiz = getQuiz(quizId, data.quizzes);
-  if (!quiz) throw HTTPError(400, 'invalid quiz');
+  if (!quiz) return { error: unauth403 };
 
   // Checking the user owns the quiz
-  if (quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
+  if (quiz.authId !== user.authUserId) return { error: unauth403 };
 
   const newUser = data.users.find(user => user.email === userEmail);
   if (!newUser) return { error: notUser400 };
   else if (user.email === userEmail) return { error: currUser400 };
   else if (data.quizzes.some(quiz2 => quiz2.authId === newUser.authUserId &&
                              quiz2.name === quiz.name)) {
-    throw HTTPError(400, nameUsed400);
+    return { error: nameUsed400 };
   }
 
   quiz.authId = newUser.authUserId;

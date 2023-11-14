@@ -1,6 +1,6 @@
 
 import HTTPError from 'http-errors';
-import request, { HttpVerb } from 'sync-request-curl';
+import request from 'sync-request-curl';
 import { port, url } from '../config.json';
 
 import {
@@ -18,26 +18,6 @@ import {
 } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
-
-function requestHelper(method: HttpVerb, path: string, payload: object) {
-  let qs = {};
-  let json = {};
-  let headers = {};
-  if ('token' in payload) {
-    headers = { token: payload.token };
-    delete payload.token;
-  }
-  if (['GET', 'DELETE'].includes(method)) {
-    qs = payload;
-  } else {
-    json = payload;
-  }
-  const res = request(method, SERVER_URL + path, { qs, json, headers, timeout: 20000 });
-  if (res.statusCode !== 200) {
-    return res.statusCode;
-  }
-  return JSON.parse(res.getBody('utf-8'));
-}
 
 // ====================================================================
 //  ======================== OTHER FUNCTIONS =========================
@@ -339,7 +319,18 @@ export function requestQuizList(token: number | string,
 // PUT QUIZ DESCRIPTION UODATE Define Wrapper Function
 export function requestQuizDescriptionUpdate(token: number | string,
   quizId: number, description: string) {
-  return requestHelper('PUT', '/v2/admin/quiz/' + quizId + '/description', { token, quizId, description });
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/description',
+    {
+      json: {
+        token: token,
+        description: description,
+      }
+    }
+  );
+
+  return JSON.parse(res.body.toString());
 }
 
 export function requestQuizNameUpdate(token: number, quizId: number,
@@ -371,9 +362,19 @@ export function requestQuizRemove(token: number, quizId: number):
 
 export function requestQuizTransfer(token: number | string, quizId: number,
   userEmail: string) {
-  return requestHelper('POST', '/v2/admin/quiz/' + quizId + '/transfer', { token, quizId, userEmail });
-}
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/transfer',
+    {
+      json: {
+        token: token,
+        userEmail: userEmail,
+      }
+    }
+  );
 
+  return JSON.parse(res.body.toString());
+}
 // GET QUIZ TRASH Define wrapper function
 
 export function requestQuizTrash(token: number | string, v1?: boolean):
@@ -508,8 +509,19 @@ export function requestQuizSessionStart(token: number, quizId: number,
 // ====================================================================
 
 export function requestQuestionCreate(token: number | string,
-  quizId: number, questionBody: QuestionBody): number {
-  return requestHelper('POST', '/v2/admin/quiz/' + quizId + '/question', { token, quizId, questionBody });
+  quizId: number, questionBody: QuestionBody): QuestionId {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/question',
+    {
+      json: {
+        token: token,
+        questionBody: questionBody,
+      }
+    }
+  );
+
+  return JSON.parse(res.body.toString());
 }
 
 // QUESTION MOVE Define wrapper function
