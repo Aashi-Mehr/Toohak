@@ -645,12 +645,14 @@ export function requestPlayerJoin(sessionId: number, name: string):
   const res = request(
     'POST',
     SERVER_URL + '/v1/player/join',
-    { json: {
-      sessionId: sessionId,
-      name: name
-    } }
+    {
+      json: {
+        sessionId: sessionId,
+        name: name
+      }
+    }
   );
-  
+
   const result = JSON.parse(res.body.toString());
 
   if (res.statusCode !== 200) {

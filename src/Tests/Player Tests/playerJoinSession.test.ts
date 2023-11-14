@@ -18,6 +18,62 @@ import HTTPError from 'http-errors';
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 
+function checkName(name: string): boolean {
+  // First 5 need to be unique letters
+  for (let i = 0; i < 5; i++) {
+    if (!/[a-zA-Z]/.test(name[i])) {
+      return false;
+    }
+
+    if (name.split('').filter(char => char === name[i]).length > 1) {
+      return false;
+    }
+  }
+
+  // Next 3 need to be unique numbers
+  for (let i = 5; i < 8; i++) {
+    if (!/[0-9]/.test(name[i])) {
+      return false;
+    }
+
+    if (name.split('').filter(char => char === name[i]).length > 1) {
+      return false;
+    }
+  }
+
+  // Length needs to be 8
+  if (name.length !== 8) return false;
+  else return true;
+}
+
+describe('Checking name format function', () => {
+  // Valid strings
+  test('Valid Strings', () => {
+    expect(checkName('ABCDE123')).toBe(true);
+    expect(checkName('abcde123')).toBe(true);
+  });
+
+  // Invalid: More than 3 digits
+  test('Invalid: More than 3 digits', () => {
+    expect(checkName('ABCD1234')).toBe(false);
+  });
+
+  // Invalid: Repeated character in letters
+  test('Invalid: Repeated character in letters', () => {
+    expect(checkName('ABCCC123')).toBe(false);
+  });
+
+  // Invalid: More than 5 letters
+  test('Invalid: More than 5 letters', () => {
+    expect(checkName('A1B2C3D4E5')).toBe(false);
+  });
+
+  // Invalid: Less than 3 digits
+  test('Invalid: Less than 3 digits', () => {
+    expect(checkName('ABCDE12')).toBe(false);
+  });
+});
+
 // Defining a constant questionBody
 const questionBody = {
   question: 'What is the first letter of the alphabet?',
@@ -30,9 +86,6 @@ const questionBody = {
     { answer: 'd', correct: false }
   ]
 };
-
-// Defnining a constant name structure
-const regexName = /^(?!.*(.).*\1)[A-Za-z]{5}(?!(.*\d.*){2})\d{3}$/;
 
 // Defining variables to be used later
 let token: number;
@@ -53,10 +106,10 @@ beforeEach(() => {
 describe('Error Cases', () => {
   // Error 400: Name of user entered is not unique
   test('Error 400: Name of user entered is not unique', () => {
-    requestPlayerJoin(quizSessionId, "Name1");
+    requestPlayerJoin(quizSessionId, 'Name1');
 
     expect(() => requestPlayerJoin(
-      quizSessionId, "Name1"
+      quizSessionId, 'Name1'
     )).toThrow(HTTPError[400]);
   });
 
@@ -78,44 +131,48 @@ describe('Valid Cases', () => {
 
   // Simple case where user 1 joins the session
   test('Simple Case 1', () => {
-    result = requestPlayerJoin(quizSessionId, "Name1");
+    result = requestPlayerJoin(quizSessionId, 'Name1');
     expect(result).toMatchObject({ playerId: expect.any(Number) });
   });
 
   // Simple case where user needs a name generated
   test('Simple Case 2', () => {
     // Conforms to "[5 letters][3 numbers]" with no repeated characters
-    result = requestPlayerJoin(quizSessionId, "");
+    result = requestPlayerJoin(quizSessionId, '');
     expect(result).toMatchObject({ playerId: expect.any(Number) });
 
-    requestPlayerMessage(result.playerId, { messageBody: "Checking name" });
-    let name = requestPlayerChat(result.playerId).messages[0].playerName;
-    expect(regexName.test(name)).toBe(true);
+    requestPlayerMessage(result.playerId, { messageBody: 'Checking name' });
+    const name = requestPlayerChat(result.playerId).messages[0].playerName;
+    console.log(name);
+    expect(checkName(name)).toBe(true);
   });
 
   // Simple case where user needs a name generated
   test('Simple Case 3', () => {
     // Conforms to "[5 letters][3 numbers]" with no repeated characters
-    result = requestPlayerJoin(quizSessionId, "");
+    result = requestPlayerJoin(quizSessionId, '');
     expect(result).toMatchObject({ playerId: expect.any(Number) });
 
-    requestPlayerMessage(result.playerId, { messageBody: "Checking name" });
-    let name = requestPlayerChat(result.playerId).messages[0].playerName;
-    expect(regexName.test(name)).toBe(true);
+    requestPlayerMessage(result.playerId, { messageBody: 'Checking name' });
+    const name = requestPlayerChat(result.playerId).messages[0].playerName;
+    console.log(name);
+    expect(checkName(name)).toBe(true);
   });
 
   // Simple case where multiple users need their names generated
   test('Simple Case 4', () => {
     // Conforms to "[5 letters][3 numbers]" with no repeated characters
-    result = requestPlayerJoin(quizSessionId, "");
-    requestPlayerMessage(result.playerId, { messageBody: "Checking name" });
-    let name = requestPlayerChat(result.playerId).messages[0].playerName;
-    expect(regexName.test(name)).toBe(true);
+    result = requestPlayerJoin(quizSessionId, '');
+    requestPlayerMessage(result.playerId, { messageBody: 'Checking name' });
+    const name = requestPlayerChat(result.playerId).messages[0].playerName;
+    console.log(name);
+    expect(checkName(name)).toBe(true);
 
-    let player2 = requestPlayerJoin(quizSessionId, "").playerId;
-    requestPlayerMessage(player2, { messageBody: "Checking name" });
-    let name2 = requestPlayerChat(player2).messages[1].playerName;
-    expect(regexName.test(name2)).toBe(true);
+    const player2 = requestPlayerJoin(quizSessionId, '').playerId;
+    requestPlayerMessage(player2, { messageBody: 'Checking name' });
+    const name2 = requestPlayerChat(player2).messages[1].playerName;
+    console.log(name);
+    expect(checkName(name2)).toBe(true);
 
     expect(name).not.toEqual(name2);
   });
