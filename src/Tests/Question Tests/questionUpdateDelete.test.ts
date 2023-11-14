@@ -17,10 +17,6 @@ import {
   requestRegister
 } from '../testHelper';
 
-// Defining base data
-const validUrl = 'https://img.freepik.com/free-vector/support-local-business-' +
-  'concept_23-2148592675.jpg';
-
 /** questionBody
   * Returns a questionBody object with given values
   *
@@ -32,7 +28,7 @@ const validUrl = 'https://img.freepik.com/free-vector/support-local-business-' +
   * @returns { QuestionBody } - All cases
   */
 function questionBody(question?: string, duration?: number, points?: number,
-  answers?: AnswerBody[], thumbnailUrl?: string): QuestionBody {
+  answers?: AnswerBody[]): QuestionBody {
   return {
     question: question || 'What is the second letter of the alphabet?',
     duration: duration || 10,
@@ -44,8 +40,7 @@ function questionBody(question?: string, duration?: number, points?: number,
     {
       answer: 'b',
       correct: false
-    }],
-    thumbnailUrl: thumbnailUrl || validUrl
+    }]
   };
 }
 

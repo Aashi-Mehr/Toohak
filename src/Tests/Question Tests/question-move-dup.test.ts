@@ -7,7 +7,7 @@
     Zhejun Gu (z5351573)
 
   Edited on:
-    14/11/2023
+    10/11/2023
   */
 
 /// ////////////////////////////////////////////////////////////////////////////
@@ -30,14 +30,6 @@ import HTTPError from 'http-errors';
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
-
-// Defining base data
-const validUrl = 'https://img.freepik.com/free-vector/support-local-business-' +
-  'concept_23-2148592675.jpg';
-const validUrl2 = 'https://img.freepik.com/free-vector/hand-drawn-iranian-wom' +
-  'en-illustration_23-2149855924.jpg';
-const validUrl3 = 'https://img.freepik.com/free-vector/people-analyzing-growt' +
-  'h-charts_23-2148866843.jpg';
 
 // Clear the dataBase before each test to avoid data interference
 beforeEach(() => {
@@ -69,8 +61,7 @@ describe('adminQuesMove Version 1', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl
+        ]
       }
     ).questionId;
 
@@ -89,8 +80,7 @@ describe('adminQuesMove Version 1', () => {
             answer: 'It is self luminous',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl2
+        ]
       }
     ).questionId;
 
@@ -129,8 +119,7 @@ describe('adminQuesMove Version 1', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl3
+        ]
       }
     ).questionId;
 
@@ -156,8 +145,7 @@ describe('adminQuesMove Version 1', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl2
+        ]
       }
     ).questionId;
 
@@ -185,8 +173,7 @@ describe('adminQuesMove Version 1', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl
+        ]
       }
     ).questionId;
 
@@ -213,8 +200,7 @@ describe('adminQuesMove Version 1', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl2
+        ]
       }
     ).questionId;
 
@@ -249,8 +235,7 @@ describe('adminQuesMove Version 2', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl3
+        ]
       }
     ).questionId;
 
@@ -269,8 +254,7 @@ describe('adminQuesMove Version 2', () => {
             answer: 'It is self luminous',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl2
+        ]
       }
     ).questionId;
 
@@ -309,8 +293,7 @@ describe('adminQuesMove Version 2', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl
+        ]
       }
     ).questionId;
 
@@ -336,8 +319,7 @@ describe('adminQuesMove Version 2', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl2
+        ]
       }
     ).questionId;
 
@@ -365,8 +347,7 @@ describe('adminQuesMove Version 2', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl3
+        ]
       }
     ).questionId;
 
@@ -393,8 +374,7 @@ describe('adminQuesMove Version 2', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl2
+        ]
       }
     ).questionId;
 
@@ -432,8 +412,7 @@ describe('adminQuesDup Version 1', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl
+        ]
       }
     ).questionId;
 
@@ -452,8 +431,7 @@ describe('adminQuesDup Version 1', () => {
             answer: 'It is self luminous',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl2
+        ]
       }
     ).questionId;
 
@@ -482,8 +460,7 @@ describe('adminQuesDup Version 1', () => {
           answer: 'Lovely Joe',
           correct: false
         }
-      ],
-      thumbnailUrl: validUrl3
+      ]
     }).questionId;
 
     const result = requestQuesDup(userId1.token, quizId, quesId2, true);
@@ -508,8 +485,7 @@ describe('adminQuesDup Version 1', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl2
+        ]
       }
     ).questionId;
 
@@ -536,8 +512,7 @@ describe('adminQuesDup Version 1', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl
+        ]
       }
     ).questionId;
 
@@ -564,8 +539,7 @@ describe('adminQuesDup Version 1', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl2
+        ]
       }
     ).questionId;
 
@@ -603,8 +577,7 @@ describe('adminQuesDup Version 2', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl3
+        ]
       }
     ).questionId;
 
@@ -623,8 +596,7 @@ describe('adminQuesDup Version 2', () => {
             answer: 'It is self luminous',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl2
+        ]
       }
     ).questionId;
 
@@ -653,8 +625,7 @@ describe('adminQuesDup Version 2', () => {
           answer: 'Lovely Joe',
           correct: false
         }
-      ],
-      thumbnailUrl: validUrl
+      ]
     }).questionId;
 
     const result = requestQuesDup(userId1.token, quizId, quesId2);
@@ -679,8 +650,7 @@ describe('adminQuesDup Version 2', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl2
+        ]
       }
     ).questionId;
 
@@ -707,8 +677,7 @@ describe('adminQuesDup Version 2', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl3
+        ]
       }
     ).questionId;
 
@@ -735,8 +704,7 @@ describe('adminQuesDup Version 2', () => {
             answer: 'Lovely Joe',
             correct: false
           }
-        ],
-        thumbnailUrl: validUrl2
+        ]
       }
     ).questionId;
 

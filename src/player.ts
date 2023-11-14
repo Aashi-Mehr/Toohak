@@ -11,7 +11,7 @@ import {
   Player,
   Result,
 } from './dataStore';
-// import { sessionUpdate } from './sessions';
+//import { sessionUpdate } from './sessions';
 
 /*
     LOBBY = 'LOBBY',
@@ -143,7 +143,7 @@ export const guestJoinSession = (sessionId: number, name: string): PlayerIdObjec
 
   session.players.push(player);
 
-  // const token = data.users.find(t => t.authUserId === session.quiz.authId);
+  //const token = data.users.find(t => t.authUserId === session.quiz.authId);
 
   setData(data);
 
