@@ -143,7 +143,6 @@ describe('Valid Cases', () => {
 
     requestPlayerMessage(result.playerId, { messageBody: 'Checking name' });
     const name = requestPlayerChat(result.playerId).messages[0].playerName;
-    console.log(name);
     expect(checkName(name)).toBe(true);
   });
 
@@ -155,7 +154,6 @@ describe('Valid Cases', () => {
 
     requestPlayerMessage(result.playerId, { messageBody: 'Checking name' });
     const name = requestPlayerChat(result.playerId).messages[0].playerName;
-    console.log(name);
     expect(checkName(name)).toBe(true);
   });
 
@@ -165,13 +163,11 @@ describe('Valid Cases', () => {
     result = requestPlayerJoin(quizSessionId, '');
     requestPlayerMessage(result.playerId, { messageBody: 'Checking name' });
     const name = requestPlayerChat(result.playerId).messages[0].playerName;
-    console.log(name);
     expect(checkName(name)).toBe(true);
 
     const player2 = requestPlayerJoin(quizSessionId, '').playerId;
     requestPlayerMessage(player2, { messageBody: 'Checking name' });
     const name2 = requestPlayerChat(player2).messages[1].playerName;
-    console.log(name);
     expect(checkName(name2)).toBe(true);
 
     expect(name).not.toEqual(name2);
