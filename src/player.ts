@@ -11,7 +11,6 @@ import {
   Player,
   Result,
 } from './dataStore';
-//import { sessionUpdate } from './sessions';
 
 /*
     LOBBY = 'LOBBY',
@@ -114,7 +113,7 @@ const generateRandomName = () => {
  * @param {number} sessionId - a unique id
  * @param {string} name - unique name
  *
- * @returns {number} - return the playerId
+ * @returns {playerId} - return the playerId
  */
 export const guestJoinSession = (sessionId: number, name: string): PlayerIdObject => {
   const data = getData();
@@ -143,7 +142,7 @@ export const guestJoinSession = (sessionId: number, name: string): PlayerIdObjec
 
   session.players.push(player);
 
-  //const token = data.users.find(t => t.authUserId === session.quiz.authId);
+  // const token = data.users.find(t => t.authUserId === session.quiz.authId);
 
   setData(data);
 
@@ -166,6 +165,7 @@ export const guestJoinSession = (sessionId: number, name: string): PlayerIdObjec
 export const guestQuestionAnswer = (answerIds: number[], playerId: number, questionPosition: number): EmptyReturn => {
   const data = getData();
   const session = data.sessions.find(session => session.players.some(player => player.playerId === playerId));
+
   if (!session) {
     throw HTTPError(400, 'player ID does not exist');
   }
