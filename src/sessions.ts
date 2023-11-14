@@ -1,8 +1,6 @@
 import HTTPError from 'http-errors';
 import {
-  QuizAdd,
   QuizSessionId,
-  SessionAdd,
   SessionState,
   auto400,
   getData,
@@ -10,7 +8,6 @@ import {
   getUniqueID,
   getUser,
   noQs400,
-  setData,
   token401,
   tooMany400,
   unauth403
@@ -43,8 +40,8 @@ export function quizSessionStart(token: number, quizId: number,
 
   // Error 400: A maximum of 10 sessions not in END state currently exist
   let numSessions = 0;
-  for (const session of getData().sessions) {
-    if (session.state !== 'END') numSessions++;
+  for (const session of getData().quizSessions) {
+    if (session.state !== SessionState.END) numSessions++;
   }
   if (numSessions >= 10) throw HTTPError(400, tooMany400);
 
@@ -56,30 +53,13 @@ export function quizSessionStart(token: number, quizId: number,
 
   // This copies the quiz, so that any edits whilst a session is running does
   // not affect active session
-  getData().sessions.push({
-    autoStartNum: autoStart,
-    playerNum: 0,
+  getData().quizSessions.push({
     sessionId: sessionId,
-    messages: [],
-    state: 'LOBBY',
-    questionNow: 0,
-    players: [],
-    questionStartTime: null,
+    state: SessionState.LOBBY,
+    atQuestion: 1,
     quiz: quiz,
-    currentQuestionResult: {
-      questionId: null,
-      playersCorrentList: [],
-      averageAnswerTime: -1,
-      percentCorrect: -1,
-    },
-    finalResult: {
-      usersRankedByScore: [],
-      questionResults: [],
-    },
-    csvOutputs: [],
-    token: 0,
-    authUserId: 0,
-    is_valid: false
+    players: [],
+    messages: []
   });
 
   // Return sessionId object
