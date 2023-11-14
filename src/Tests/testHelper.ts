@@ -482,37 +482,38 @@ export function requestQuizImageUpdate(token: number, quizId: number,
 // ====================================================================
 //  ======================== SESSION FUNCTIONS =======================
 // ====================================================================
+
 // POST START SESSION Define Wrapper Function
-// export function requestQuizSessionStart(token: number, quizId: number,
-//   autoStart: number): QuizSessionId {
-//   const res = request(
-//     'POST',
-//     SERVER_URL + '/v1/admin/quiz/' + quizId + '/session/start',
-//     {
-//       headers: { token: token.toString() },
-//       json: { autoStartNum: autoStart }
-//     }
-//   );
+export function requestQuizSessionStart(token: number, quizId: number,
+  autoStart: number): QuizSessionId {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/session/start',
+    {
+      headers: { token: token.toString() },
+      json: { autoStartNum: autoStart }
+    }
+  );
 
-//   const result = JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
 
-//   if (res.statusCode !== 200) {
-//     throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
-//   }
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
 
-//   return result;
-// }
+  return result;
+}
 
-export const requestQuizSessionStart = (token: number, quizId: number, autoStart: number): QuizSessionId => {
+/* export const requestQuizSessionStart = (token: number, quizId: number, autoStart: number): QuizSessionId => {
   return requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { token, quizId, autoStart });
-};
+}; */
 
 // ====================================================================
 //  ======================= QUESTION FUNCTIONS =======================
 // ====================================================================
 
 export function requestQuestionCreate(token: number | string,
-  quizId: number, questionBody: QuestionBody): number {
+  quizId: number, questionBody: QuestionBody): QuestionId {
   return requestHelper('POST', '/v2/admin/quiz/' + quizId + '/question', { token, quizId, questionBody });
 }
 
@@ -635,7 +636,7 @@ export function requestguestJoinSession(
 }
 
 export function requestguestQuestionAnswer(answerIds: number[],
-  playerId: number, questionPosition: number){
+  playerId: number, questionPosition: number) {
   return requestHelper('PUT', `/v1/player/${playerId}/question/${questionPosition}/answer`, { answerIds, playerId, questionPosition });
 }
 
@@ -644,13 +645,13 @@ export function requestguestSessionResult(playerId: number) {
 }
 
 export const requestSessionStatus = (token: number, quizId: number, sessionId: number) => {
-  return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { token , quizId, sessionId });
+  return requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { token, quizId, sessionId });
 };
 
 export const requestSessionUpdate = (token: number, quizId: number, sessionId: number, action: number | string) => {
-  return requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`,  { token, quizId,sessionId,action });
+  return requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { token, quizId, sessionId, action });
 };
 
 export const requestPlayerStatus = (playerId: number) => {
-  return requestHelper('GET', `/v1/player/${playerId}`, {playerId});
+  return requestHelper('GET', `/v1/player/${playerId}`, { playerId });
 };

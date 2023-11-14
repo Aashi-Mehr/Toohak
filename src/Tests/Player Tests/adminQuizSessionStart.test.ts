@@ -14,6 +14,10 @@ import HTTPError from 'http-errors';
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 
+// Defining base data
+const validUrl = 'https://img.freepik.com/free-vector/support-local-business-' +
+  'concept_23-2148592675.jpg';
+
 const questionBody = {
   question: 'What is the first letter of the alphabet?',
   duration: 10,
@@ -23,7 +27,8 @@ const questionBody = {
     { answer: 'b', correct: false },
     { answer: 'c', correct: false },
     { answer: 'd', correct: false }
-  ]
+  ],
+  thumbnailUrl: validUrl
 };
 
 let token1: number;
@@ -84,7 +89,7 @@ describe('Error Cases', () => {
 
   // Error 400: A maximum of 10 active sessions currently exist
   test('Error 400: A maximum of 10 active sessions currently exist', () => {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 8; i++) {
       const quizId = requestQuizCreate(token1, 'Quiz ' + i, '').quizId;
       requestQuestionCreate(token1, quizId, questionBody);
       requestQuizSessionStart(token1, quizId, 0);
