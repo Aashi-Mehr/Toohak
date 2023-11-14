@@ -52,7 +52,7 @@ import {
   unauth403
 } from './dataStore';
 import { guestJoinSession, guestQuestionAnswer, guestSessionResult, playerMessageChat, playerViewChat } from './player';
-import { quizSessionStart} from './sessions';
+import { quizSessionStart } from './sessions';
 
 // Set up web app
 const app = express();
@@ -587,7 +587,6 @@ app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate',
 app.get('/v1/player/:playerid/chat', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
   res.json(playerViewChat(playerId));
-  backupData();
 });
 
 app.post('/v1/player/:playerid/chat', (req: Request, res: Response) => {
@@ -620,7 +619,6 @@ app.get('/v1/player/:playerid/results', (req: Request, res: Response) => {
 
   const ret = guestSessionResult(playerId);
   res.json(ret);
-  backupData();
 });
 
 // ====================================================================
