@@ -54,7 +54,7 @@ export function playerMessageChat(playerId: number, message: MessageBody):
   playerSession.quizSession.messages.push({
     messageBody: message.messageBody,
     playerId: playerId,
-    timeSent: Math.floor(Date.now()),
+    timeSent: Math.floor(Date.now() / 1000),
     playerName: playerSession.player.name
   });
 
