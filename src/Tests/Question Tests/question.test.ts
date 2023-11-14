@@ -10,14 +10,13 @@ import {
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 
+const ERROR = { error: expect.any(String) };
+
 const invalidUser = 10000;
 const quizId = -4123214;
 const invlalidQuestion1 = 'asdf';
 const invlalidQuestion2 = 'qweasdzsfhkngkujdfhgujklhgjbfrtyfghvbnsadsafsafsafc';
 const questionString = 'How to call a person without a body and a nose?';
-
-const validThumbnailUrl = 'https://static.vecteezy.com/system/resources/previews/000/440/213/original/question-mark-vector-icon.jpg';
-const invalidThumbnailUrl = 'not-a-valid-url';
 
 const answers = [
   {
@@ -168,7 +167,6 @@ const questionBody = {
   duration: 60,
   points: 5,
   answers: answers,
-  thumbnailUrl: validThumbnailUrl
 };
 
 const questionBody2 = {
@@ -176,7 +174,6 @@ const questionBody2 = {
   duration: 30,
   points: 7,
   answers: answers2,
-  thumbnailUrl: validThumbnailUrl
 };
 
 const questionBodyNegativeDuration = {
@@ -184,7 +181,6 @@ const questionBodyNegativeDuration = {
   duration: -1,
   points: 5,
   answers: answers,
-  thumbnailUrl: validThumbnailUrl
 };
 
 const questionBodyInvalidPoint1 = {
@@ -192,7 +188,6 @@ const questionBodyInvalidPoint1 = {
   duration: 60,
   points: 0,
   answers: answers,
-  thumbnailUrl: validThumbnailUrl
 };
 
 const questionBodyInvalidPoint2 = {
@@ -200,16 +195,7 @@ const questionBodyInvalidPoint2 = {
   duration: 60,
   points: 11,
   answers: answers,
-  thumbnailUrl: validThumbnailUrl
 };
-
-// const invalidURLquestionBody = {
-//   question: questionString,
-//   duration: 60,
-//   points: 5,
-//   answers: answers,
-//   thumbnailUrl: invalidThumbnailUrl
-// };
 
 beforeEach(() => {
   requestClear();
@@ -220,14 +206,14 @@ describe('questionCreate', () => {
     test('token is not a valid user', () => {
       // token is not an integer
       const result = requestQuestionCreate(invalidUser, quizId, questionBody);
-      expect(result).toStrictEqual(401);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('Quiz ID does not refer to a valid quiz', () => {
       const token1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
       const result = requestQuestionCreate(token1, quizId, questionBody);
 
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('Quiz ID does not refer to a quiz that this user owns', () => {
@@ -237,7 +223,7 @@ describe('questionCreate', () => {
 
       const result = requestQuestionCreate(token1, quizId1, questionBody);
 
-      expect(result).toStrictEqual(403);
+      expect(result).toMatchObject(ERROR);
     });
   });
 
@@ -256,10 +242,9 @@ describe('questionCreate', () => {
         duration: 60,
         points: 5,
         answers: answers,
-        thumbnailUrl: validThumbnailUrl
       };
       const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('Question string is greater than 50 characters in length', () => {
@@ -268,10 +253,9 @@ describe('questionCreate', () => {
         duration: 60,
         points: 5,
         answers: answers,
-        thumbnailUrl: validThumbnailUrl
       };
       const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('The question has less than 2 answers', () => {
@@ -280,10 +264,9 @@ describe('questionCreate', () => {
         duration: 60,
         points: 5,
         answers: invalidAnswerLength1,
-        thumbnailUrl: validThumbnailUrl
       };
       const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('The question has more than 6 answers', () => {
@@ -292,31 +275,32 @@ describe('questionCreate', () => {
         duration: 60,
         points: 5,
         answers: invalidAnswerLength2,
-        thumbnailUrl: validThumbnailUrl
       };
       const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('The question duration is not a positive number', () => {
       const result = requestQuestionCreate(token1, quizId1, questionBodyNegativeDuration);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('The sum of the question durations in the quiz exceeds 3 minutes', () => {
       // question body has a length of 60 seconds
       for (let i = 0; i < 3; i++) {
-        requestQuestionCreate(token1, quizId1, questionBody);
+        const result = requestQuestionCreate(token1, quizId1, questionBody);
+        expect(result).not.toMatchObject(ERROR);
       }
 
       const result = requestQuestionCreate(token1, quizId1, questionBody);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('Sum of the question durations in the quiz will be 181 seconds', () => {
       // question body has a length of 60 seconds
       for (let i = 0; i < 3; i++) {
-        requestQuestionCreate(token1, quizId1, questionBody);
+        const result = requestQuestionCreate(token1, quizId1, questionBody);
+        expect(result).not.toMatchObject(ERROR);
       }
 
       const result = requestQuestionCreate(token1, quizId1, {
@@ -326,20 +310,19 @@ describe('questionCreate', () => {
         answers: [
           { answer: 'who?', correct: false },
           { answer: 'you?', correct: true }
-        ],
-        thumbnailUrl: validThumbnailUrl,
+        ]
       });
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('The points awarded for the question are less than 1', () => {
       const result = requestQuestionCreate(token1, quizId1, questionBodyInvalidPoint1);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('The points awarded for the question are greater than 10', () => {
       const result = requestQuestionCreate(token1, quizId1, questionBodyInvalidPoint2);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('The length of any answer is shorter than 1 character long', () => {
@@ -348,10 +331,9 @@ describe('questionCreate', () => {
         duration: 60,
         points: 5,
         answers: answersInvliadStringLength1,
-        thumbnailUrl: validThumbnailUrl
       };
       const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('The length of any answer is longer than 30 characters long', () => {
@@ -360,10 +342,9 @@ describe('questionCreate', () => {
         duration: 60,
         points: 5,
         answers: answersInvliadStringLength2,
-        thumbnailUrl: validThumbnailUrl
       };
       const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('Any answer strings are duplicates of one another (within the same question)', () => {
@@ -372,10 +353,9 @@ describe('questionCreate', () => {
         duration: 60,
         points: 5,
         answers: answersDuplicateAnswers,
-        thumbnailUrl: validThumbnailUrl
       };
       const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('There are no correct answers', () => {
@@ -384,28 +364,9 @@ describe('questionCreate', () => {
         duration: 60,
         points: 5,
         answers: answersNoCorrect,
-        thumbnailUrl: validThumbnailUrl
       };
       const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toStrictEqual(400);
-    });
-
-    test('The thumbnailUrl is an empty string', () => {
-      const questionWithEmptyThumbnailUrl = {
-        ...questionBody,
-        thumbnailUrl: ''
-      };
-      const result = requestQuestionCreate(token1, quizId1, questionWithEmptyThumbnailUrl);
-      expect(result).toStrictEqual(400);
-    });
-
-    test('The thumbnailUrl does not return to a valid file', () => {
-      const questionWithInvalidThumbnailUrl = {
-        ...questionBody,
-        thumbnailUrl: invalidThumbnailUrl
-      };
-      const result = requestQuestionCreate(token1, quizId1, questionWithInvalidThumbnailUrl);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
   });
 
@@ -433,11 +394,11 @@ describe('questionCreate', () => {
         token1,
         quizId1,
         questionBody
-      );
+      ).questionId;
 
       const result = requestQuizInfo(token1, quizId1);
 
-      expect({ questionId: result.questions[0].questionId }).toMatchObject(questionId);
+      expect(result.questions[0].questionId).toStrictEqual(questionId);
       expect(result.questions[0].question).toStrictEqual(questionString);
       expect(result.questions[0].duration).toStrictEqual(60);
       expect(result.questions[0].points).toStrictEqual(5);

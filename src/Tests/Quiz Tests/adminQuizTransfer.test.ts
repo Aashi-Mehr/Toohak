@@ -12,6 +12,7 @@ import HTTPError from 'http-errors';
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 
+const ERROR = { error: expect.any(String) };
 const invalidUser = -10000;
 const quizId = -214213;
 const email1 = 'first.last1@gmail.com';
@@ -36,12 +37,13 @@ describe('requestQuizTransfer', () => {
     test('token is not a valid user', () => {
       // token is not an integer
       const result = requestQuizTransfer(invalidUser, quizId1, email2);
-      expect(result).toStrictEqual(401);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('Quiz ID does not refer to a valid quiz', () => {
       const result = requestQuizTransfer(token1, quizId, email2);
-      expect(result).toStrictEqual(400);
+
+      expect(result).toMatchObject(ERROR);
     });
 
     test('Quiz ID does not refer to a quiz that this user owns', () => {
@@ -49,23 +51,23 @@ describe('requestQuizTransfer', () => {
 
       const result = requestQuizTransfer(token1, quizId2, email2);
 
-      expect(result).toStrictEqual(403);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('userEmail is not a real user', () => {
       const result = requestQuizTransfer(token1, quizId1, 'invalid@gmail.com');
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('userEmail is the current logged in user', () => {
       const result = requestQuizTransfer(token1, quizId1, email1);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
 
     test('Quiz ID refers to a quiz that has a name that is already used by the target user', () => {
       requestQuizCreate(token2, 'first last', 'fist_test');
       const result = requestQuizTransfer(token1, quizId1, email2);
-      expect(result).toStrictEqual(400);
+      expect(result).toMatchObject(ERROR);
     });
   });
 

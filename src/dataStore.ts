@@ -161,8 +161,7 @@ interface QuestionBody {
   question: string,
   duration: number,
   points: number,
-  answers: AnswerBody[],
-  thumbnailUrl: string
+  answers: AnswerBody[]
 }
 
 interface QuestionBodyV2 {
