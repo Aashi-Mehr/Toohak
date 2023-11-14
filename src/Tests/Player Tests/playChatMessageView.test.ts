@@ -14,10 +14,6 @@ import {
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 
-// Defining base data
-const validUrl = 'https://img.freepik.com/free-vector/support-local-business-' +
-  'concept_23-2148592675.jpg';
-
 const questionBody = {
   question: 'What is the first letter of the alphabet?',
   duration: 10,
@@ -27,8 +23,7 @@ const questionBody = {
     { answer: 'b', correct: false },
     { answer: 'c', correct: false },
     { answer: 'd', correct: false }
-  ],
-  thumbnailUrl: validUrl
+  ]
 };
 
 let token: number;
