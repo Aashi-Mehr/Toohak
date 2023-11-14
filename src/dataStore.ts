@@ -56,6 +56,8 @@ const noQs400 = 'The quiz does not have any questions in it';
 // Player errors
 const playerId400 = 'Player ID does not exist';
 const message400 = 'Message is less than 1 or more than 100 characters';
+const playerName400 = 'Name of user entered is not unique';
+const playerJoin400 = 'Session is not in LOBBY state';
 
 // Image errors
 const invImg400 = 'When fetched, the URL doesn\'t return a valid file or type' +
@@ -247,6 +249,10 @@ interface QuizSessionAdd {
   messages: Message[]
 }
 
+interface PlayerId {
+  playerId: number
+}
+
 // INTERFACE Datastore
 interface Datastore {
   users: UserAdd[],
@@ -322,10 +328,31 @@ function getQuiz(quizId: number, quizzes: QuizAdd[]): QuizAdd | undefined {
   return undefined;
 }
 
+/** getQuizSession
+  * Loops through all quiz sessions to find the session with given Id
+  *
+  * @param { number } sessionId - The sessionId for the quiz session
+  * @param { QuizSessionAdd[] } sessions - All quiz sessions
+  *
+  * @returns { SessionAdd } - If the sessionId exists
+  * @returns { undefined } - If the sessionId is invalid
+  */
+function getQuizSession(sessionId: number, sessions: QuizSessionAdd[]):
+  QuizSessionAdd | undefined {
+  // Loops through all quiz sessions until it finds relevant session
+  for (const quizSess of sessions) {
+    if (sessionId === quizSess.sessionId) return quizSess;
+  }
+
+  // Invalid / Never existed
+  return undefined;
+}
+
 /** getSession
   * Loops through all sessions to find the session with given token
   *
   * @param { number } token - The token for the session
+  * @param { SessionAdd[] } sessions - All sessions
   *
   * @returns { SessionAdd } - If the token exists and is valid
   * @returns { undefined } - If the token is invalid
@@ -384,9 +411,6 @@ function getUniqueID(allData: Datastore): number {
   const usedIds: number[] = [];
   const allIds: number[] = [];
 
-  // Adding used sessionIds
-  for (const sess of allData.quizSessions) usedIds.push(sess.sessionId);
-
   // Adding used authUserIds
   for (const user of allData.users) usedIds.push(user.authUserId);
 
@@ -404,6 +428,12 @@ function getUniqueID(allData: Datastore): number {
       // Adding used answerIds
       for (const answer of question.answers) usedIds.push(answer.answerId);
     }
+  }
+
+  // Adding used sessionIds, playerIds
+  for (const sess of allData.quizSessions) {
+    usedIds.push(sess.sessionId);
+    for (const player of sess.players) usedIds.push(player.playerId);
   }
 
   // To ensure that the Id is 8 digits (Or greater, but unlikely to be greater)
@@ -445,6 +475,7 @@ export {
   setData,
   getUser,
   getQuiz,
+  getQuizSession,
   getSession,
   getUniqueID,
   getPlayerSession,
@@ -471,6 +502,7 @@ export {
   Message,
   QuizSessionPlayer,
   QuizSessionAdd,
+  PlayerId,
   MessageBody,
   DEFAULT_QUIZ_THUMBNAIL,
   unauth403,
@@ -505,5 +537,7 @@ export {
   noQs400,
   playerId400,
   message400,
-  invImg400
+  invImg400,
+  playerName400,
+  playerJoin400
 };
