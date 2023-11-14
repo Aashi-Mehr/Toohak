@@ -124,6 +124,11 @@ describe('Error Cases', () => {
     // Uncomment after requestUpdateSessionState is created
     expect(1 + 1).toStrictEqual(2);
   });
+
+  // Error 400: Session is not in LOBBY state
+  test('Error 400: Session is not in LOBBY state, it doesn\'t exist', () => {
+    expect(() => requestPlayerJoin(0, 'Name1')).toThrow(HTTPError[400]);
+  });
 });
 
 describe('Valid Cases', () => {
