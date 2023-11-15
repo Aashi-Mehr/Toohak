@@ -52,6 +52,7 @@ const newPass400 = 'Old Password and New Password match exactly';
 const auto400 = 'autoStartNum is a number greater than 50';
 const tooMany400 = 'A maximum of 10 sessions not in END state currently exist';
 const noQs400 = 'The quiz does not have any questions in it';
+const inval400 = 'Session Id does not refer to a valid session';
 
 // Player errors
 const playerId400 = 'Player ID does not exist';
@@ -174,6 +175,13 @@ interface QuestionBodyV2 {
 
 interface QuestionId {
   questionId: number
+}
+
+interface sessionStatus {
+  state: string,
+  atQuestion: number,
+  players: [],
+  metadata: QuizInfo[]
 }
 
 // INTERFACES Quiz
@@ -471,6 +479,7 @@ export {
   Message,
   QuizSessionPlayer,
   QuizSessionAdd,
+  sessionStatus,
   MessageBody,
   DEFAULT_QUIZ_THUMBNAIL,
   unauth403,
@@ -505,5 +514,6 @@ export {
   noQs400,
   playerId400,
   message400,
-  invImg400
+  invImg400,
+  inval400
 };
