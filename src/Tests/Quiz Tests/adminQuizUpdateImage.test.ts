@@ -19,6 +19,7 @@ const validUrl3 = 'https://img.freepik.com/free-vector/people-analyzing-growt' +
   'h-charts_23-2148866843.jpg';
 const invalidType = 'https://i0.wp.com/www.galvanizeaction.org/wp-content/upl' +
   'oads/2022/06/Wow-gif.gif';
+const invalidType2 = 'https://en.wikipedia.org/wiki/Food';
 const invalidFile = 'ThisIsCompletelyInvalid.jpg';
 
 let token1: number;
@@ -65,6 +66,13 @@ describe('adminQuizImageUpdate Error Cases', () => {
   test('400: imgUrl when fetch is not a JPG or PNG image', () => {
     expect(() => requestQuizImageUpdate(
       token1, quizId1, invalidType
+    )).toThrow(HTTPError[400]);
+  });
+
+  // 400: imgUrl when fetch is not a JPG or PNG image
+  test('400: imgUrl when fetch is not a JPG or PNG image', () => {
+    expect(() => requestQuizImageUpdate(
+      token1, quizId1, invalidType2
     )).toThrow(HTTPError[400]);
   });
 
