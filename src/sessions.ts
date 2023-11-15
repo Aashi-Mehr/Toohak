@@ -2,19 +2,13 @@ import HTTPError from 'http-errors';
 import {
   QuizSessionId,
   SessionState,
-  auto400,
   getData,
   getQuiz,
-  getUniqueID,
   getUser,
-  noQs400,
-  token401,
-  tooMany400,
   unauth403,
   getSession,
-  unactive400,
-  invalAct400,
-  cantAct400
+  inval400,
+  token401
 } from './dataStore';
 
 /** quizSessionStart
@@ -103,3 +97,28 @@ export function adminQuizSessionUpdate(token: number, quizId: number,
   //% 
 
   }
+
+/** quizGetSession
+  * Get the status of a particular quiz session
+  * 
+  * @param { number } token - The token of the user starting the session
+  * @param { number } quizId - The quizId of the quiz that's being started
+  * @param { number } sessionId - The session id of an active session within the quiz
+  *
+  * @returns { Record<string, never>  } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+export function quizGetSession(quizId: number, sessionId: number, token: number):
+ErrorObject | Record<string, never> {
+
+  // Error 401: Token is empty or invalid
+  const user = getUser(token, getData());
+  if (!user) throw HTTPError(401, token401);
+
+  // Error 403 : Check if quizId is valid
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz) throw HTTPError(403, unauth403);
+
+  const session = getQuizSession(sessionId, getData().quizSessions);
+  if(!session) throw HTTPError(400, inval400)
+}
