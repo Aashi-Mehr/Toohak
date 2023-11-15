@@ -10,7 +10,11 @@ import {
   noQs400,
   token401,
   tooMany400,
-  unauth403
+  unauth403,
+  getSession,
+  unactive400,
+  invalAct400,
+  cantAct400
 } from './dataStore';
 
 /** quizSessionStart
@@ -65,3 +69,37 @@ export function quizSessionStart(token: number, quizId: number,
   // Return sessionId object
   return { sessionId: sessionId };
 }
+
+/** adminQuizSessionUpdate
+  * Update the state of a particular session by sending an action command
+  * 
+  * @param { number } token - The token of the user starting the session
+  * @param { number } quizId - The quizId of the quiz that's being started
+  * @param { number } sessionId - The session id of an active session within the quiz
+  * @param { string } action - Action enum to change the state
+  *
+  * @returns { Record<string, never>  } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+export function adminQuizSessionUpdate(token: number, quizId: number,
+  sessionId: number, action: string): ErrorObject | Record<string, never> {
+  
+  // Error 401 : Checking if user exists
+  const user = getUser(token, getData());
+  if (!user) throw HTTPError(401, token401);
+
+  // Error 403 : Check if quizId is valid
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz) throw HTTPError(403, unauth403);
+
+  // Error 400 : Check if session is inactive or invalid
+  const session = getSession(token, getData().sessions);
+  if (!session) throw HTTPError(400, unactive400);
+  
+  // Ensuring the user owns the quiz
+  if(user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);
+
+  // Loop through the quiz to find valid active session
+  //% 
+
+  }

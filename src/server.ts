@@ -51,7 +51,10 @@ import {
   unauth403
 } from './dataStore';
 import { playerMessageChat, playerViewChat } from './player';
-import { quizSessionStart } from './sessions';
+import {
+  quizSessionStart,
+  adminQuizSessionUpdate
+} from './sessions';
 
 // Set up web app
 const app = express();
@@ -406,6 +409,17 @@ app.post('/v1/admin/quiz/:quizid/session/start',
     const autoStart = parseInt(req.body.autoStartNum);
 
     res.json(quizSessionStart(token, quizId, autoStart));
+    backupData();
+  });
+
+app.put('/v1/admin/quiz/:quizid/session/:sessionid',
+  (req: Request, res: Response) => {
+    const token = parseInt(req.headers.token as string);
+    const quizId = parseInt(req.params.quizid);
+    const sessionId = parseInt(req.params.sessionid);
+    const action = parseInt(req.body.action);
+
+    res.json(adminQuizSessionUpdate(quizId, sessionId, token, action));
     backupData();
   });
 
