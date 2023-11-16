@@ -473,6 +473,12 @@ function getUniqueID(allData: Datastore): number {
   return allIds[randomPos];
 }
 
+// Sleep Sync function
+const sleepSync = (ms: number) => {
+  const StartTime = new Date().getTime();
+  while (new Date().getTime() - StartTime < ms) { /* zzzZZ */ }
+};
+
 export {
   getData,
   setData,
@@ -542,5 +548,9 @@ export {
   message400,
   invImg400,
   playerName400,
-  playerJoin400
+  playerJoin400,
+  sleepSync,
+  unactive400,
+  invalAct400,
+  cantAct400,
 };

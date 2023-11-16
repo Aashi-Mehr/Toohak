@@ -508,8 +508,8 @@ export function requestQuizSessionStart(token: number, quizId: number,
 }
 
 // PUT SESSION UPDATE Define Wrapper Function
-export function requestQuizSessionUpdate(token: number, quizId: number,
-  sessionId: number, action: string): ErrorObject | Record<string, never> {
+export function requestQuizSessionUpdate(quizId: number, sessionId: number,
+  token: number, action: string): ErrorObject | Record<string, never> {
   const res = request(
     'PUT',
     SERVER_URL + '/v1/admin/quiz/' + quizId + '/session/' + sessionId,

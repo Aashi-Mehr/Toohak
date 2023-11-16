@@ -57,8 +57,6 @@ import {
 } from './sessions';
 
 import { playerJoinSession, playerMessageChat, playerViewChat } from './player';
-import { quizSessionStart } from './sessions';
-
 
 // Set up web app
 const app = express();
