@@ -257,8 +257,11 @@ export function requestQuizCreate(token: number, name: string,
 
   const result = JSON.parse(res.body.toString());
 
-  if ('error' in result) return { quizId: -1 };
-  else return result;
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // GET QUIZ INFO Define wrapper function

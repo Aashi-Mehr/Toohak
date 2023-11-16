@@ -72,16 +72,16 @@ function adminQuizCreate(token: number, name: string, description: string):
   QuizId | ErrorObject {
   // Error checking
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Name can only have alphanumeric characters, spaces and apostrophes
   // Length should be between 3 and 30
   const invalidName = /[^a-zA-Z0-9 ']/.test(name);
   if (invalidName || name.length < 3 || name.length > 30) {
-    return { error: nameChar400 + ' ' + nameLen400 };
+    throw HTTPError(400, nameChar400 + ' ' + nameLen400);
   }
 
-  if (description.length > 100) return { error: desc400 };
+  if (description.length > 100) throw HTTPError(400, desc400);
 
   // Error checking: In used quiz name
   const quizzes: QuizAdd[] = [];
@@ -92,7 +92,7 @@ function adminQuizCreate(token: number, name: string, description: string):
   }
 
   for (const quiz of quizzes) {
-    if (quiz.name === name) return { error: nameUsed400 };
+    if (quiz.name === name) throw HTTPError(400, nameUsed400);
   }
 
   // Returning and altering data
@@ -127,11 +127,11 @@ function adminQuizRemove(token: number, quizId: number):
   ErrorObject | Record<string, never> {
   // Check if token is in a valid session
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Finding the quiz
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Deleting the quiz if it's owned by the correct user
   if (quiz.authId === user.authUserId && quiz.in_trash === false) {
@@ -140,7 +140,7 @@ function adminQuizRemove(token: number, quizId: number):
     return { };
   } else {
     // It's not owned by given user
-    return { error: unauth403 };
+    throw HTTPError(403, unauth403);
   }
 }
 
@@ -198,29 +198,29 @@ function adminQuizInfo(token: number, quizId: number): QuizInfo {
   * @returns { ErrorObject } - If the details given are invalid
   */
 function adminQuizNameUpdate(token: number, quizId: number, name: string):
-  ErrorObject | Record<string, never> {
+  Record<string, never> {
   // Checking if user exists
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Checking if quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Checking if given user owns the quiz
-  if (user.authUserId !== quiz.authId) return { error: token401 };
+  if (user.authUserId !== quiz.authId) throw HTTPError(401, token401);
 
   // Check if the name contains invalid, non-alphanumeric characters
   const invalidName = /[^a-zA-Z0-9 ']/.test(name);
   if (invalidName || name.length < 3 || name.length > 30) {
-    return { error: nameChar400 };
+    throw HTTPError(400, nameChar400);
   }
 
   // Checking if the user has another quiz with the same name
   for (const otherQuiz of getData().quizzes) {
     if (name === otherQuiz.name && quizId !== otherQuiz.quizId &&
         user.authUserId === otherQuiz.authId && otherQuiz.in_trash === false) {
-      return { error: nameUsed400 };
+      throw HTTPError(400, nameUsed400);
     }
   }
 
@@ -231,7 +231,7 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
     return { };
   } else {
     // Quiz is invalid
-    return { error: unauth403 };
+    throw HTTPError(403, unauth403);
   }
 }
 
@@ -249,17 +249,17 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
   description: string): ErrorObject | Record<string, never> {
   // Ensuring the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Ensuring the token is valid
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Ensuring the user owns the quiz
-  if (user.authUserId !== quiz.authId) return { error: unauth403 };
+  if (user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);
 
   // Dexcriotion must be within 100 characters
-  if (description.length > 100) return { error: desc400 };
+  if (description.length > 100) throw HTTPError(400, desc400);
 
   // Quiz is valid
   if (quiz.in_trash === false) {
@@ -268,7 +268,7 @@ function adminQuizDescriptionUpdate(token: number, quizId: number,
     return { };
   } else {
     // Exit with an error message if the quiz is invalid
-    return { error: unauth403 };
+    throw HTTPError(403, unauth403);
   }
 }
 
@@ -287,21 +287,21 @@ function adminQuizTransfer(token: number, quizId: number,
   const data = getData();
   // Checking if the user exists
   const user = getUser(token, data);
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Checking if the quiz exists
   const quiz = getQuiz(quizId, data.quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Checking the user owns the quiz
-  if (quiz.authId !== user.authUserId) return { error: unauth403 };
+  if (quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
 
   const newUser = data.users.find(user => user.email === userEmail);
-  if (!newUser) return { error: notUser400 };
-  else if (user.email === userEmail) return { error: currUser400 };
+  if (!newUser) throw HTTPError(400, notUser400);
+  else if (user.email === userEmail) throw HTTPError(400, currUser400);
   else if (data.quizzes.some(quiz2 => quiz2.authId === newUser.authUserId &&
                              quiz2.name === quiz.name)) {
-    return { error: nameUsed400 };
+    throw HTTPError(400, nameUsed400);
   }
 
   quiz.authId = newUser.authUserId;
