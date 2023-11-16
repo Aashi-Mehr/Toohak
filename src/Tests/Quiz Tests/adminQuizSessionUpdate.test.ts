@@ -291,7 +291,7 @@ describe('Valid Cases', () => {
   });
   test('end at LOBBY', () => {
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'end');
+      quizId1, sessionId1, token1, 'end');
     expect(result).toMatchObject({ });
   });
 
@@ -299,7 +299,7 @@ describe('Valid Cases', () => {
   test('skip_countdown at QUESTION COUNTDOWN route 1', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'skip_countdown');
+      quizId1, sessionId1, token1, 'skip_countdown');
     expect(result).toMatchObject({ });
   });
   test('skip_countdown at QUESTION COUNTDOWN route 2', () => {
@@ -308,12 +308,13 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'skip_countdown');
+      quizId1, sessionId1, token1, 'skip_countdown');
     expect(result).toMatchObject({ });
   });
   test('end at QUESTION COUNTDOWN', () => {
+    requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'end');
+      quizId1, sessionId1, token1, 'end');
     expect(result).toMatchObject({ });
   });
 
@@ -322,28 +323,28 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'go_to_answer');
+      quizId1, sessionId1, token1, 'go_to_answer');
     expect(result).toMatchObject({ });
   });
   test('go_to_answer at QUESTION OPEN route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     sleepSync(3000);
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'go_to_answer');
+      quizId1, sessionId1, token1, 'go_to_answer');
     expect(result).toMatchObject({ });
   });
   test('end at QUESTION OPEN route 1', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'end');
+      quizId1, sessionId1, token1, 'end');
     expect(result).toMatchObject({ });
   });
   test('end at QUESTION OPEN route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     sleepSync(3000);
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'end');
+      quizId1, sessionId1, token1, 'end');
     expect(result).toMatchObject({ });
   });
 
@@ -352,21 +353,21 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'go_to_answer');
+      quizId1, sessionId1, token1, 'go_to_answer');
     expect(result).toMatchObject({ });
   });
   test('next_question at QUESTION CLOSE', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'next_question');
+      quizId1, sessionId1, token1, 'next_question');
     expect(result).toMatchObject({ });
   });
   test('end at QUESTION CLOSE', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'end');
+      quizId1, sessionId1, token1, 'end');
     expect(result).toMatchObject({ });
   });
 
@@ -376,7 +377,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'next_question');
+      quizId1, sessionId1, token1, 'next_question');
     expect(result).toMatchObject({ });
   });
   test('next_question at ANSWER SHOW route 2', () => {
@@ -384,7 +385,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'next_question');
+      quizId1, sessionId1, token1, 'next_question');
     expect(result).toMatchObject({ });
   });
   test('go_to_final_results at ANSWER SHOW route 1', () => {
@@ -392,7 +393,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'go_to_final_results');
+      quizId1, sessionId1, token1, 'go_to_final_results');
     expect(result).toMatchObject({ });
   });
   test('go_to_final_results at ANSWER SHOW route 2', () => {
@@ -400,7 +401,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'go_to_final_results');
+      quizId1, sessionId1, token1, 'go_to_final_results');
     expect(result).toMatchObject({ });
   });
   test('end at ANSWER SHOW route 1', () => {
@@ -408,7 +409,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'end');
+      quizId1, sessionId1, token1, 'end');
     expect(result).toMatchObject({ });
   });
   test('end at ANSWER SHOW route 2', () => {
@@ -417,7 +418,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'end');
+      quizId1, sessionId1, token1, 'end');
     expect(result).toMatchObject({ });
   });
 
@@ -428,7 +429,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'end');
+      quizId1, sessionId1, token1, 'end');
     expect(result).toMatchObject({ });
   });
   test('end at FINAL RESULTS route 2', () => {
@@ -437,7 +438,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'end');
+      quizId1, sessionId1, token1, 'end');
     expect(result).toMatchObject({ });
   });
   test('end at FINAL RESULTS route 3', () => {
@@ -445,8 +446,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
     const result = requestQuizSessionUpdate(
-      quizId2, sessionId2, token2, 'end');
+      quizId1, sessionId1, token1, 'end');
     expect(result).toMatchObject({ });
-    console.log(result);
   });
 });
