@@ -198,7 +198,7 @@ interface QuizBrief {
 
 interface QuizList { quizzes: QuizBrief[] }
 
-interface QuizAdd { // Need to add thumbnail URL component
+interface QuizAdd {
   quizId: number,
   authId: number,
   name: string,
@@ -235,9 +235,16 @@ interface MessageBody {
   messageBody: string
 }
 
+interface PlayerAnswers {
+  questionNo: number,
+  time: number, // In seconds
+  correct: boolean
+}
+
 interface QuizSessionPlayer {
   name: string,
-  playerId: number
+  playerId: number,
+  answers: PlayerAnswers[]
 }
 
 interface QuizSessionAdd {
@@ -246,7 +253,11 @@ interface QuizSessionAdd {
   atQuestion: number,
   quiz: QuizAdd,
   players: QuizSessionPlayer[],
-  messages: Message[]
+  messages: Message[],
+  timers: {
+    countdown: ReturnType<typeof setTimeout>,
+    open: ReturnType<typeof setTimeout>
+  }
 }
 
 interface PlayerId {
