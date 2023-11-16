@@ -26,7 +26,9 @@ describe('INVALID Tokens', () => {
 
   test('Token is empty', () => {
     // Token is empty
-    expect(() => requestQuizCreate(0, 'Quiz', 'quizDescription')).toThrow(HTTPError[401])
+    expect(() => requestQuizCreate(
+      0, 'Quiz', 'quizDescription'
+    )).toThrow(HTTPError[401])
   });
 
   test('Token doesn\'t exist', () => {
@@ -35,8 +37,9 @@ describe('INVALID Tokens', () => {
       'first', 'last').token;
 
     // Correct format for token but does not exist in data base
-    const result = requestQuizCreate(token + 1, 'QuizName', 'description');
-    expect(result.quizId).toStrictEqual(-1);
+    expect(() => requestQuizCreate(
+      token + 1, 'QuizName', 'description'
+    )).toThrow(HTTPError[401]);
   });
 });
 
@@ -59,58 +62,62 @@ describe('INVALID Quiz Name', () => {
     // Name contains spaces, but also special characters
     expect(() => requestQuizCreate(
       authId, 'Qu1# COMP', 'quizDescription'
-    )).toThrow(HTTPError);
-    expect(result.quizId).toStrictEqual(-1);
+    )).toThrow(HTTPError[400]);
   });
 
   test('Name With Invalid Character \'~\'', () => {
     // Non alphanumeric characters
-    expect(() => requestQuizCreate(authId, 'Quiz~COMP', 'quizDescription');
-    expect(result.quizId).toStrictEqual(-1);
+    expect(() => requestQuizCreate(
+      authId, 'Quiz~COMP', 'quizDescription'
+    )).toThrow(HTTPError[400]);
   });
 
   test('Name With Invalid Characters \'``+\'', () => {
-    expect(() => requestQuizCreate(authId, 'Qu1z``+ COMP1511', 'quizDescription');
-    expect(result.quizId).toStrictEqual(-1);
+    expect(() => requestQuizCreate(
+      authId, 'Qu1z``+ COMP1511', 'quizDescription'
+    )).toThrow(HTTPError[400]);
   });
 
   test('Name With Invalid Characters \'==_-\'', () => {
-    expect(() => requestQuizCreate(authId, 'Qu1z==_-C0MP1511', 'quizDescription');
-    expect(result.quizId).toStrictEqual(-1);
+    expect(() => requestQuizCreate(
+      authId, 'Qu1z==_-C0MP1511', 'quizDescription'
+    )).toThrow(HTTPError[400]);
   });
 
   // Invalid Name Lengths
   test('Name Length Less than 3', () => {
     // Name is less than 3 characters long
-    const expect(() => requestQuizCreate(authId, 'Qu', 'quizDescription');
-    expect(result.quizId).toStrictEqual(-1);
+    expect(() => requestQuizCreate(
+      authId, 'Qu', 'quizDescription'
+    )).toThrow(HTTPError[400]);
   });
 
   test('Name Empty', () => {
     // Name is empty
-    expect(() => requestQuizCreate(authId, '', 'quizDescription');
-    expect(result.quizId).toStrictEqual(-1);
+    expect(() => requestQuizCreate(
+      authId, '', 'quizDescription'
+    )).toThrow(HTTPError[400]);
   });
 
   test('Name Length Greater than 30', () => {
     // Name is more than 30 characters long
-    expect(() => requestQuizCreate(authId, 'Quizzzzzzzzzzzzzzzz COMPPPPPPPPPPPPP',
-      'quizDescription');
-    expect(result.quizId).toStrictEqual(-1);
+    expect(() => requestQuizCreate(
+      authId, 'Quizzzzzzzzzzzzzzzz COMPPPPPPPPPPPPP', 'quizDescription'
+    )).toThrow(HTTPError[400]);
   });
 
   test('Name Length Greater than 30 with Special Characters', () => {
     // Name is more than 30 characters long and contains special characters
-    expect(() => requestQuizCreate(authId, 'Quizzzzzzzzzzzzzzzz C@MPPPPPPPPPPPPP',
-      'quizDescription');
-    expect(result.quizId).toStrictEqual(-1);
+    expect(() => requestQuizCreate(
+      authId, 'Quizzzzzzzzzzzzzzzz C@MPPPPPPPPPPPPP', 'quizDescription'
+    )).toThrow(HTTPError[400]);
   });
 
   test('Name Length Greater than 30 with Valid Numbers', () => {
     // Name is more than 30 characters long and contains numbers
-    expect(() => requestQuizCreate(authId, 'Qu1zzzzzzzzzzzzzzzz COMPPPPPPPPPPPPP',
-      'quizDescription');
-    expect(result.quizId).toStrictEqual(-1);
+    expect(() => requestQuizCreate(
+      authId, 'Qu1zzzzzzzzzzzzzzzz COMPPPPPPPPPPPPP', 'quizDescription'
+    )).toThrow(HTTPError[400]);
   });
 
   // Test : Quiz Name Is Already Used
@@ -118,8 +125,9 @@ describe('INVALID Quiz Name', () => {
     requestQuizCreate(authId, 'quizName1', 'This quiz is about COMP1531');
 
     // Name is already used by the current logged in user for another quiz
-    const expect(() => requestQuizCreate(authId, 'quizName1', 'quizDescription1');
-    expect(result.quizId).toStrictEqual(-1);
+    expect(() => requestQuizCreate(
+      authId, 'quizName1', 'quizDescription1'
+    )).toThrow(HTTPError[400]);
   });
 });
 
@@ -131,10 +139,10 @@ describe('INVALID Description', () => {
     const authId: number = authRegisterResult.token;
 
     // Description is more than 100 characters
-    const expect(() => requestQuizCreate(authId, 'COMP Quiz ',
-      'This might be the longest quiz description ever been tested. This quiz ' +
-        'is the most amazing quiz ever been made.');
-    expect(result.quizId).toStrictEqual(-1);
+    expect(() => requestQuizCreate(
+      authId, 'COMP Quiz ', 'This might be the longest quiz description ever ' +
+      'been tested. This quiz is the most amazing quiz ever been made.'
+    )).toThrow(HTTPError[400]);
   });
 });
 

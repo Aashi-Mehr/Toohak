@@ -93,12 +93,12 @@ export function adminQuestionCreate(token: number, quizId: number,
 
   // Checking if the user exists
   const user = getUser(token, data);
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Checking if user owns the quiz
   const quiz = getQuiz(quizId, data.quizzes);
-  if (!quiz) return { error: unauth403 };
-  if (quiz.authId !== user.authUserId) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
+  if (quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
 
   // Checking the question body is valid
   const valid = validQuestionBody(questionBody);
@@ -107,7 +107,7 @@ export function adminQuestionCreate(token: number, quizId: number,
   // Ensuring the duration is valid
   let durationSum = questionBody.duration;
   for (const ques of quiz.questions) durationSum += ques.duration;
-  if (durationSum > 180) return { error: quizDur400 };
+  if (durationSum > 180) throw HTTPError(400, quizDur400);
 
   /// //////////////////////////////////////////////////////////////////////////
   /// ///// ERROR CHECKING THUMBNAIL ///////////////////////////////////////////
@@ -218,21 +218,21 @@ export function updateQuestion(token: number, quizId: number, quesId: number,
   // Error Checking
   // Check if the user is valid
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Check if the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Checking that the user owns the quiz
-  if (quiz.authId !== user.authUserId) return { error: unauth403 };
+  if (quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
 
   // Check if the question exists within the quiz
   let question: Question;
   for (const ques of quiz.questions) {
     if (ques.questionId === quesId) question = ques;
   }
-  if (!question) return { error: quesID400 };
+  if (!question) throw HTTPError(400, quesID400);
 
   const valid = validQuestionBody(questionBody);
   if (valid.error) return valid;
@@ -242,7 +242,7 @@ export function updateQuestion(token: number, quizId: number, quesId: number,
   for (const ques of quiz.questions) {
     if (ques.questionId !== quesId) durationSum += ques.duration;
   }
-  if (durationSum > 180) return { error: quizDur400 };
+  if (durationSum > 180) throw HTTPError(400, quizDur400);
 
   // No errors occur, so update the question
   question.question = questionBody.question;
@@ -271,14 +271,14 @@ export function deleteQuestion(token: number, quizId: number, quesId: number):
   // Error Checking
   // Check if the user is valid
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Check if the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Checking that the user owns the quiz
-  if (quiz.authId !== user.authUserId) return { error: unauth403 };
+  if (quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
 
   // Check if the question exists within the quiz
   for (const ques of quiz.questions) {
@@ -288,7 +288,7 @@ export function deleteQuestion(token: number, quizId: number, quesId: number):
     }
   }
 
-  return { error: quesID400 };
+  throw HTTPError(400, quesID400);
 }
 
 /** adminQuesDup
