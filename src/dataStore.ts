@@ -237,7 +237,7 @@ interface MessageBody {
 
 interface PlayerAnswers {
   questionNo: number,
-  time: number, // In seconds
+  time: number,
   correct: boolean
 }
 
