@@ -515,7 +515,7 @@ export function requestQuizSessionUpdate(quizId: number, sessionId: number,
     SERVER_URL + '/v1/admin/quiz/' + quizId + '/session/' + sessionId,
     {
       headers: { token: token.toString() },
-      json: { state: action }
+      json: { action: action }
     }
   );
 

@@ -419,7 +419,7 @@ app.put('/v1/admin/quiz/:quizid/session/:sessionid',
     const token = parseInt(req.headers.token as string);
     const quizId = parseInt(req.params.quizid);
     const sessionId = parseInt(req.params.sessionid);
-    const action = parseInt(req.body.action);
+    const action = req.body.action;
 
     res.json(adminQuizSessionUpdate(quizId, sessionId, token, action));
     backupData();

@@ -14,7 +14,6 @@ import {
   noQs400,
   tooMany400,
   cantAct400,
-  sleepSync,
   ErrorObject
 } from './dataStore';
 
@@ -84,6 +83,8 @@ export function quizSessionStart(token: number, quizId: number,
   */
 export function adminQuizSessionUpdate(quizId: number, sessionId: number,
   token: number, action: string): ErrorObject | Record<string, never> {
+  action = action.toUpperCase();
+
   // Error 401 : Checking if user exists
   const user = getUser(token, getData());
   if (!user) throw HTTPError(401, token401);
@@ -97,50 +98,72 @@ export function adminQuizSessionUpdate(quizId: number, sessionId: number,
   // Loop through the quiz to find valid active session
   // Error 400 : Invalid or unactive session id
   const session = getQuizSession(sessionId, getData().quizSessions);
-  if (!session || session.sessionId !== quiz.sessionId) {
+  if (!session || session.quiz.quizId !== quizId || session.state === SessionState.END) {
     throw HTTPError(400, unactive400);
   }
 
   // Update the session state based on the action given
-  if (action === SessionState.END) {
-    session.state = SessionState.END;
-    return { };
-  } else if (action === SessionState.NEXT_QUESTION) {
+  // Action : next_question
+  if (action === 'NEXT_QUESTION') {
+    // player either be in lobby, question close or answer show
     if (session.state === SessionState.LOBBY ||
         session.state === SessionState.QUESTION_CLOSE ||
-        session.state === SessionState.ANSWER_SHOW) { 
-        session.state = SessionState.QUESTION_COUNTDOWN; 
-        return { };
-    } 
-  } else if (action === SessionState.SKIP_COUNTDOWN) {
-    if (session.state === SessionState.QUESTION_COUNTDOWN) {
-      session.state = SessionState.QUESTION_OPEN;
-      sleepSync(quiz.questions[session.atQuestion - 1].duration * 1000);
-      session.state = SessionState.QUESTION_CLOSE;
+        session.state === SessionState.ANSWER_SHOW) {
+      // change session state to question countdown
+      session.state = SessionState.QUESTION_COUNTDOWN;
       return { };
     }
+  // Action : skip_countdown
   } else if (session.state === SessionState.QUESTION_COUNTDOWN) {
-    // Wait for 3 seconds
-    sleepSync(3000);
-    session.state = SessionState.QUESTION_OPEN;
-    sleepSync(quiz.questions[session.atQuestion - 1].duration * 1000);
-    session.state = SessionState.QUESTION_CLOSE;
-    return { };
-
-    // End duration when the question opened???
-  } else if (action === SessionState.GO_TO_ANSWER) {
+    // player is in question countdown
+    if (action === 'SKIP_COUNTDOWN') {
+      // change the state to question open
+      session.state = SessionState.QUESTION_OPEN;
+      // wait until the duration ends
+      setTimeout(() => {
+        // change the state to question close
+        session.state = SessionState.QUESTION_CLOSE;
+      }, quiz.questions[session.atQuestion - 1].duration * 1000);
+      return { };
+      // if player dont skip_countdown
+    } else {
+        // wait until the countdown ends
+        setTimeout(() => {
+        // change state into question_open
+        session.state = SessionState.QUESTION_OPEN;
+        }, 3000);
+        // wait for question duration to end
+        setTimeout(() => {
+        // change the session state to question_close
+        session.state = SessionState.QUESTION_CLOSE;
+      }, quiz.questions[session.atQuestion - 1].duration * 1000);
+      return { };
+    }
+  
+    // Action : go_to_answer
+  } else if (action === 'GO_TO_ANSWER') {
+    // if player either be in question_open, question_close or answer_show
     if (session.state === SessionState.QUESTION_OPEN ||
     session.state === SessionState.QUESTION_CLOSE) {
+      // change player state to answer_show
       session.state = SessionState.ANSWER_SHOW;
       return { };
     }
-  } else if (action === SessionState.GO_TO_FINAL_RESULTS) {
+  // Action : go_to_final_results
+  } else if (action === 'GO_TO_FINAL_RESULTS') {
+    // if player either in question_close or answer_show
     if (session.state === SessionState.QUESTION_CLOSE ||
     session.state === SessionState.ANSWER_SHOW) {
+      // change player state to final_results
       session.state = SessionState.FINAL_RESULTS;
       return { };
     }
+  // Action : End (Deactivate Session)
+  } else if (action === 'END') {
+    // Change session state to end
+    session.state = SessionState.END;
+    return { };
   }
-  
   throw HTTPError(400, cantAct400);
+
 }

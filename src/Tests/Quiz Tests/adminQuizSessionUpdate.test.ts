@@ -133,7 +133,7 @@ describe('Invalid Cases - Action', () => {
   test('400 : Invalid Action - Next question at Question Countdown', () => {
     // Move player to question countdown by action next_question
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
-    // Player input skip_countdown action
+    // Player input next_question action
     expect(() => requestQuizSessionUpdate(
       quizId1, sessionId1, token1, 'next_question')).toThrow(HTTPError[400]);
   });
@@ -287,12 +287,12 @@ describe('Valid Cases', () => {
   test('next_question at LOBBY', () => {
     const result = requestQuizSessionUpdate(
       quizId1, sessionId1, token1, 'next_question');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('end at LOBBY', () => {
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'end');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
 
   // When player at question countdown state
@@ -300,7 +300,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'skip_countdown');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('skip_countdown at QUESTION COUNTDOWN route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
@@ -309,12 +309,12 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'skip_countdown');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('end at QUESTION COUNTDOWN', () => {
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'end');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
 
   // When player at question open state
@@ -323,28 +323,28 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'go_to_answer');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('go_to_answer at QUESTION OPEN route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     sleepSync(3000);
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'go_to_answer');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('end at QUESTION OPEN route 1', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'end');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('end at QUESTION OPEN route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     sleepSync(3000);
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'end');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
 
   // When player at question close state
@@ -355,7 +355,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, '');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'go_to_answer');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('next_question at QUESTION CLOSE', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
@@ -364,7 +364,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, '');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'next_question');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('end at QUESTION CLOSE', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
@@ -373,7 +373,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, '');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'end');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
 
   // When player at answer show state
@@ -383,7 +383,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'next_question');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('next_question at ANSWER SHOW route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
@@ -393,7 +393,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'next_question');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('go_to_final_results at ANSWER SHOW route 1', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
@@ -401,7 +401,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'go_to_final_results');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('go_to_final_results at ANSWER SHOW route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
@@ -411,7 +411,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'go_to_final_results');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('end at ANSWER SHOW route 1', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
@@ -419,7 +419,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'end');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('end at ANSWER SHOW route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
@@ -430,7 +430,7 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'end');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
 
   // When player at final results state
@@ -441,27 +441,24 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'end');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('end at FINAL RESULTS route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
-    // how to move player to question close?????
-    requestQuizSessionUpdate(quizId1, sessionId1, token1, '');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'end');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
   });
   test('end at FINAL RESULTS route 3', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
-    // how to move player to question close?????
-    requestQuizSessionUpdate(quizId1, sessionId1, token1, '');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
     const result = requestQuizSessionUpdate(
       quizId2, sessionId2, token2, 'end');
-    expect(result).toMatchObject({});
+    expect(result).toMatchObject({ });
+    console.log(result);
   });
 });

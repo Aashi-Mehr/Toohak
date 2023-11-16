@@ -69,47 +69,47 @@ const invImg400 = 'When fetched, the URL doesn\'t return a valid file or type' +
 // ENUM States
 export enum SessionState {
   // Players can join in this state, and nothing has started
-  LOBBY = 'lobby',
+  LOBBY = 'LOBBY',
 
   // This is the question countdown period. It always exists before a question
   // is open and the frontend makes the request to move to the open state
-  QUESTION_COUNTDOWN = 'question_countdown',
+  QUESTION_COUNTDOWN = 'QUESTION_COUNTDOWN',
 
   // This is when players can see the question and answers, and submit their
   // answers (as many times as they like)
-  QUESTION_OPEN = 'question_open',
+  QUESTION_OPEN = 'QUESTION_OPEN',
 
   // This is when players can still see the question answers, but cannot submit
-  QUESTION_CLOSE = 'question_close',
+  QUESTION_CLOSE = 'QUESTION_CLOSE',
 
   // This is when players can see the correct answer, as well as everyone
   // playings' performance in that question, whilst they typically wait to go to
   // the next countdown
-  ANSWER_SHOW = 'answer_show',
+  ANSWER_SHOW = 'ANSWER_SHOW',
 
   // This is where the final results are displayed for all players and questions
-  FINAL_RESULTS = 'final_results',
+  FINAL_RESULTS = 'FINAL_RESULTS',
 
   // The game is now over and inactive
-  END = 'end'
+  END = 'END'
 }
 
 // ENUM Actions
 export enum Actions {
   // Move onto the countdown for the next question
-  NEXT_QUESTION = 'next_question',
+  NEXT_QUESTION = 'NEXT_QUESTIONS',
 
   // This is how to skip the question countdown period immediately.
-  SKIP_COUNTDOWN = 'skip_countdown',
+  SKIP_COUNTDOWN = 'SKIP_COUNTDOWN',
 
   // Go straight to the next most immediate answers show state
-  GO_TO_ANSWER = 'go_to_answer',
+  GO_TO_ANSWER = 'GO_TO_ANSWER',
 
   // Go straight to the final results state
-  GO_TO_FINAL_RESULTS = 'go_to_final_results',
+  GO_TO_FINAL_RESULTS = 'GO_TO_FINAL_RESULTS',
 
   // Go straight to the END state
-  END = 'end'
+  END = 'END'
 }
 
 // INTERFACES Other
@@ -249,7 +249,11 @@ interface QuizSessionAdd {
   atQuestion: number,
   quiz: QuizAdd,
   players: QuizSessionPlayer[],
-  messages: Message[]
+  messages: Message[],
+  timers: {
+    countdown: ReturnType<typeof setTimeout>,
+    open: ReturnType<typeof setTimeout>
+  }
 }
 
 interface PlayerId {
