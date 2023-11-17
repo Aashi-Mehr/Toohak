@@ -56,6 +56,7 @@ const newPass400 = 'Old Password and New Password match exactly';
 const auto400 = 'autoStartNum is a number greater than 50';
 const tooMany400 = 'A maximum of 10 sessions not in END state currently exist';
 const noQs400 = 'The quiz does not have any questions in it';
+const inval400 = 'Session Id does not refer to a valid session';
 const unactive400 = 'Session Id does not refer to a valid session within this quiz';
 const invalAct400 = 'Action provided in not a valid action';
 const cantAct400 = 'Action cannot be applied in current state';
@@ -189,6 +190,13 @@ interface QuizInfo {
   questions: Question[],
   duration: number,
   thumbnailUrl: string
+}
+
+interface sessionStatus {
+  state: string,
+  atQuestion: number,
+  players: string[],
+  metadata: QuizInfo
 }
 
 interface QuizBrief {
@@ -544,6 +552,7 @@ export {
   Message,
   QuizSessionPlayer,
   QuizSessionAdd,
+  sessionStatus,
   PlayerId,
   MessageBody,
   DEFAULT_QUIZ_THUMBNAIL,
@@ -580,6 +589,7 @@ export {
   playerId400,
   message400,
   invImg400,
+  inval400,
   playerName400,
   playerJoin400,
   sleepSync,

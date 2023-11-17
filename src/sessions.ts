@@ -5,7 +5,6 @@ import {
   getData,
   getQuiz,
   getUser,
-  getQuizSession,
   getUniqueID,
   unauth403,
   unactive400,
@@ -13,8 +12,10 @@ import {
   auto400,
   noQs400,
   tooMany400,
+  ErrorObject,
   cantAct400,
-  ErrorObject
+  sessionStatus,
+  getQuizSession
 } from './dataStore';
 
 /** quizSessionStart
@@ -191,4 +192,76 @@ export function adminQuizSessionUpdate(quizId: number, sessionId: number,
   }
 
   throw HTTPError(400, cantAct400);
+}
+
+/** quizGetSession
+  * Get the status of a particular quiz session
+  *
+  * @param { number } token - The token of the user starting the session
+  * @param { number } quizId - The quizId of the quiz that's being started
+  * @param { number } sessionId - The session id of an active session within the quiz
+  *
+  * @returns { sessionStatus } - If the details given are valid
+  */
+export function quizGetSession(quizId: number, sessionId: number,
+  token: number): sessionStatus {
+  // Error 401 : Checking if user exists
+  const user = getUser(token, getData());
+  if (!user) throw HTTPError(401, token401);
+
+  // Error 403 : Check if quizId is valid
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz || quiz.authId !== user.authUserId) {
+    throw HTTPError(403, unauth403);
+  }
+
+  // Loop through the quiz to find valid active session
+  // Error 400 : Invalid or unactive session id
+  const session = getQuizSession(sessionId, getData().quizSessions);
+  if (!session ||
+      session.quiz.quizId !== quizId ||
+      session.state === SessionState.END) {
+    throw HTTPError(400, unactive400);
+  }
+
+  // get player names in session
+  const playersInSession: string[] = [];
+  for (const player of session.players) {
+    // Add players to the array
+    playersInSession.push(player.name);
+  }
+
+  // get questions in the quiz
+  const quizQuestions = [];
+  for (const ques of session.quiz.questions) {
+    quizQuestions.push({
+      questionId: ques.questionId,
+      question: ques.question,
+      duration: ques.duration,
+      thumbnailUrl: ques.thumbnailUrl,
+      points: ques.points,
+      answers: ques.answers
+    });
+  }
+
+  // Calculating the duration of the quiz
+  let duration = 0;
+  for (const question of quiz.questions) { duration += question.duration; }
+
+  return {
+    state: session.state,
+    atQuestion: session.atQuestion,
+    players: playersInSession,
+    metadata: {
+      quizId: quiz.quizId,
+      name: quiz.name,
+      timeCreated: quiz.timeCreated,
+      timeLastEdited: quiz.timeLastEdited,
+      description: quiz.description,
+      numQuestions: quiz.questions.length,
+      questions: quizQuestions,
+      duration: duration,
+      thumbnailUrl: quiz.thumbnailUrl
+    }
+  };
 }

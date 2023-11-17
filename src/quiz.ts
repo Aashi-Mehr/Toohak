@@ -349,8 +349,8 @@ function adminQuizTrash(token: number): QuizList {
   * @returns { Record<string, never>  } - If the details given are valid
   * @returns { ErrorObject } - If the details given are invalid
   */
-function adminQuizRestore(token: number, quizId: number): Record<string, any> {
-  // ErrorObject | Record<string, any> {
+function adminQuizRestore(token: number, quizId: number):
+  Record<string, never> {
   // Check if authUserId is valid
   const user = getUser(token, getData());
   if (!user) throw HTTPError(401, token401);
