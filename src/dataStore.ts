@@ -250,10 +250,7 @@ interface QuizSessionAdd {
   quiz: QuizAdd,
   players: QuizSessionPlayer[],
   messages: Message[],
-  timers: {
-    countdown: ReturnType<typeof setTimeout>,
-    open: ReturnType<typeof setTimeout>
-  }
+  timers: ReturnType<typeof setTimeout>[]
 }
 
 interface PlayerId {

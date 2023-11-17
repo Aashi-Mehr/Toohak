@@ -63,7 +63,8 @@ export function quizSessionStart(token: number, quizId: number,
     atQuestion: 1,
     quiz: quiz,
     players: [],
-    messages: []
+    messages: [],
+    timers: []
   });
 
   // Return sessionId object
@@ -98,72 +99,96 @@ export function adminQuizSessionUpdate(quizId: number, sessionId: number,
   // Loop through the quiz to find valid active session
   // Error 400 : Invalid or unactive session id
   const session = getQuizSession(sessionId, getData().quizSessions);
-  if (!session || session.quiz.quizId !== quizId || session.state === SessionState.END) {
+  if (!session ||
+      session.quiz.quizId !== quizId ||
+      session.state === SessionState.END) {
     throw HTTPError(400, unactive400);
   }
 
   // Update the session state based on the action given
-  // Action : next_question
-  if (action === 'NEXT_QUESTION') {
-    // player either be in lobby, question close or answer show
+  if (action === 'END') {
+    // Action : End - Change session state to end
+    session.state = SessionState.END;
+    return { };
+  } else if (action === 'NEXT_QUESTION') {
+    // Action : next_question
+
+    // player must be in lobby, question close or answer show
     if (session.state === SessionState.LOBBY ||
         session.state === SessionState.QUESTION_CLOSE ||
         session.state === SessionState.ANSWER_SHOW) {
       // change session state to question countdown
       session.state = SessionState.QUESTION_COUNTDOWN;
+
+      // Set a 3 second timer which will move to question_open
+      const countdownTimer = setTimeout(() => {
+        adminQuizSessionUpdate(quizId, sessionId, token, 'SKIP_COUNTDOWN');
+      }, 3000);
+
+      // Add that to timers
+      session.timers.push(countdownTimer);
+
       return { };
     }
-  // Action : skip_countdown
-  } else if (session.state === SessionState.QUESTION_COUNTDOWN) {
-    // player is in question countdown
-    if (action === 'SKIP_COUNTDOWN') {
-      // change the state to question open
+  } else if (action === 'SKIP_COUNTDOWN') {
+    // Action : skip_countdown
+
+    // player must be in question countdown
+    if (session.state === SessionState.QUESTION_COUNTDOWN) {
+      // Remove timers
+      while (session.timers.length > 0) {
+        clearTimeout(session.timers[0]);
+        session.timers.splice(0, 1);
+      }
+
+      // Switch state to QUESTION_OPEN
       session.state = SessionState.QUESTION_OPEN;
-      // wait until the duration ends
-      setTimeout(() => {
-        // change the state to question close
+
+      // At question open, a timer to get to question_close starts
+      const duration = quiz.questions[session.atQuestion - 1].duration;
+      const openTimer = setTimeout(() => {
         session.state = SessionState.QUESTION_CLOSE;
-      }, quiz.questions[session.atQuestion - 1].duration * 1000);
-      return { };
-      // if player dont skip_countdown
-    } else {
-        // wait until the countdown ends
-        setTimeout(() => {
-        // change state into question_open
-        session.state = SessionState.QUESTION_OPEN;
-        }, 3000);
-        // wait for question duration to end
-        setTimeout(() => {
-        // change the session state to question_close
-        session.state = SessionState.QUESTION_CLOSE;
-      }, quiz.questions[session.atQuestion - 1].duration * 1000);
+
+        // Remove timers
+        while (session.timers.length > 0) {
+          clearTimeout(session.timers[0]);
+          session.timers.splice(0, 1);
+        }
+      }, duration * 1000);
+
+      // Add that to timers
+      session.timers.push(openTimer);
+
       return { };
     }
-  
-    // Action : go_to_answer
   } else if (action === 'GO_TO_ANSWER') {
-    // if player either be in question_open, question_close or answer_show
+    // Action : go_to_answer
+
+    // Player must be in question_open or question_close
     if (session.state === SessionState.QUESTION_OPEN ||
-    session.state === SessionState.QUESTION_CLOSE) {
+        session.state === SessionState.QUESTION_CLOSE) {
+      // Remove timers, as question no longer needs to close
+      while (session.timers.length > 0) {
+        clearTimeout(session.timers[0]);
+        session.timers.splice(0, 1);
+      }
+
       // change player state to answer_show
       session.state = SessionState.ANSWER_SHOW;
       return { };
     }
-  // Action : go_to_final_results
   } else if (action === 'GO_TO_FINAL_RESULTS') {
-    // if player either in question_close or answer_show
+    // Action : go_to_final_results
+
+    // Player must be in question_close or answer_show
     if (session.state === SessionState.QUESTION_CLOSE ||
-    session.state === SessionState.ANSWER_SHOW) {
+        session.state === SessionState.ANSWER_SHOW) {
       // change player state to final_results
       session.state = SessionState.FINAL_RESULTS;
+
       return { };
     }
-  // Action : End (Deactivate Session)
-  } else if (action === 'END') {
-    // Change session state to end
-    session.state = SessionState.END;
-    return { };
   }
-  throw HTTPError(400, cantAct400);
 
+  throw HTTPError(400, cantAct400);
 }
