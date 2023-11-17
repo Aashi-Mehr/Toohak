@@ -1,4 +1,4 @@
-import request from 'sync-request-curl';
+import request from 'sync-request';
 
 import {
   ErrorObject,

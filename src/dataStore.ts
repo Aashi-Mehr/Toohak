@@ -1,3 +1,7 @@
+import request, { HttpVerb } from 'sync-request';
+
+export const DEPLOYED_URL = "toohakdeploy.vercel.app";
+
 // Default Quiz Thumnail
 const DEFAULT_QUIZ_THUMBNAIL = '';
 
@@ -278,19 +282,48 @@ let data: Datastore = {
 };
 
 // DATASTORE FUNCTIONS
-/** getData
-  * Access the data
-  *
-  * @returns { Datastore } - All cases
-  */
-function getData(): Datastore { return data; }
+const requestHelper = (method: HttpVerb, path: string, payload: object) => {
+  let json = {};
+  let qs = {};
+  if (['POST', 'DELETE'].includes(method)) { qs = payload; }
+  else { json = payload; }
 
-/** setData
-  * Reset data to modified date
-  *
-  * @param { Datastore } newData - Data to set
-  */
-function setData(newData: Datastore) { data = newData; }
+  const res = request(method, DEPLOYED_URL + path, { qs, json, timeout: 20000 });
+  return JSON.parse(res.body.toString());
+};
+
+const getData = (): Datastore => {
+  try {
+    const res = requestHelper('GET', '/data', {});
+    return res.data;
+    
+  } catch (e) {
+    return {
+      users: [],
+      quizzes: [],
+      sessions: [],
+      quizSessions: []
+    };
+  }
+};
+
+const setData = (newData: Datastore) => {
+  requestHelper('PUT', '/data', { data: newData });
+};
+
+// /** getData
+//   * Access the data
+//   *
+//   * @returns { Datastore } - All cases
+//   */
+// function getData(): Datastore { return data; }
+// 
+// /** setData
+//   * Reset data to modified date
+//   *
+//   * @param { Datastore } newData - Data to set
+//   */
+// function setData(newData: Datastore) { data = newData; }
 
 /** getUser
   * Loops through all tokens and users to identify the user

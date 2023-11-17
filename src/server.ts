@@ -9,6 +9,7 @@ import sui from 'swagger-ui-express';
 import fs from 'fs';
 import path from 'path';
 import process from 'process';
+import { createClient } from '@vercel/kv';
 
 import data from '../data.json';
 
@@ -71,6 +72,15 @@ app.use('/docs', sui.serve, sui.setup(YAML.parse(file), {
 const PORT: number = parseInt(process.env.PORT || config.port);
 const HOST: string = process.env.IP || 'localhost';
 
+const KV_REST_API_URL = "https://game-whale-34222.kv.vercel-storage.com";
+const KV_REST_API_TOKEN = "AYWuASQgZGJlNGIwMDgtMTdkNi00MjE1LWIxMzctYjM2Njk2Nz" +
+  "MyMmI0NWM1YmRjMDM2YzlhNDRmMGJlNDU1MTEzMmM1NGQwMGY=";
+
+const database = createClient({
+  url: KV_REST_API_URL,
+  token: KV_REST_API_TOKEN,
+});
+
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
@@ -83,6 +93,18 @@ function backupData() {
 app.get('/echo', (req: Request, res: Response) => {
   const data = req.query.echo as string;
   return res.json(echo(data));
+});
+
+// KV Data
+app.get('/data', async (req: Request, res: Response) => {
+  const data = await database.hgetall('data:toohak');
+  res.status(200).json({data: data});
+});
+
+app.put('/data', async (req: Request, res: Response) => {
+  const { data } = req.body;
+  await database.hset("data:toohak", data);
+  return res.status(200).json({ });
 });
 
 // ====================================================================
