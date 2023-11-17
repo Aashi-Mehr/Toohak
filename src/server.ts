@@ -50,11 +50,12 @@ import {
   token401,
   unauth403
 } from './dataStore';
-import { playerMessageChat, playerViewChat } from './player';
 import {
   quizSessionStart,
   quizGetSession
 } from './sessions';
+import { playerJoinSession, playerMessageChat, playerViewChat } from './player';
+
 
 // Set up web app
 const app = express();
@@ -592,6 +593,12 @@ app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate',
 // ====================================================================
 //  =========================== VERSION 2 ============================
 // ====================================================================
+app.post('/v1/player/join', (req: Request, res: Response) => {
+  const { sessionId, name } = req.body;
+  res.json(playerJoinSession(sessionId, name));
+  backupData();
+});
+
 app.get('/v1/player/:playerid/chat', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
   res.json(playerViewChat(playerId));

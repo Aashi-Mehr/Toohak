@@ -15,7 +15,8 @@ import {
   Message,
   MessageBody,
   QuizSessionId,
-  sessionStatus
+  sessionStatus,
+  PlayerId
 } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
@@ -334,6 +335,7 @@ export function requestQuizDescriptionUpdate(token: number | string,
   return JSON.parse(res.body.toString());
 }
 
+// PUT QUIZ NMAE UPDATE Define wrapper function
 export function requestQuizNameUpdate(token: number, quizId: number,
   name: string) {
   const res = request(
@@ -361,6 +363,7 @@ export function requestQuizRemove(token: number, quizId: number):
   return JSON.parse(res.body.toString());
 }
 
+// POST QUIZ TRANSFER Define wrapper function
 export function requestQuizTransfer(token: number | string, quizId: number,
   userEmail: string) {
   const res = request(
@@ -376,8 +379,8 @@ export function requestQuizTransfer(token: number | string, quizId: number,
 
   return JSON.parse(res.body.toString());
 }
-// GET QUIZ TRASH Define wrapper function
 
+// GET QUIZ TRASH Define wrapper function
 export function requestQuizTrash(token: number | string, v1?: boolean):
   QuizList | ErrorObject {
   let res;
@@ -648,6 +651,28 @@ export function requestPlayerMessage(playerId: number, message: MessageBody):
 
 export function requestPlayerChat(playerId: number): { messages: Message[] } {
   const res = request('GET', SERVER_URL + '/v1/player/' + playerId + '/chat');
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
+}
+
+export function requestPlayerJoin(sessionId: number, name: string):
+  PlayerId {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/player/join',
+    {
+      json: {
+        sessionId: sessionId,
+        name: name
+      }
+    }
+  );
+
   const result = JSON.parse(res.body.toString());
 
   if (res.statusCode !== 200) {
