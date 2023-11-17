@@ -15,6 +15,7 @@ import {
   Message,
   MessageBody,
   QuizSessionId,
+  sessionStatus
 } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
@@ -492,6 +493,25 @@ export function requestQuizSessionStart(token: number, quizId: number,
     {
       headers: { token: token.toString() },
       json: { autoStartNum: autoStart }
+    }
+  );
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
+}
+
+export function requestQuizGetSession(quizId: number, sessionId: number,
+  token: number): sessionStatus {
+  const res = request(
+    'GET',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/session/' + sessionId,
+    {
+      headers: { token: token.toString() },
     }
   );
 
