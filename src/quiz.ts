@@ -208,7 +208,7 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
   if (!quiz) throw HTTPError(403, unauth403);
 
   // Checking if given user owns the quiz
-  if (user.authUserId !== quiz.authId) throw HTTPError(401, token401);
+  if (user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);
 
   // Check if the name contains invalid, non-alphanumeric characters
   const invalidName = /[^a-zA-Z0-9 ']/.test(name);
@@ -247,13 +247,13 @@ function adminQuizNameUpdate(token: number, quizId: number, name: string):
   */
 function adminQuizDescriptionUpdate(token: number, quizId: number,
   description: string): ErrorObject | Record<string, never> {
-  // Ensuring the quiz exists
-  const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) throw HTTPError(403, unauth403);
-
   // Ensuring the token is valid
   const user = getUser(token, getData());
   if (!user) throw HTTPError(401, token401);
+
+  // Ensuring the quiz exists
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Ensuring the user owns the quiz
   if (user.authUserId !== quiz.authId) throw HTTPError(403, unauth403);

@@ -255,8 +255,8 @@ interface QuizSessionAdd {
   players: QuizSessionPlayer[],
   messages: Message[],
   timers: {
-    countdown: ReturnType<typeof setTimeout>,
-    open: ReturnType<typeof setTimeout>
+    countdown: ReturnType<typeof setTimeout>[],
+    open: ReturnType<typeof setTimeout>[]
   }
 }
 

@@ -59,7 +59,11 @@ export function quizSessionStart(token: number, quizId: number,
     atQuestion: 1,
     quiz: quiz,
     players: [],
-    messages: []
+    messages: [],
+    timers: {
+      countdown: [],
+      open: []
+    }
   });
 
   // Return sessionId object

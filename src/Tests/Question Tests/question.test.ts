@@ -6,11 +6,11 @@ import {
   requestQuizInfo
 } from '../testHelper';
 
+import HTTPError from 'http-errors';
+
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
-
-const ERROR = { error: expect.any(String) };
 
 const invalidUser = 10000;
 const quizId = -4123214;
@@ -201,29 +201,45 @@ beforeEach(() => {
   requestClear();
 });
 
+/// /////////////////////////////////////////////////////////////////////////////
+/// /////////////////////////////// VERSION 2 ///////////////////////////////////
+/// /////////////////////////////////////////////////////////////////////////////
+
 describe('questionCreate', () => {
   describe('ERROR Tests 401 403', () => {
     test('token is not a valid user', () => {
       // token is not an integer
-      const result = requestQuestionCreate(invalidUser, quizId, questionBody);
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        invalidUser, quizId, questionBody
+      )).toThrow(HTTPError[401]);
     });
 
     test('Quiz ID does not refer to a valid quiz', () => {
-      const token1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
-      const result = requestQuestionCreate(token1, quizId, questionBody);
+      const token1 = requestRegister(
+        'first.last1@gmail.com', 'abcd1234', 'first', 'last'
+      ).token;
 
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        token1, quizId, questionBody
+      )).toThrow(HTTPError[403]);
     });
 
     test('Quiz ID does not refer to a quiz that this user owns', () => {
-      const token1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
-      const token2 = requestRegister('first.last2@gmail.com', 'abcd1234', 'first', 'last').token;
-      const quizId1 = requestQuizCreate(token2, 'first last', 'fist_test').quizId;
+      const token1 = requestRegister(
+        'first.last1@gmail.com', 'abcd1234', 'first', 'last'
+      ).token;
 
-      const result = requestQuestionCreate(token1, quizId1, questionBody);
+      const token2 = requestRegister(
+        'first.last2@gmail.com', 'abcd1234', 'first', 'last'
+      ).token;
 
-      expect(result).toMatchObject(ERROR);
+      const quizId1 = requestQuizCreate(
+        token2, 'first last', 'fist_test'
+      ).quizId;
+
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBody
+      )).toThrow(HTTPError[403]);
     });
   });
 
@@ -232,8 +248,12 @@ describe('questionCreate', () => {
     let quizId1: number;
 
     beforeEach(() => {
-      token1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
-      quizId1 = requestQuizCreate(token1, 'first last', 'fist_test').quizId;
+      token1 = requestRegister(
+        'first.last1@gmail.com', 'abcd1234', 'first', 'last'
+      ).token;
+      quizId1 = requestQuizCreate(
+        token1, 'first last', 'fist_test'
+      ).quizId;
     });
 
     test('Question string is less than 5 characters in length', () => {
@@ -243,8 +263,9 @@ describe('questionCreate', () => {
         points: 5,
         answers: answers,
       };
-      const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question
+      )).toThrow(HTTPError[400]);
     });
 
     test('Question string is greater than 50 characters in length', () => {
@@ -254,8 +275,9 @@ describe('questionCreate', () => {
         points: 5,
         answers: answers,
       };
-      const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question
+      )).toThrow(HTTPError[400]);
     });
 
     test('The question has less than 2 answers', () => {
@@ -265,8 +287,9 @@ describe('questionCreate', () => {
         points: 5,
         answers: invalidAnswerLength1,
       };
-      const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question
+      )).toThrow(HTTPError[400]);
     });
 
     test('The question has more than 6 answers', () => {
@@ -276,34 +299,36 @@ describe('questionCreate', () => {
         points: 5,
         answers: invalidAnswerLength2,
       };
-      const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question
+      )).toThrow(HTTPError[400]);
     });
 
     test('The question duration is not a positive number', () => {
-      const result = requestQuestionCreate(token1, quizId1, questionBodyNegativeDuration);
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBodyNegativeDuration
+      )).toThrow(HTTPError[400]);
     });
 
-    test('The sum of the question durations in the quiz exceeds 3 minutes', () => {
+    test('The sum of the question durations exceeds 3 minutes', () => {
       // question body has a length of 60 seconds
       for (let i = 0; i < 3; i++) {
-        const result = requestQuestionCreate(token1, quizId1, questionBody);
-        expect(result).not.toMatchObject(ERROR);
+        requestQuestionCreate(token1, quizId1, questionBody);
       }
 
-      const result = requestQuestionCreate(token1, quizId1, questionBody);
-      expect(result).toMatchObject(ERROR);
+      // This will tip it up from 180 seconds.
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBody
+      )).toThrow(HTTPError[400]);
     });
 
-    test('Sum of the question durations in the quiz will be 181 seconds', () => {
+    test('Sum of the question durations will be 181 seconds', () => {
       // question body has a length of 60 seconds
       for (let i = 0; i < 3; i++) {
-        const result = requestQuestionCreate(token1, quizId1, questionBody);
-        expect(result).not.toMatchObject(ERROR);
+        requestQuestionCreate(token1, quizId1, questionBody);
       }
 
-      const result = requestQuestionCreate(token1, quizId1, {
+      expect(() => requestQuestionCreate(token1, quizId1, {
         question: 'Who let the dogs out?',
         duration: 1,
         points: 10,
@@ -311,18 +336,19 @@ describe('questionCreate', () => {
           { answer: 'who?', correct: false },
           { answer: 'you?', correct: true }
         ]
-      });
-      expect(result).toMatchObject(ERROR);
+      })).toThrow(HTTPError[400]);
     });
 
     test('The points awarded for the question are less than 1', () => {
-      const result = requestQuestionCreate(token1, quizId1, questionBodyInvalidPoint1);
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBodyInvalidPoint1
+      )).toThrow(HTTPError[400]);
     });
 
     test('The points awarded for the question are greater than 10', () => {
-      const result = requestQuestionCreate(token1, quizId1, questionBodyInvalidPoint2);
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBodyInvalidPoint2
+      )).toThrow(HTTPError[400]);
     });
 
     test('The length of any answer is shorter than 1 character long', () => {
@@ -332,8 +358,9 @@ describe('questionCreate', () => {
         points: 5,
         answers: answersInvliadStringLength1,
       };
-      const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question
+      )).toThrow(HTTPError[400]);
     });
 
     test('The length of any answer is longer than 30 characters long', () => {
@@ -343,19 +370,21 @@ describe('questionCreate', () => {
         points: 5,
         answers: answersInvliadStringLength2,
       };
-      const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question
+      )).toThrow(HTTPError[400]);
     });
 
-    test('Any answer strings are duplicates of one another (within the same question)', () => {
+    test('Any answer strings are duplicates within the same question', () => {
       const question = {
         question: questionString,
         duration: 60,
         points: 5,
         answers: answersDuplicateAnswers,
       };
-      const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question
+      )).toThrow(HTTPError[400]);
     });
 
     test('There are no correct answers', () => {
@@ -365,8 +394,9 @@ describe('questionCreate', () => {
         points: 5,
         answers: answersNoCorrect,
       };
-      const result = requestQuestionCreate(token1, quizId1, question);
-      expect(result).toMatchObject(ERROR);
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question
+      )).toThrow(HTTPError[400]);
     });
   });
 
@@ -374,7 +404,9 @@ describe('questionCreate', () => {
     let token1: number;
     let quizId1: number;
     beforeEach(() => {
-      token1 = requestRegister('first.last1@gmail.com', 'abcd1234', 'first', 'last').token;
+      token1 = requestRegister(
+        'first.last1@gmail.com', 'abcd1234', 'first', 'last'
+      ).token;
       quizId1 = requestQuizCreate(token1, 'first last', 'fist_test').quizId;
     });
 
@@ -397,6 +429,249 @@ describe('questionCreate', () => {
       ).questionId;
 
       const result = requestQuizInfo(token1, quizId1);
+
+      expect(result.questions[0].questionId).toStrictEqual(questionId);
+      expect(result.questions[0].question).toStrictEqual(questionString);
+      expect(result.questions[0].duration).toStrictEqual(60);
+      expect(result.questions[0].points).toStrictEqual(5);
+      expect(result.questions[0].answers.length).toStrictEqual(2);
+    });
+  });
+});
+
+/// /////////////////////////////////////////////////////////////////////////////
+/// /////////////////////////////// VERSION 1 ///////////////////////////////////
+/// /////////////////////////////////////////////////////////////////////////////
+
+describe('questionCreate', () => {
+  describe('ERROR Tests 401 403', () => {
+    test('token is not a valid user', () => {
+      // token is not an integer
+      expect(() => requestQuestionCreate(
+        invalidUser, quizId, questionBody, true
+      )).toThrow(HTTPError[401]);
+    });
+
+    test('Quiz ID does not refer to a valid quiz', () => {
+      const token1 = requestRegister(
+        'first.last1@gmail.com', 'abcd1234', 'first', 'last', true
+      ).token;
+
+      expect(() => requestQuestionCreate(
+        token1, quizId, questionBody, true
+      )).toThrow(HTTPError[403]);
+    });
+
+    test('Quiz ID does not refer to a quiz that this user owns', () => {
+      const token1 = requestRegister(
+        'first.last1@gmail.com', 'abcd1234', 'first', 'last', true
+      ).token;
+
+      const token2 = requestRegister(
+        'first.last2@gmail.com', 'abcd1234', 'first', 'last', true
+      ).token;
+
+      const quizId1 = requestQuizCreate(
+        token2, 'first last', 'fist_test', true
+      ).quizId;
+
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBody, true
+      )).toThrow(HTTPError[403]);
+    });
+  });
+
+  describe('ERROR Tests 400', () => {
+    let token1: number;
+    let quizId1: number;
+
+    beforeEach(() => {
+      token1 = requestRegister(
+        'first.last1@gmail.com', 'abcd1234', 'first', 'last', true
+      ).token;
+      quizId1 = requestQuizCreate(
+        token1, 'first last', 'fist_test', true
+      ).quizId;
+    });
+
+    test('Question string is less than 5 characters in length', () => {
+      const question = {
+        question: invlalidQuestion1,
+        duration: 60,
+        points: 5,
+        answers: answers,
+      };
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question, true
+      )).toThrow(HTTPError[400]);
+    });
+
+    test('Question string is greater than 50 characters in length', () => {
+      const question = {
+        question: invlalidQuestion2,
+        duration: 60,
+        points: 5,
+        answers: answers,
+      };
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question, true
+      )).toThrow(HTTPError[400]);
+    });
+
+    test('The question has less than 2 answers', () => {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: invalidAnswerLength1,
+      };
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question, true
+      )).toThrow(HTTPError[400]);
+    });
+
+    test('The question has more than 6 answers', () => {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: invalidAnswerLength2,
+      };
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question, true
+      )).toThrow(HTTPError[400]);
+    });
+
+    test('The question duration is not a positive number', () => {
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBodyNegativeDuration, true
+      )).toThrow(HTTPError[400]);
+    });
+
+    test('The sum of the question durations exceeds 3 minutes', () => {
+      // question body has a length of 60 seconds
+      for (let i = 0; i < 3; i++) {
+        requestQuestionCreate(token1, quizId1, questionBody, true);
+      }
+
+      // This will tip it up from 180 seconds.
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBody, true
+      )).toThrow(HTTPError[400]);
+    });
+
+    test('Sum of the question durations will be 181 seconds', () => {
+      // question body has a length of 60 seconds
+      for (let i = 0; i < 3; i++) {
+        requestQuestionCreate(token1, quizId1, questionBody, true);
+      }
+
+      expect(() => requestQuestionCreate(token1, quizId1, {
+        question: 'Who let the dogs out?',
+        duration: 1,
+        points: 10,
+        answers: [
+          { answer: 'who?', correct: false },
+          { answer: 'you?', correct: true }
+        ]
+      }, true)).toThrow(HTTPError[400]);
+    });
+
+    test('The points awarded for the question are less than 1', () => {
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBodyInvalidPoint1, true
+      )).toThrow(HTTPError[400]);
+    });
+
+    test('The points awarded for the question are greater than 10', () => {
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBodyInvalidPoint2, true
+      )).toThrow(HTTPError[400]);
+    });
+
+    test('The length of any answer is shorter than 1 character long', () => {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: answersInvliadStringLength1,
+      };
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question, true
+      )).toThrow(HTTPError[400]);
+    });
+
+    test('The length of any answer is longer than 30 characters long', () => {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: answersInvliadStringLength2,
+      };
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question, true
+      )).toThrow(HTTPError[400]);
+    });
+
+    test('Any answer strings are duplicates within the same question', () => {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: answersDuplicateAnswers,
+      };
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question, true
+      )).toThrow(HTTPError[400]);
+    });
+
+    test('There are no correct answers', () => {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: answersNoCorrect,
+      };
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question, true
+      )).toThrow(HTTPError[400]);
+    });
+  });
+
+  describe('VALID Tests', () => {
+    let token1: number;
+    let quizId1: number;
+    beforeEach(() => {
+      token1 = requestRegister(
+        'first.last1@gmail.com', 'abcd1234', 'first', 'last', true
+      ).token;
+      quizId1 = requestQuizCreate(
+        token1, 'first last', 'fist_test', true
+      ).quizId;
+    });
+
+    test('return question id', () => {
+      const result = requestQuestionCreate(token1, quizId1, questionBody, true);
+      expect(result).toMatchObject({ questionId: expect.any(Number) });
+    });
+
+    test('return unique question id', () => {
+      const result = requestQuestionCreate(token1, quizId1, questionBody, true);
+      const result2 = requestQuestionCreate(
+        token1, quizId1, questionBody2, true
+      );
+      expect(result).not.toMatchObject(result2);
+    });
+
+    test('successfully create the question with correct infos', () => {
+      const questionId = requestQuestionCreate(
+        token1,
+        quizId1,
+        questionBody,
+        true
+      ).questionId;
+
+      const result = requestQuizInfo(token1, quizId1, true);
 
       expect(result.questions[0].questionId).toStrictEqual(questionId);
       expect(result.questions[0].question).toStrictEqual(questionString);

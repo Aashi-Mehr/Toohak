@@ -102,7 +102,7 @@ export function adminQuestionCreate(token: number, quizId: number,
 
   // Checking the question body is valid
   const valid = validQuestionBody(questionBody);
-  if (valid.error) { return valid; }
+  if (valid.error) throw HTTPError(400, valid.error);
 
   // Ensuring the duration is valid
   let durationSum = questionBody.duration;
@@ -235,7 +235,7 @@ export function updateQuestion(token: number, quizId: number, quesId: number,
   if (!question) throw HTTPError(400, quesID400);
 
   const valid = validQuestionBody(questionBody);
-  if (valid.error) return valid;
+  if (valid.error) throw HTTPError(400, valid.error);
 
   // Sum of the question durations in the quiz exceeds 3 minutes
   let durationSum = questionBody.duration;
