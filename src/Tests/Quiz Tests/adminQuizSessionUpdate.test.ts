@@ -9,6 +9,11 @@ import {
   requestQuizSessionUpdate
 } from '../testHelper';
 
+// Defining a function to make a function "sleep"
+function delay(time: number) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
@@ -56,6 +61,7 @@ describe('Invalid Cases - Session ID, Quiz ID and Token', () => {
     expect(() => requestQuizSessionUpdate(
       quizId1, 0, token1, 'NEXT_QUESTION')).toThrow(HTTPError[400]);
   });
+
   test('400 : Invalid Session Id', () => {
     expect(() => requestQuizSessionUpdate(
       quizId1, sessionId1 + 1, token1, 'next_question')).toThrow(HTTPError[400]);
@@ -66,10 +72,12 @@ describe('Invalid Cases - Session ID, Quiz ID and Token', () => {
     expect(() => requestQuizSessionUpdate(
       quizId1, sessionId1, 0, 'next_question')).toThrow(HTTPError[401]);
   });
+
   test('401 : Invalid Token', () => {
     expect(() => requestQuizSessionUpdate(
       quizId1, sessionId1, token1 + 1, 'next_question')).toThrow(HTTPError[401]);
   });
+
   test('401 : Empty Token', () => {
     expect(() => requestQuizSessionUpdate(
       quizId1, sessionId1, -1, 'next_question')).toThrow(HTTPError[401]);
@@ -80,10 +88,12 @@ describe('Invalid Cases - Session ID, Quiz ID and Token', () => {
     expect(() => requestQuizSessionUpdate(
       quizId1 + 1, sessionId1, token1, 'next_question')).toThrow(HTTPError[403]);
   });
+
   test('403 : Empty Quiz Id', () => {
     expect(() => requestQuizSessionUpdate(
       0, sessionId1, token1, 'next_question')).toThrow(HTTPError[403]);
   });
+
   test('403 : Out of range Quiz Id', () => {
     expect(() => requestQuizSessionUpdate(
       -1, sessionId1, token1, 'next_question')).toThrow(HTTPError[403]);
@@ -94,6 +104,7 @@ describe('Invalid Cases - Session ID, Quiz ID and Token', () => {
     expect(() => requestQuizSessionUpdate(
       quizId2, sessionId2, token1, 'next_question')).toThrow(HTTPError[403]);
   });
+
   test('403 : Quiz Not Owned By User 2', () => {
     expect(() => requestQuizSessionUpdate(
       quizId1, sessionId2, token2, 'next_question')).toThrow(HTTPError[403]);
@@ -104,6 +115,7 @@ describe('Invalid Cases - Session ID, Quiz ID and Token', () => {
     expect(() => requestQuizSessionUpdate(
       quizId1, sessionId2, token1, 'next_question')).toThrow(HTTPError[400]);
   });
+
   test('403 : Session Does Not Owned by Quiz', () => {
     expect(() => requestQuizSessionUpdate(
       quizId2, sessionId1, token2, 'next_question')).toThrow(HTTPError[400]);
@@ -122,59 +134,80 @@ describe('Invalid Cases - Action', () => {
   test('400 : Invalid Action - Next question at Question Open', () => {
     // Move player to question countdown by action next_question
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+
     // Move player to question open by action skip_countdown
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
+
     // Player input skip_countdown action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'next_question')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'next_question'
+    )).toThrow(HTTPError[400]);
   });
+
   // Errors when user in question_countdown
   test('400 : Invalid Action - Next question at Question Countdown', () => {
     // Move player to question countdown by action next_question
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+
     // Player input next_question action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'next_question')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'next_question'
+    )).toThrow(HTTPError[400]);
   });
+
   // Error when user in final_results
   test('400 : Invalid Action - Next question at Final Results', () => {
     // Move player to question countdown by action next_question
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+
     // Move player to question open by action skip_countdown
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
+
     // Move player to answer show by action go_to_answer
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
+
     // Move player to results show by action go_to_final_results
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
+
     // Player input skip_countdown action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'next_question')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'next_question'
+    )).toThrow(HTTPError[400]);
   });
+
   // Error when user in end
   test('400 : Invalid Action - Next question at End', () => {
     // Move player to question countdown by action next_question
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'end');
+
     // Player input skip_countdown action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'next_question')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'next_question'
+    )).toThrow(HTTPError[400]);
   });
 
   // 400 : Invalid Actions - SKIP COUNTDOWN
   // Errors when user in lobby
   test('400 : Invalid Action - Skip countdown at Lobby', () => {
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'skip_countdown')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'skip_countdown'
+    )).toThrow(HTTPError[400]);
   });
+
   // Errors when user in question open
   test('400 : Invalid Action - Skip countdown at Question Open', () => {
     // Move player to question countdown by action next_question
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+
     // Move player to question open by action skip_countdown
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
+
     // Player input skip_countdown action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'skip_countdown')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'skip_countdown'
+    )).toThrow(HTTPError[400]);
   });
+
   // Error when user in answer_show
   test('400 : Invalid Action - Skip countdown at Answer Show', () => {
     // Move player to question countdown by action next_question
@@ -191,60 +224,81 @@ describe('Invalid Cases - Action', () => {
   test('400 : Invalid Action - Skip countdown at Final Results', () => {
     // Move player to question countdown by action next_question
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+
     // Move player to question open by action skip_countdown
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
+
     // Move player to answer show by action go_to_answer
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
+
     // Move player to results show by action go_to_final_results
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
+
     // Player input skip_countdown action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'skip_countdown')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'skip_countdown'
+    )).toThrow(HTTPError[400]);
   });
+
   // Error when user in end
   test('400 : Invalid Action - Skip countdown at End', () => {
     // Move player to question countdown by action next_question
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'end');
+
     // Player input skip_countdown action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'skip_countdown')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'skip_countdown'
+    )).toThrow(HTTPError[400]);
   });
 
   // 400 : Invalid Actions - GO TO ANSWER
   // Error when user in lobby
   test('400 : Invalid Action - Go to answer at Lobby', () => {
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'go_to_answer')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'go_to_answer'
+    )).toThrow(HTTPError[400]);
   });
+
   // Error when user in question_countdown
   test('400 : Invalid Action - Go to answer at Question Countdown', () => {
     // Move player to question countdown by action next_question
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+
     // Player input go_to_answer action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'go_to_answer')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'go_to_answer'
+    )).toThrow(HTTPError[400]);
   });
+
   // Error when user in final_result
   test('400 : Invalid Action - Go to answer at Final Result', () => {
     // Move player to question countdown by action next_question
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+
     // Move player to question open by action skip_countdown
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
+
     // Move player to answer show by action go_to_answer
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
+
     // Move player to final results by action go_to_final_results
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
+
     // Player input go_to_answer action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'go_to_answer')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'go_to_answer'
+    )).toThrow(HTTPError[400]);
   });
+
   // Error when user in end
   test('400 : Invalid Action - Go to answer at End', () => {
     // Move player to end by action end
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'end');
+
     // Player input go_to_answer action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'go_to_answer')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'go_to_answer'
+    )).toThrow(HTTPError[400]);
   });
 
   // 400 : Invalid Actions - GO TO FINAL RESULTS
@@ -252,33 +306,44 @@ describe('Invalid Cases - Action', () => {
   test('400 : Invalid Action - Go to final results at Lobby', () => {
     // Player input go_to_final_results action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'go_to_final_results')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'go_to_final_results'
+    )).toThrow(HTTPError[400]);
   });
+
   // Error when user in question_countdown
   test('400 : Invalid Action - Go to final results at Question Countdown', () => {
     // Move player to question countdown by next_question action
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+
     // Player input go_to_final_results action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'go_to_final_results')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'go_to_final_results'
+    )).toThrow(HTTPError[400]);
   });
+
   // Error when user in question_open
   test('400 : Invalid Action - Go to final results at Question Open', () => {
     // Move player to question countdown by next_question action
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+
     // Move player to question open by skip_countdown action
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
+
     // Player input go_to_final_results action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'go_to_final_results')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'go_to_final_results'
+    )).toThrow(HTTPError[400]);
   });
+
   // Error when user in end
   test('400 : Invalid Action - Go to final results at End', () => {
     // Move player to end by end action
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'end');
+
     // Player input go_to_final_results action
     expect(() => requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'go_to_final_results')).toThrow(HTTPError[400]);
+      quizId1, sessionId1, token1, 'go_to_final_results'
+    )).toThrow(HTTPError[400]);
   });
 });
 
@@ -286,12 +351,13 @@ describe('Valid Cases', () => {
   test('next_question at LOBBY', () => {
     const result = requestQuizSessionUpdate(
       quizId1, sessionId1, token1, 'next_question');
-    expect(result).toMatchObject({ });
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
+
   test('end at LOBBY', () => {
     const result = requestQuizSessionUpdate(
       quizId1, sessionId1, token1, 'end');
-    expect(result).toMatchObject({ });
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
 
   // When player at question countdown state
@@ -299,76 +365,101 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     const result = requestQuizSessionUpdate(
       quizId1, sessionId1, token1, 'skip_countdown');
-    expect(result).toMatchObject({ });
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
+
   test('skip_countdown at QUESTION COUNTDOWN route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+
     const result = requestQuizSessionUpdate(
       quizId1, sessionId1, token1, 'skip_countdown');
-    expect(result).toMatchObject({ });
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
+
   test('end at QUESTION COUNTDOWN', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+
     const result = requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'end');
-    expect(result).toMatchObject({ });
+      quizId1, sessionId1, token1, 'end'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
 
   // When player at question open state
   test('go_to_answer at QUESTION OPEN route 1', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
+
+    const result = requestQuizSessionUpdate(
+      quizId1, sessionId1, token1, 'go_to_answer'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('go_to_answer at QUESTION OPEN route 2', async () => {
+    requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+    await delay(3000);
     const result = requestQuizSessionUpdate(
       quizId1, sessionId1, token1, 'go_to_answer');
-    expect(result).toMatchObject({ });
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
-  // test('go_to_answer at QUESTION OPEN route 2', () => {
-  //   requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
-  //   sleepSync(3000);
-  //   const result = requestQuizSessionUpdate(
-  //     quizId1, sessionId1, token1, 'go_to_answer');
-  //   expect(result).toMatchObject({ });
-  // });
+
   test('end at QUESTION OPEN route 1', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
+
+    const result = requestQuizSessionUpdate(
+      quizId1, sessionId1, token1, 'end'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('end at QUESTION OPEN route 2', async () => {
+    requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+    await delay(3000);
     const result = requestQuizSessionUpdate(
       quizId1, sessionId1, token1, 'end');
-    expect(result).toMatchObject({ });
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
-  // test('end at QUESTION OPEN route 2', () => {
-  //   requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
-  //   sleepSync(3000);
-  //   const result = requestQuizSessionUpdate(
-  //     quizId1, sessionId1, token1, 'end');
-  //   expect(result).toMatchObject({ });
-  // });
 
   // When player at question close state
   test('go_to_answer at QUESTION CLOSE', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
+
     const result = requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'go_to_answer');
-    expect(result).toMatchObject({ });
+      quizId1, sessionId1, token1, 'go_to_answer'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
-  // test('next_question at QUESTION CLOSE', () => {
-  //   requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
-  //   requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
-  //   // Sleep sync for question_close
-  //   const result = requestQuizSessionUpdate(
-  //     quizId1, sessionId1, token1, 'next_question');
-  //   expect(result).toMatchObject({ });
-  // });
+
+  test('next_question at QUESTION CLOSE', async () => {
+    requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+    requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
+
+    await delay(questionBody.duration * 1000);
+
+    const result = requestQuizSessionUpdate(
+      quizId1, sessionId1, token1, 'next_question');
+    expect(Object.keys(result).length).toStrictEqual(0);
+  }, questionBody.duration * 1000 + 2000);
+
   test('end at QUESTION CLOSE', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
+
     const result = requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'end');
-    expect(result).toMatchObject({ });
+      quizId1, sessionId1, token1, 'end'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
 
   // When player at answer show state
@@ -376,50 +467,73 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
+
     const result = requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'next_question');
-    expect(result).toMatchObject({ });
+      quizId1, sessionId1, token1, 'next_question'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
+
   test('next_question at ANSWER SHOW route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
+
     const result = requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'next_question');
-    expect(result).toMatchObject({ });
+      quizId1, sessionId1, token1, 'next_question'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
+
   test('go_to_final_results at ANSWER SHOW route 1', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
+
     const result = requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'go_to_final_results');
-    expect(result).toMatchObject({ });
+      quizId1, sessionId1, token1, 'go_to_final_results'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
+
   test('go_to_final_results at ANSWER SHOW route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
+
     const result = requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'go_to_final_results');
-    expect(result).toMatchObject({ });
+      quizId1, sessionId1, token1, 'go_to_final_results'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
+
   test('end at ANSWER SHOW route 1', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
+
     const result = requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'end');
-    expect(result).toMatchObject({ });
+      quizId1, sessionId1, token1, 'end'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
+
   test('end at ANSWER SHOW route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
+
     const result = requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'end');
-    expect(result).toMatchObject({ });
+      quizId1, sessionId1, token1, 'end'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
 
   // When player at final results state
@@ -428,26 +542,36 @@ describe('Valid Cases', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
+
     const result = requestQuizSessionUpdate(
-      quizId1, sessionId1, token1, 'end');
-    expect(result).toMatchObject({ });
+      quizId1, sessionId1, token1, 'end'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
   });
+
   test('end at FINAL RESULTS route 2', () => {
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_answer');
     requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
+
+    const result = requestQuizSessionUpdate(
+      quizId1, sessionId1, token1, 'end'
+    );
+
+    expect(Object.keys(result).length).toStrictEqual(0);
+  });
+
+  test('end at FINAL RESULTS route 3', async () => {
+    requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
+    requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
+
+    await delay(questionBody.duration * 1000);
+
+    requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
     const result = requestQuizSessionUpdate(
       quizId1, sessionId1, token1, 'end');
-    expect(result).toMatchObject({ });
-  });
-  // test('end at FINAL RESULTS route 3', () => {
-  //   requestQuizSessionUpdate(quizId1, sessionId1, token1, 'next_question');
-  //   requestQuizSessionUpdate(quizId1, sessionId1, token1, 'skip_countdown');
-  //   // Sleep-snnc to question_close
-  //   requestQuizSessionUpdate(quizId1, sessionId1, token1, 'go_to_final_results');
-  //   const result = requestQuizSessionUpdate(
-  //     quizId1, sessionId1, token1, 'end');
-  //   expect(result).toMatchObject({ });
-  // });
+    expect(Object.keys(result).length).toStrictEqual(0);
+  }, questionBody.duration * 1000 + 2000);
 });
