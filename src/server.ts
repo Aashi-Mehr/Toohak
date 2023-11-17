@@ -92,6 +92,7 @@ const database = createClient({
 // Used after every put, post, delete routes to keep data.json updated
 function backupData() {
   fs.writeFileSync('data.json', JSON.stringify(getData()));
+  setData(getData());
 }
 
 // Example get request
