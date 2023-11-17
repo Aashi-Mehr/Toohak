@@ -103,19 +103,19 @@ app.get('/echo', (req: Request, res: Response) => {
 
 // KV Data
 app.get('/data', async (req: Request, res: Response) => {
-  await database.hset("data:forum", {
+  await database.hset("data:toohak", {
     users: [],
     quizzes: [],
     sessions: [],
     quizSessions: []
   });
-  const data = await database.hgetall('data:forum');
+  const data = await database.hgetall('data:toohak');
   res.status(200).json({data: data});
 });
 
 app.put('/data', async (req: Request, res: Response) => {
   const { data } = req.body;
-  await database.hset("data:forum", data);
+  await database.hset("data:toohak", data);
   return res.status(200).json({ });
 });
 
