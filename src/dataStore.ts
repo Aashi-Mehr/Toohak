@@ -163,15 +163,8 @@ interface QuestionBody {
   question: string,
   duration: number,
   points: number,
-  answers: AnswerBody[]
-}
-
-interface QuestionBodyV2 {
-  question: string,
-  duration: number,
-  points: number,
   answers: AnswerBody[],
-  thumbnailUrl: string
+  thumbnailUrl?: string
 }
 
 interface QuestionId {
@@ -198,7 +191,7 @@ interface QuizBrief {
 
 interface QuizList { quizzes: QuizBrief[] }
 
-interface QuizAdd { // Need to add thumbnail URL component
+interface QuizAdd {
   quizId: number,
   authId: number,
   name: string,
@@ -235,9 +228,16 @@ interface MessageBody {
   messageBody: string
 }
 
+interface PlayerAnswers {
+  questionNo: number,
+  time: number,
+  correct: boolean
+}
+
 interface QuizSessionPlayer {
   name: string,
-  playerId: number
+  playerId: number,
+  answers: PlayerAnswers[]
 }
 
 interface QuizSessionAdd {
@@ -246,7 +246,11 @@ interface QuizSessionAdd {
   atQuestion: number,
   quiz: QuizAdd,
   players: QuizSessionPlayer[],
-  messages: Message[]
+  messages: Message[],
+  timers: {
+    countdown: ReturnType<typeof setTimeout>[],
+    open: ReturnType<typeof setTimeout>[]
+  }
 }
 
 interface PlayerId {
@@ -495,7 +499,6 @@ export {
   Datastore,
   AnswerBody,
   QuestionBody,
-  QuestionBodyV2,
   QuestionId,
   QuizSessionId,
   Answer,
