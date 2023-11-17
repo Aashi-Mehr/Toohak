@@ -27,7 +27,8 @@ import {
   requestQuizGetSession,
   requestQuizSessionStart,
   requestQuestionCreate,
-  requestPlayerJoin
+  requestPlayerJoin,
+  requestQuizSessionUpdate
 } from '../testHelper';
 
 const questionBody = {
@@ -204,6 +205,38 @@ describe('Valid Tests', () => {
     result = requestQuizGetSession(quizId2, sessionId2, token2);
     expect(result).toMatchObject({
       state: 'LOBBY',
+      atQuestion: 1,
+      players: ['Name2'],
+      metadata: {
+        quizId: quizId2,
+        name: 'Quiz 2',
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: '',
+        numQuestions: 1,
+        questions: [
+          {
+            questionId: expect.any(Number),
+            question: questionBody.question,
+            duration: questionBody.duration,
+            thumbnailUrl: questionBody.thumbnailUrl,
+            points: questionBody.points,
+            answers: questionBody.answers
+          }
+        ],
+        duration: questionBody.duration,
+        thumbnailUrl: DEFAULT_QUIZ_THUMBNAIL
+      }
+    });
+  });
+
+  test('Simple Case 3', () => {
+    requestQuizSessionUpdate(quizId2, sessionId2, token2, 'next_question');
+
+    // Attempt to get session
+    result = requestQuizGetSession(quizId2, sessionId2, token2);
+    expect(result).toMatchObject({
+      state: 'QUESTION_COUNTDOWN',
       atQuestion: 1,
       players: ['Name2'],
       metadata: {
