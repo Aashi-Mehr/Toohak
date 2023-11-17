@@ -15,10 +15,9 @@ import {
   unactive400,
   inval400,
   cantAct400,
-  sessionStatus
+  sessionStatus,
+  getQuizSession
 } from './dataStore';
-
-import { requestQuizGetSession } from './testHelper';
 
 /** quizSessionStart
   * Starts a quiz sessions
@@ -97,8 +96,12 @@ sessionStatus {
 
   // Loop through the quiz to find valid active session
   // Error 400 : Invalid or unactive session id
+  // const session = getQuizSession(sessionId, getData().quizSessions);
+  // if (!session || session.quiz.quizId !== quizId || session.state === SessionState.END) {
+  //   throw HTTPError(400, unactive400);
+  // }
   const session = getQuizSession(sessionId, getData().quizSessions);
-  if (!session || session.quiz.quizId !== quizId || session.state === SessionState.END) {
+  if (!session || !session.quiz || session.quiz.quizId !== quizId || session.state === SessionState.END) {
     throw HTTPError(400, unactive400);
   }
 
@@ -114,6 +117,11 @@ sessionStatus {
   for (const questionInQuiz of session.quiz.questions) {
     quizQuest.push(questionInQuiz);
   }
+
+  // const quizAns: string;
+  // for (const questionAnswers of quiz.questions.answers) {
+  //   quizAnswer = questionAnswers;
+  // }
 
   // Calculating the duration of the quiz
   let duration = 0;
@@ -134,17 +142,21 @@ sessionStatus {
       numQuestions: quiz.questions.length,
       questions: [
         {
-          questionId: quiz.question.quiestionId,
-          question: quiz.question.question,
-          duration: quiz.question.duration,
-          thumbnailUrl: quiz.question.thumbnailUrl,
-          points: quiz.question.points,
+          questionId: quiz.questions.quiestionId,
+          question: quiz.questions.question,
+          duration: quiz.questions.duration,
+          thumbnailUrl: quiz.questions.thumbnailUrl,
+          points: quiz.questions.points,
           answers: [
             {
-              answerId: quiz.question.answer.answerId,
-              answer: quiz.question.answer.answer,
-              colour: quiz.question.answer.colour,
-              correct: quiz.question.answer.correct
+              // answerId: quiz.questions.question.answers.answerId,
+              // answer: quiz.questions.question.answers.answer,
+              // colour: quiz.questions.question.answers.colour,
+              // correct: quiz.questions.question.answers.correct
+              answerId: quiz.questions.question.quizAnswer.answerId,
+              answer: quiz.questions.question.quizAnswer.answer,
+              colour: quiz.questions.question.quizAnswer.colour,
+              correct: quiz.questions.question.quizAnswer.correct
             }
           ]
         }

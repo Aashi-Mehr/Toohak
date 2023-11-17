@@ -56,7 +56,6 @@ import {
 } from './sessions';
 import { playerJoinSession, playerMessageChat, playerViewChat } from './player';
 
-
 // Set up web app
 const app = express();
 // Use middleware that allows us to access the JSON body of requests
@@ -413,7 +412,7 @@ app.post('/v1/admin/quiz/:quizid/session/start',
     backupData();
   });
 
-app.get('v1/admin/quiz/:quizid/session/:sessionid',
+app.get('/v1/admin/quiz/:quizid/session/:sessionid',
   (req: Request, res: Response) => {
     const quizId = parseInt(req.params.quizid);
     const sessionId = parseInt(req.params.sessionid);

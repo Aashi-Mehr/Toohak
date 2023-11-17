@@ -18,7 +18,6 @@ unauth403 : Valid token, user unauthorised
 */
 
 import {
-  Token,
   sessionStatus,
   DEFAULT_QUIZ_THUMBNAIL,
   ErrorObject
@@ -48,7 +47,7 @@ const questionBody = {
   ]
 };
 let result: sessionStatus | ErrorObject;
-let token1: Token;
+let token1: number;
 let token2: number;
 let quizId1: number;
 let quizId2: number;
@@ -58,6 +57,7 @@ let sessionId2: number;
 // Clear the dataBase before each test to avoid data interference
 beforeEach(() => {
   requestClear();
+
   token1 = requestRegister('am@gmail.com', 'Vl1dPass', 'fir', 'las').token;
   quizId1 = requestQuizCreate(token1, 'Quiz 1', '').quizId;
   requestQuestionCreate(token1, quizId1, questionBody);
@@ -70,41 +70,6 @@ beforeEach(() => {
   sessionId2 = requestQuizSessionStart(token2, quizId2, 2).sessionId;
   requestPlayerJoin(sessionId2, 'Name2');
 });
-
-// interface sessionStatus {
-//     state: string,
-//     atQuestion: number,
-//     players: [],
-//     metadata: QuizInfo[]
-// }
-
-// interface QuizInfo {
-//     quizId: number,
-//     name: string,
-//     timeCreated: number,
-//     timeLastEdited: number,
-//     description: string,
-//     numQuestions: number,
-//     questions: Question[],
-//     duration: number,
-//     thumbnailUrl: string
-// }
-
-// interface Question {
-//     questionId: number,
-//     question: string,
-//     duration: number,
-//     points: number,
-//     answers: Answer[],
-//     thumbnailUrl: string
-// }
-
-// interface Answer {
-//     answerId: number,
-//     answer: string,
-//     colour: string,
-//     correct: boolean
-// }
 
 /// ////////////////////////////////////////////////////////////////////////////
 /// //////////////////////////////// Tests /////////////////////////////////////
@@ -125,7 +90,7 @@ describe('Invalid Tests', () => {
     expect(() => requestQuizGetSession(quizId1, -1, token1)).toThrow(HTTPError[400]);
   });
 
-  // 401 : Token in empty
+  // 401 : Invalid token
   test('Empty Token', () => {
     // Token is empty
     expect(() => requestQuizGetSession(quizId1, sessionId1, 0)).toThrow(HTTPError[401]);
@@ -133,12 +98,24 @@ describe('Invalid Tests', () => {
   // Invalid Token
   test('Invalid Token', () => {
     // Token is invalid
-    expect(() => requestQuizGetSession(quizId1, sessionId1, 'z544444')).toThrow(HTTPError[401]);
+    expect(() => requestQuizGetSession(quizId1, sessionId1, token1 + 1)).toThrow(HTTPError[401]);
+    expect(() => requestQuizGetSession(quizId1, sessionId1, token1 - 1)).toThrow(HTTPError[401]);
   });
   // Out of Range Token
   test('Out of Range Token', () => {
     // Token is out of range
     expect(() => requestQuizGetSession(quizId1, sessionId1, -1)).toThrow(HTTPError[401]);
+  });
+
+  // 403 : Invalid Quiz ID
+  test('Empty Quiz ID', () => {
+    // Quiz ID is empty
+    expect(() => requestQuizGetSession(0, sessionId1, token1)).toThrow(HTTPError[403]);
+  });
+  test('Invalid Quiz ID', () => {
+    // Quiz ID is invalid
+    expect(() => requestQuizGetSession(quizId1 + 1, sessionId1, token1)).toThrow(HTTPError[403]);
+    expect(() => requestQuizGetSession(quizId1 - 1, sessionId1, token1)).toThrow(HTTPError[403]);
   });
 
   // 403 : Unauthorised Session ID
@@ -147,15 +124,9 @@ describe('Invalid Tests', () => {
     expect(() => requestQuizGetSession(quizId1, sessionId1 + 1, token1)).toThrow(HTTPError[403]);
     expect(() => requestQuizGetSession(quizId1, sessionId1 - 1, token1)).toThrow(HTTPError[403]);
   });
+
   // Quiz does not match session ID
   test('Quiz ID does not match Session ID', () => {
-    // Quiz ID is invalid
-    expect(() => requestQuizGetSession(quizId1 + 1, sessionId1, token1)).toThrow(HTTPError[403]);
-    expect(() => requestQuizGetSession(quizId1 - 1, sessionId1, token1)).toThrow(HTTPError[403]);
-    // Quiz ID is empty
-    expect(() => requestQuizGetSession(0, sessionId1, token1)).toThrow(HTTPError[403]);
-    // Quiz ID is invalid
-    expect(() => requestQuizGetSession('quizId', sessionId1, token1)).toThrow(HTTPError[403]);
     // Quiz does not match session ID
     expect(() => requestQuizGetSession(quizId1, sessionId2, token1)).toThrow(HTTPError[403]);
     expect(() => requestQuizGetSession(quizId2, sessionId1, token2)).toThrow(HTTPError[403]);
@@ -199,4 +170,40 @@ describe('Valid Tests', () => {
       }
     });
   });
+  test('Simple Case 2', () => {
+    // Attempt to get session
+      result = requestQuizGetSession(quizId2, sessionId2, token2);
+      expect(result).toMatchObject({
+        state: 'LOBBY',
+        atQuestion: expect.any(Number),
+        players: [expect.any(String)],
+        metadata: {
+          quizId: quizId2,
+          name: expect.any(String),
+          timeCreated: expect.any(Number),
+          timeLastEdited: expect.any(Number),
+          description: expect.any(String),
+          numQuestions: expect.any(Number),
+          questions: [
+            {
+              questionId: expect.any(Number),
+              question: expect.any(String),
+              duration: expect.any(String),
+              thumbnailUrl: DEFAULT_QUIZ_THUMBNAIL,
+              points: expect.any(Number),
+              answers: [
+                {
+                  answerId: expect.any(Number),
+                  answer: expect.any(Number),
+                  colour: expect.any(Number),
+                  correct: expect.any(Number)
+                }
+              ]
+            }
+          ],
+          duration: expect.any(Number),
+          thumbnailUrl: DEFAULT_QUIZ_THUMBNAIL
+        }
+      });
+    });
 });
