@@ -1,7 +1,7 @@
 
 import HTTPError from 'http-errors';
+import { IncomingHttpHeaders } from 'http';
 import request from 'sync-request-curl';
-import { port, url } from '../config.json';
 
 import {
   Token,
@@ -15,10 +15,20 @@ import {
   Message,
   MessageBody,
   QuizSessionId,
-  PlayerId,
+  sessionStatus,
+  PlayerId
 } from '../dataStore';
 
+import { port, url } from '../config.json';
 const SERVER_URL = `${url}:${port}`;
+
+interface data {
+  name?: string,
+  description?: string,
+  token?: number | string
+  userEmail?: string,
+  questionBody?: QuestionBody
+}
 
 // ====================================================================
 //  ======================== OTHER FUNCTIONS =========================
@@ -241,8 +251,8 @@ export function requestPasswordEdit(token: number, oldPass: string,
 export function requestQuizCreate(token: number, name: string,
   description: string, v1?: boolean): QuizId {
   let v = '/v2';
-  let headers: any = { token: token.toString() };
-  let json: any = {
+  let headers: IncomingHttpHeaders = { token: token.toString() };
+  let json: data = {
     name: name,
     description: description
   };
@@ -335,8 +345,8 @@ export function requestQuizList(token: number | string,
 export function requestQuizDescriptionUpdate(token: number | string,
   quizId: number, description: string, v1?: boolean): Record<string, never> {
   let v = '/v2';
-  let headers: any = { token: token.toString() };
-  let json: any = { description: description };
+  let headers: IncomingHttpHeaders = { token: token.toString() };
+  let json: data = { description: description };
 
   if (v1) {
     v = '/v1';
@@ -369,8 +379,8 @@ export function requestQuizDescriptionUpdate(token: number | string,
 export function requestQuizNameUpdate(token: number, quizId: number,
   name: string, v1?: boolean): Record<string, never> {
   let v = '/v2';
-  let headers: any = { token: token.toString() };
-  let json: any = { name: name };
+  let headers: IncomingHttpHeaders = { token: token.toString() };
+  let json: data = { name: name };
 
   if (v1) {
     v = '/v1';
@@ -403,8 +413,8 @@ export function requestQuizNameUpdate(token: number, quizId: number,
 export function requestQuizRemove(token: number, quizId: number, v1?: boolean):
   Record<string, never> {
   let v = '/v2';
-  let headers: any = { token: token.toString() };
-  let qs: any = { };
+  let headers: IncomingHttpHeaders = { token: token.toString() };
+  let qs: data = { };
 
   if (v1) {
     v = '/v1';
@@ -434,8 +444,8 @@ export function requestQuizRemove(token: number, quizId: number, v1?: boolean):
 export function requestQuizTransfer(token: number | string, quizId: number,
   userEmail: string, v1?: boolean): Record<string, never> {
   let v = '/v2';
-  let headers: any = { token: token.toString() };
-  let json: any = { userEmail: userEmail };
+  let headers: IncomingHttpHeaders = { token: token.toString() };
+  let json: data = { userEmail: userEmail };
 
   if (v1) {
     v = '/v1';
@@ -593,6 +603,26 @@ export function requestQuizSessionStart(token: number, quizId: number,
   return result;
 }
 
+// GET SESSION Define Wrapper Function
+export function requestQuizGetSession(quizId: number, sessionId: number,
+  token: number): sessionStatus {
+  const res = request(
+    'GET',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/session/' + sessionId,
+    {
+      headers: { token: token.toString() },
+    }
+  );
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
+}
+
 // PUT SESSION UPDATE Define Wrapper Function
 export function requestQuizSessionUpdate(quizId: number, sessionId: number,
   token: number, action: string): ErrorObject | Record<string, never> {
@@ -621,8 +651,8 @@ export function requestQuizSessionUpdate(quizId: number, sessionId: number,
 export function requestQuestionCreate(token: number | string,
   quizId: number, questionBody: QuestionBody, v1?: boolean): QuestionId {
   let v = '/v2';
-  let headers: any = { token: token.toString() };
-  let json: any = { questionBody: questionBody };
+  let headers: IncomingHttpHeaders = { token: token.toString() };
+  let json: data = { questionBody: questionBody };
 
   if (v1) {
     v = '/v1';
@@ -711,8 +741,8 @@ export function requestQuesUpdate(token: number, quizId: number, quesId: number,
   questionBody: QuestionBody, v1?: boolean):
   ErrorObject | Record<string, never> {
   let v = '/v2';
-  let headers: any = { token: token.toString() };
-  let json: any = { questionBody: questionBody };
+  let headers: IncomingHttpHeaders = { token: token.toString() };
+  let json: data = { questionBody: questionBody };
 
   if (v1) {
     v = '/v1';
@@ -745,8 +775,8 @@ export function requestQuesUpdate(token: number, quizId: number, quesId: number,
 export function requestQuesDelete(token: number, quizId: number,
   quesId: number, v1?: boolean): ErrorObject | Record<string, never> {
   let v = '/v2';
-  let qs: any = { };
-  let headers:any = { token: token.toString() };
+  let qs: data = { };
+  let headers:IncomingHttpHeaders = { token: token.toString() };
 
   if (v1) {
     v = '/v1';
