@@ -25,7 +25,8 @@ const questionBody = {
     { answer: 'b', correct: false },
     { answer: 'c', correct: false },
     { answer: 'd', correct: false }
-  ]
+  ],
+  thumbnailUrl: 'https://ThisIsSomehowValid.png'
 };
 
 let token: number;

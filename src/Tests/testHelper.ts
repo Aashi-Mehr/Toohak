@@ -24,15 +24,12 @@ const SERVER_URL = `${url}:${port}`;
 //  ======================== OTHER FUNCTIONS =========================
 // ====================================================================
 
-// DELETE CLEAR Define wrapper function: Version 1
-export function requestClearV1() {
-  const res = request('DELETE', SERVER_URL + '/v1/clear');
-  return JSON.parse(res.body.toString());
-}
+// DELETE CLEAR Define wrapper function
+export function requestClear(v1?: boolean) {
+  let v = '/v2';
+  if (v1) v = '/v1';
 
-// DELETE CLEAR Define wrapper function: Version 1
-export function requestClear() {
-  const res = request('DELETE', SERVER_URL + '/v2/clear');
+  const res = request('DELETE', SERVER_URL + v + '/clear');
   return JSON.parse(res.body.toString());
 }
 
@@ -484,6 +481,7 @@ export function requestQuizTrash(token: number | string, v1?: boolean):
       { headers: { token: token.toString() } }
     );
   }
+
   const result = JSON.parse(res.body.toString());
 
   if (res.statusCode !== 200) {

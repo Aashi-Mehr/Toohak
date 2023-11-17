@@ -163,15 +163,8 @@ interface QuestionBody {
   question: string,
   duration: number,
   points: number,
-  answers: AnswerBody[]
-}
-
-interface QuestionBodyV2 {
-  question: string,
-  duration: number,
-  points: number,
   answers: AnswerBody[],
-  thumbnailUrl: string
+  thumbnailUrl?: string
 }
 
 interface QuestionId {
@@ -506,7 +499,6 @@ export {
   Datastore,
   AnswerBody,
   QuestionBody,
-  QuestionBodyV2,
   QuestionId,
   QuizSessionId,
   Answer,

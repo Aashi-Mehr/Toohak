@@ -30,22 +30,41 @@ import HTTPError from 'http-errors';
   * @returns { QuestionBody } - All cases
   */
 function questionBody(question?: string, duration?: number, points?: number,
-  answers?: AnswerBody[]): QuestionBody {
-  return {
-    question: question || 'What is the second letter of the alphabet?',
-    duration: duration || 10,
-    points: points || 5,
-    answers: answers || [{
-      answer: 'a',
-      correct: true
-    },
-    {
-      answer: 'b',
-      correct: false
-    }]
-  };
+  answers?: AnswerBody[], thumb?: string): QuestionBody {
+  if (!thumb) {
+    return {
+      question: question || 'What is the second letter of the alphabet?',
+      duration: duration || 10,
+      points: points || 5,
+      answers: answers || [{
+        answer: 'a',
+        correct: true
+      },
+      {
+        answer: 'b',
+        correct: false
+      }]
+    };
+  } else {
+    return {
+      question: question || 'What is the second letter of the alphabet?',
+      duration: duration || 10,
+      points: points || 5,
+      answers: answers || [{
+        answer: 'a',
+        correct: true
+      },
+      {
+        answer: 'b',
+        correct: false
+      }],
+      thumbnailUrl: thumb
+    };
+  }
 }
 
+const validUrl = 'http://ThisIsValid.png';
+const newUrl = 'https://ThisIsNew.png';
 const shortQ = 'Wha?';
 const longQ = 'What is the first letter of the alphabettttttttttttttttttttttt?';
 const shortAnswers = [{ answer: 'b', correct: true }];
@@ -59,9 +78,27 @@ const longAnswers = [
   { answer: 'g', correct: false }
 ];
 
-const initialQ = questionBody('What is the first letter of the alphabet?');
-const finalQ = questionBody(undefined, 15, 10, [{ answer: 'b', correct: true },
-  { answer: 'a', correct: false }]);
+const initialQV1 = questionBody('What is the first letter of the alphabet?');
+const finalQV1 = questionBody(
+  undefined,
+  15,
+  10,
+  [{ answer: 'b', correct: true }, { answer: 'a', correct: false }]
+);
+const initialQV2 = questionBody(
+  'What is the first letter of the alphabet?',
+  undefined,
+  undefined,
+  undefined,
+  validUrl
+);
+const finalQV2 = questionBody(
+  undefined,
+  15,
+  10,
+  [{ answer: 'b', correct: true }, { answer: 'a', correct: false }],
+  newUrl
+);
 
 let token1: number;
 let quizId1: number;
@@ -71,11 +108,6 @@ let result: ErrorObject | Record<string, never>;
 beforeEach(() => {
   // Clearing any previous data
   requestClear();
-
-  // Defining base data to be manipulated in the tests (Updated/Deleted)
-  token1 = requestRegister('am@gmail.com', 'Vl1dPass', 'fir', 'las').token;
-  quizId1 = requestQuizCreate(token1, 'New Quiz 1', '').quizId;
-  questionId1 = requestQuestionCreate(token1, quizId1, initialQ).questionId;
 });
 
 /// /////////////////////////////////////////////////////////////////////////////
@@ -83,12 +115,19 @@ beforeEach(() => {
 /// /////////////////////////////////////////////////////////////////////////////
 
 describe('adminQuizQuestionUpdate', () => {
+  beforeEach(() => {
+    // Defining base data to be manipulated in the tests (Updated/Deleted)
+    token1 = requestRegister('am@gmail.com', 'Vl1dPass', 'fir', 'las').token;
+    quizId1 = requestQuizCreate(token1, 'New Quiz 1', '').quizId;
+    questionId1 = requestQuestionCreate(token1, quizId1, initialQV2).questionId;
+  });
+
   // Error Checking
 
   test('QuestionId does not refer to a valid question', () => {
     // QuestionId does not refer to a valid question
     expect(() => requestQuesUpdate(
-      token1, quizId1, questionId1 + 1, finalQ
+      token1, quizId1, questionId1 + 1, finalQV2
     )).toThrow(HTTPError[400]);
   });
 
@@ -96,18 +135,18 @@ describe('adminQuizQuestionUpdate', () => {
     // QuestionId does not refer to a valid question in this quiz
     const quizId2 = requestQuizCreate(token1, 'New Quiz 2', '').quizId;
     const questionId2 = requestQuestionCreate(
-      token1, quizId2, finalQ
+      token1, quizId2, finalQV2
     ).questionId;
 
     expect(() => requestQuesUpdate(
-      token1, quizId1, questionId2, initialQ
+      token1, quizId1, questionId2, initialQV2
     )).toThrow(HTTPError[400]);
   });
 
   test('QuestionId is out of the valid range', () => {
     // QuestionId is out of the valid range
     expect(() => requestQuesUpdate(
-      token1, quizId1, 0, finalQ
+      token1, quizId1, 0, finalQV2
     )).toThrow(HTTPError[400]);
   });
 
@@ -167,11 +206,11 @@ describe('adminQuizQuestionUpdate', () => {
 
   test('The question duration is lerger than 3 minutes', () => {
     // The question duration is lerger than 3 minutes
-    const q2 = questionBody('Question 2', 30);
-    const q3 = questionBody('Question 3', 30);
-    const q4 = questionBody('Question 4', 30);
-    const q5 = questionBody('Question 5', 30);
-    const q6 = questionBody('Question 6', 30);
+    const q2 = questionBody('Question 2', 30, 5, undefined, validUrl);
+    const q3 = questionBody('Question 3', 30, 5, undefined, validUrl);
+    const q4 = questionBody('Question 4', 30, 5, undefined, validUrl);
+    const q5 = questionBody('Question 5', 30, 5, undefined, validUrl);
+    const q6 = questionBody('Question 6', 30, 5, undefined, validUrl);
 
     requestQuestionCreate(token1, quizId1, q2);
     requestQuestionCreate(token1, quizId1, q3);
@@ -252,14 +291,14 @@ describe('adminQuizQuestionUpdate', () => {
   test('Token is empty', () => {
     // Token is empty
     expect(() => requestQuesUpdate(
-      0, quizId1, questionId1, finalQ
+      0, quizId1, questionId1, finalQV2
     )).toThrow(HTTPError[401]);
   });
 
   test('Token does not refer to valid logged in user session', () => {
     // Token does not refer to valid logged in user session
     expect(() => requestQuesUpdate(
-      token1 + 1, quizId1, questionId1, finalQ
+      token1 + 1, quizId1, questionId1, finalQV2
     )).toThrow(HTTPError[401]);
   });
 
@@ -269,14 +308,14 @@ describe('adminQuizQuestionUpdate', () => {
       'a@gmail.com', 'Val1Pass', 'fir', 'las'
     ).token;
     expect(() => requestQuesUpdate(
-      token2, quizId1, questionId1, finalQ
+      token2, quizId1, questionId1, finalQV2
     )).toThrow(HTTPError[403]);
   });
 
   test('Valid token is provided, but the quiz is invalid', () => {
     // Valid token is provided, but the user is unauthorised
     expect(() => requestQuesUpdate(
-      token1, quizId1 + 1, questionId1, finalQ
+      token1, quizId1 + 1, questionId1, finalQV2
     )).toThrow(HTTPError[403]);
   });
 
@@ -285,14 +324,14 @@ describe('adminQuizQuestionUpdate', () => {
     requestRegister('a@gmail.com', 'Val1Pass', 'fir', 'las');
     requestQuizTransfer(token1, quizId1, 'a@gmail.com');
     expect(() => requestQuesUpdate(
-      token1, quizId1, questionId1, finalQ
+      token1, quizId1, questionId1, finalQV2
     )).toThrow(HTTPError[403]);
   });
 
   // Valid Cases
   test('Checking a simple case of restructuring a question', () => {
     // Checking a simple case of restructuring a question
-    result = requestQuesUpdate(token1, quizId1, questionId1, finalQ);
+    result = requestQuesUpdate(token1, quizId1, questionId1, finalQV2);
     expect(Object.keys(result).length).toStrictEqual(0);
 
     const info = requestQuizInfo(token1, quizId1);
@@ -305,13 +344,11 @@ describe('adminQuizQuestionUpdate', () => {
       numQuestions: 1,
       questions: [{
         questionId: questionId1,
-        question: 'What is the second letter of the alphabet?',
-        duration: 15,
-        points: 10,
-        answers: [
-          { answer: 'b', correct: true },
-          { answer: 'a', correct: false }
-        ]
+        question: finalQV2.question,
+        duration: finalQV2.duration,
+        points: finalQV2.points,
+        answers: finalQV2.answers,
+        thumbnailUrl: finalQV2.thumbnailUrl
       }],
       duration: 15
     });
@@ -319,9 +356,9 @@ describe('adminQuizQuestionUpdate', () => {
 
   test('Updating the same question multiple times', () => {
     // Updating multiple times
-    requestQuesUpdate(token1, quizId1, questionId1, finalQ);
-    requestQuesUpdate(token1, quizId1, questionId1, initialQ);
-    result = requestQuesUpdate(token1, quizId1, questionId1, finalQ);
+    requestQuesUpdate(token1, quizId1, questionId1, finalQV2);
+    requestQuesUpdate(token1, quizId1, questionId1, initialQV2);
+    result = requestQuesUpdate(token1, quizId1, questionId1, finalQV2);
     expect(Object.keys(result).length).toStrictEqual(0);
 
     const info = requestQuizInfo(token1, quizId1);
@@ -340,7 +377,8 @@ describe('adminQuizQuestionUpdate', () => {
         answers: [
           { answer: 'b', correct: true },
           { answer: 'a', correct: false }
-        ]
+        ],
+        thumbnailUrl: finalQV2.thumbnailUrl
       }],
       duration: 15
     });
@@ -348,9 +386,9 @@ describe('adminQuizQuestionUpdate', () => {
 
   test('Moving, then updating', () => {
     // Moving, then updating
-    const question2 = requestQuestionCreate(token1, quizId1, initialQ);
+    const question2 = requestQuestionCreate(token1, quizId1, initialQV2);
     requestQuesMove(token1, 1, questionId1, quizId1);
-    result = requestQuesUpdate(token1, quizId1, questionId1, finalQ);
+    result = requestQuesUpdate(token1, quizId1, questionId1, finalQV2);
     expect(Object.keys(result).length).toStrictEqual(0);
 
     const info = requestQuizInfo(token1, quizId1);
@@ -363,13 +401,14 @@ describe('adminQuizQuestionUpdate', () => {
       numQuestions: 2,
       questions: [{
         questionId: question2.questionId,
-        question: 'What is the first letter of the alphabet?',
+        question: initialQV2.question,
         duration: 10,
         points: 5,
         answers: [
           { answer: 'a', correct: true },
           { answer: 'b', correct: false }
-        ]
+        ],
+        thumbnailUrl: initialQV2.thumbnailUrl
       },
       {
         questionId: questionId1,
@@ -379,9 +418,9 @@ describe('adminQuizQuestionUpdate', () => {
         answers: [
           { answer: 'b', correct: true },
           { answer: 'a', correct: false }
-        ]
-      }
-      ],
+        ],
+        thumbnailUrl: finalQV2.thumbnailUrl
+      }],
       duration: 25
     });
   });
@@ -392,8 +431,8 @@ describe('adminQuizQuestionUpdate', () => {
 
     if ('questionId' in question2) {
       const questionId2 = question2.questionId;
-      requestQuesUpdate(token1, quizId1, questionId1, finalQ);
-      requestQuesUpdate(token1, quizId1, questionId2, finalQ);
+      requestQuesUpdate(token1, quizId1, questionId1, finalQV2);
+      requestQuesUpdate(token1, quizId1, questionId2, finalQV2);
       expect(Object.keys(result).length).toStrictEqual(0);
 
       const info = requestQuizInfo(token1, quizId1);
@@ -412,7 +451,8 @@ describe('adminQuizQuestionUpdate', () => {
           answers: [
             { answer: 'b', correct: true },
             { answer: 'a', correct: false }
-          ]
+          ],
+          thumbnailUrl: finalQV2.thumbnailUrl
         },
         {
           questionId: questionId2,
@@ -422,9 +462,9 @@ describe('adminQuizQuestionUpdate', () => {
           answers: [
             { answer: 'b', correct: true },
             { answer: 'a', correct: false }
-          ]
-        }
-        ],
+          ],
+          thumbnailUrl: finalQV2.thumbnailUrl
+        }],
         duration: 30
       });
     } else expect(question2).toMatchObject({ questionId: expect.any(Number) });
@@ -432,11 +472,11 @@ describe('adminQuizQuestionUpdate', () => {
 
   test('Checking that question duration can be upto 180 seconds', () => {
     // Checking that question duration can be upto 180 seconds
-    const q2 = questionBody('Question 2', 30);
-    const q3 = questionBody('Question 3', 30);
-    const q4 = questionBody('Question 4', 30);
-    const q5 = questionBody('Question 5', 30);
-    const q6 = questionBody('Question 6', 30);
+    const q2 = questionBody('Question 2', 30, undefined, undefined, validUrl);
+    const q3 = questionBody('Question 3', 30, undefined, undefined, validUrl);
+    const q4 = questionBody('Question 4', 30, undefined, undefined, validUrl);
+    const q5 = questionBody('Question 5', 30, undefined, undefined, validUrl);
+    const q6 = questionBody('Question 6', 30, undefined, undefined, validUrl);
 
     requestQuestionCreate(token1, quizId1, q2);
     requestQuestionCreate(token1, quizId1, q3);
@@ -445,7 +485,7 @@ describe('adminQuizQuestionUpdate', () => {
     requestQuestionCreate(token1, quizId1, q6);
 
     result = requestQuesUpdate(token1, quizId1, questionId1, questionBody(
-      undefined, 30
+      undefined, 30, undefined, undefined, newUrl
     ));
     expect(Object.keys(result).length).toStrictEqual(0);
 
@@ -456,6 +496,13 @@ describe('adminQuizQuestionUpdate', () => {
 });
 
 describe('adminQuizQuestionDelete', () => {
+  beforeEach(() => {
+    // Defining base data to be manipulated in the tests (Updated/Deleted)
+    token1 = requestRegister('am@gmail.com', 'Vl1dPass', 'fir', 'las').token;
+    quizId1 = requestQuizCreate(token1, 'New Quiz 1', '').quizId;
+    questionId1 = requestQuestionCreate(token1, quizId1, initialQV2).questionId;
+  });
+
   // Error Checking
 
   test('Question Id does not refer to a valid question', () => {
@@ -477,7 +524,7 @@ describe('adminQuizQuestionDelete', () => {
     // QuestionId does not refer to a valid question in this quiz
     const quizId2 = requestQuizCreate(token1, 'New Quiz 2', '').quizId;
     const questionId2 = requestQuestionCreate(
-      token1, quizId2, finalQ
+      token1, quizId2, finalQV2
     ).questionId;
 
     expect(() => requestQuesDelete(
@@ -508,7 +555,9 @@ describe('adminQuizQuestionDelete', () => {
 
   test('Valid token is provided, but the user is unauthorised', () => {
     // Valid token is provided, but the user is unauthorised
-    const token2 = requestRegister('a@gmail.com', 'Val1Pass', 'fir', 'las').token;
+    const token2 = requestRegister(
+      'a@gmail.com', 'Val1Pass', 'fir', 'las'
+    ).token;
     expect(() => requestQuesDelete(
       token2, quizId1, questionId1
     )).toThrow(HTTPError[403]);
@@ -564,13 +613,14 @@ describe('adminQuizQuestionDelete', () => {
       description: '',
       numQuestions: 1,
       questions: [{
-        question: 'What is the first letter of the alphabet?',
+        question: initialQV2.question,
         duration: 10,
         points: 5,
         answers: [
           { answer: 'a', correct: true },
           { answer: 'b', correct: false }
-        ]
+        ],
+        thumbnailUrl: initialQV2.thumbnailUrl
       }],
       duration: 10
     });
@@ -578,7 +628,7 @@ describe('adminQuizQuestionDelete', () => {
 
   test('Updating, then deleting a question', () => {
     // Updating, then deleting a question
-    requestQuesUpdate(token1, quizId1, questionId1, finalQ);
+    requestQuesUpdate(token1, quizId1, questionId1, finalQV2);
     result = requestQuesDelete(token1, quizId1, questionId1);
     expect(Object.keys(result).length).toStrictEqual(0);
 
@@ -600,13 +650,31 @@ describe('adminQuizQuestionDelete', () => {
 /// /////////////////////////////// VERSION 1 ///////////////////////////////////
 /// /////////////////////////////////////////////////////////////////////////////
 
+beforeEach(() => {
+  // Clearing any previous data
+  requestClear();
+});
+
 describe('adminQuizQuestionUpdate', () => {
+  beforeEach(() => {
+    // Defining base data to be manipulated in the tests (Updated/Deleted)
+    token1 = requestRegister(
+      'am@gmail.com', 'Vl1dPass', 'fir', 'las', true
+    ).token;
+
+    quizId1 = requestQuizCreate(token1, 'New Quiz 1', '', true).quizId;
+
+    questionId1 = requestQuestionCreate(
+      token1, quizId1, initialQV1, true
+    ).questionId;
+  });
+
   // Error Checking
 
   test('QuestionId does not refer to a valid question', () => {
     // QuestionId does not refer to a valid question
     expect(() => requestQuesUpdate(
-      token1, quizId1, questionId1 + 1, finalQ, true
+      token1, quizId1, questionId1 + 1, finalQV1, true
     )).toThrow(HTTPError[400]);
   });
 
@@ -614,18 +682,18 @@ describe('adminQuizQuestionUpdate', () => {
     // QuestionId does not refer to a valid question in this quiz
     const quizId2 = requestQuizCreate(token1, 'New Quiz 2', '', true).quizId;
     const questionId2 = requestQuestionCreate(
-      token1, quizId2, finalQ, true
+      token1, quizId2, finalQV1, true
     ).questionId;
 
     expect(() => requestQuesUpdate(
-      token1, quizId1, questionId2, initialQ, true
+      token1, quizId1, questionId2, initialQV1, true
     )).toThrow(HTTPError[400]);
   });
 
   test('QuestionId is out of the valid range', () => {
     // QuestionId is out of the valid range
     expect(() => requestQuesUpdate(
-      token1, quizId1, 0, finalQ, true
+      token1, quizId1, 0, finalQV1, true
     )).toThrow(HTTPError[400]);
   });
 
@@ -646,8 +714,7 @@ describe('adminQuizQuestionUpdate', () => {
       token1,
       quizId1,
       questionId1,
-      questionBody(longQ),
-      true
+      questionBody(longQ)
     )).toThrow(HTTPError[400]);
   });
 
@@ -674,14 +741,14 @@ describe('adminQuizQuestionUpdate', () => {
   test('The question duration is not a positive number', () => {
     // The question duration is not a positive number
     expect(() => requestQuesUpdate(token1, quizId1, questionId1, questionBody(
-      undefined, -1
+      undefined, -1, undefined, undefined
     ), true)).toThrow(HTTPError[400]);
   });
 
   test('1 question duration is larger than 3 minutes', () => {
     // 1 question duration is larger than 3 minutes
     expect(() => requestQuesUpdate(token1, quizId1, questionId1, questionBody(
-      undefined, 181
+      undefined, 181, undefined, undefined
     ), true)).toThrow(HTTPError[400]);
   });
 
@@ -700,21 +767,21 @@ describe('adminQuizQuestionUpdate', () => {
     requestQuestionCreate(token1, quizId1, q6, true);
 
     expect(() => requestQuesUpdate(token1, quizId1, questionId1, questionBody(
-      undefined, 31
+      undefined, 31, undefined, undefined
     ), true)).toThrow(HTTPError[400]);
   });
 
   test('The points awarded for the question are less than 1', () => {
     // The points awarded for the question are less than 1
     expect(() => requestQuesUpdate(token1, quizId1, questionId1, questionBody(
-      undefined, undefined, -1
+      undefined, undefined, -1, undefined
     ), true)).toThrow(HTTPError[400]);
   });
 
   test('The points awarded for the question are greater than 10', () => {
     // The points awarded for the question are greater than 10
     expect(() => requestQuesUpdate(token1, quizId1, questionId1, questionBody(
-      undefined, undefined, 11
+      undefined, undefined, 11, undefined
     ), true)).toThrow(HTTPError[400]);
   });
 
@@ -772,14 +839,14 @@ describe('adminQuizQuestionUpdate', () => {
   test('Token is empty', () => {
     // Token is empty
     expect(() => requestQuesUpdate(
-      0, quizId1, questionId1, finalQ, true
+      0, quizId1, questionId1, finalQV1, true
     )).toThrow(HTTPError[401]);
   });
 
   test('Token does not refer to valid logged in user session', () => {
     // Token does not refer to valid logged in user session
     expect(() => requestQuesUpdate(
-      token1 + 1, quizId1, questionId1, finalQ, true
+      token1 + 1, quizId1, questionId1, finalQV1, true
     )).toThrow(HTTPError[401]);
   });
 
@@ -789,14 +856,14 @@ describe('adminQuizQuestionUpdate', () => {
       'a@gmail.com', 'Val1Pass', 'fir', 'las', true
     ).token;
     expect(() => requestQuesUpdate(
-      token2, quizId1, questionId1, finalQ, true
+      token2, quizId1, questionId1, finalQV1, true
     )).toThrow(HTTPError[403]);
   });
 
   test('Valid token is provided, but the quiz is invalid', () => {
     // Valid token is provided, but the user is unauthorised
     expect(() => requestQuesUpdate(
-      token1, quizId1 + 1, questionId1, finalQ, true
+      token1, quizId1 + 1, questionId1, finalQV1, true
     )).toThrow(HTTPError[403]);
   });
 
@@ -805,14 +872,14 @@ describe('adminQuizQuestionUpdate', () => {
     requestRegister('a@gmail.com', 'Val1Pass', 'fir', 'las', true);
     requestQuizTransfer(token1, quizId1, 'a@gmail.com', true);
     expect(() => requestQuesUpdate(
-      token1, quizId1, questionId1, finalQ, true
+      token1, quizId1, questionId1, finalQV1, true
     )).toThrow(HTTPError[403]);
   });
 
   // Valid Cases
   test('Checking a simple case of restructuring a question', () => {
     // Checking a simple case of restructuring a question
-    result = requestQuesUpdate(token1, quizId1, questionId1, finalQ, true);
+    result = requestQuesUpdate(token1, quizId1, questionId1, finalQV1, true);
     expect(Object.keys(result).length).toStrictEqual(0);
 
     const info = requestQuizInfo(token1, quizId1, true);
@@ -839,9 +906,9 @@ describe('adminQuizQuestionUpdate', () => {
 
   test('Updating the same question multiple times', () => {
     // Updating multiple times
-    requestQuesUpdate(token1, quizId1, questionId1, finalQ, true);
-    requestQuesUpdate(token1, quizId1, questionId1, initialQ, true);
-    result = requestQuesUpdate(token1, quizId1, questionId1, finalQ, true);
+    requestQuesUpdate(token1, quizId1, questionId1, finalQV1, true);
+    requestQuesUpdate(token1, quizId1, questionId1, initialQV1, true);
+    result = requestQuesUpdate(token1, quizId1, questionId1, finalQV1, true);
     expect(Object.keys(result).length).toStrictEqual(0);
 
     const info = requestQuizInfo(token1, quizId1, true);
@@ -868,9 +935,9 @@ describe('adminQuizQuestionUpdate', () => {
 
   test('Moving, then updating', () => {
     // Moving, then updating
-    const question2 = requestQuestionCreate(token1, quizId1, initialQ, true);
+    const question2 = requestQuestionCreate(token1, quizId1, initialQV1, true);
     requestQuesMove(token1, 1, questionId1, quizId1, true);
-    result = requestQuesUpdate(token1, quizId1, questionId1, finalQ, true);
+    result = requestQuesUpdate(token1, quizId1, questionId1, finalQV1, true);
     expect(Object.keys(result).length).toStrictEqual(0);
 
     const info = requestQuizInfo(token1, quizId1, true);
@@ -883,7 +950,7 @@ describe('adminQuizQuestionUpdate', () => {
       numQuestions: 2,
       questions: [{
         questionId: question2.questionId,
-        question: 'What is the first letter of the alphabet?',
+        question: initialQV1.question,
         duration: 10,
         points: 5,
         answers: [
@@ -912,8 +979,8 @@ describe('adminQuizQuestionUpdate', () => {
 
     if ('questionId' in question2) {
       const questionId2 = question2.questionId;
-      requestQuesUpdate(token1, quizId1, questionId1, finalQ, true);
-      requestQuesUpdate(token1, quizId1, questionId2, finalQ, true);
+      requestQuesUpdate(token1, quizId1, questionId1, finalQV1, true);
+      requestQuesUpdate(token1, quizId1, questionId2, finalQV1, true);
       expect(Object.keys(result).length).toStrictEqual(0);
 
       const info = requestQuizInfo(token1, quizId1, true);
@@ -976,6 +1043,19 @@ describe('adminQuizQuestionUpdate', () => {
 });
 
 describe('adminQuizQuestionDelete', () => {
+  beforeEach(() => {
+    // Defining base data to be manipulated in the tests (Updated/Deleted)
+    token1 = requestRegister(
+      'am@gmail.com', 'Vl1dPass', 'fir', 'las', true
+    ).token;
+
+    quizId1 = requestQuizCreate(token1, 'New Quiz 1', '', true).quizId;
+
+    questionId1 = requestQuestionCreate(
+      token1, quizId1, initialQV1, true
+    ).questionId;
+  });
+
   // Error Checking
 
   test('Question Id does not refer to a valid question', () => {
@@ -997,7 +1077,7 @@ describe('adminQuizQuestionDelete', () => {
     // QuestionId does not refer to a valid question in this quiz
     const quizId2 = requestQuizCreate(token1, 'New Quiz 2', '', true).quizId;
     const questionId2 = requestQuestionCreate(
-      token1, quizId2, finalQ, true
+      token1, quizId2, finalQV1, true
     ).questionId;
 
     expect(() => requestQuesDelete(
@@ -1087,7 +1167,7 @@ describe('adminQuizQuestionDelete', () => {
       description: '',
       numQuestions: 1,
       questions: [{
-        question: 'What is the first letter of the alphabet?',
+        question: initialQV1.question,
         duration: 10,
         points: 5,
         answers: [
@@ -1101,7 +1181,7 @@ describe('adminQuizQuestionDelete', () => {
 
   test('Updating, then deleting a question', () => {
     // Updating, then deleting a question
-    requestQuesUpdate(token1, quizId1, questionId1, finalQ, true);
+    requestQuesUpdate(token1, quizId1, questionId1, finalQV1, true);
     result = requestQuesDelete(token1, quizId1, questionId1, true);
     expect(Object.keys(result).length).toStrictEqual(0);
 

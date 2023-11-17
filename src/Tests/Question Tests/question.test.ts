@@ -12,6 +12,17 @@ import HTTPError from 'http-errors';
 /// //////////////////////////////// Tests /////////////////////////////////////
 /// ////////////////////////////////////////////////////////////////////////////
 
+// Defining base urls
+const validUrl = 'https://image.jpg';
+const validUrl2 = 'http://image.jpeg';
+const validUrl3 = 'http://image.png';
+
+const invalidType = 'https://image.gif';
+const invalidType2 = 'https://en.wikipedia.org/wiki/Food';
+const invalidFile1 = 'htp://ThisIsCompletelyInvalid.jpg';
+const invalidFile2 = 'htt://ThisIsCompletelyInvalid.png';
+
+// Defining other base data
 const invalidUser = 10000;
 const quizId = -4123214;
 const invlalidQuestion1 = 'asdf';
@@ -19,149 +30,60 @@ const invlalidQuestion2 = 'qweasdzsfhkngkujdfhgujklhgjbfrtyfghvbnsadsafsafsafc';
 const questionString = 'How to call a person without a body and a nose?';
 
 const answers = [
-  {
-    answer: 'Nobody Knows',
-    correct: true
-  },
-  {
-    answer: 'Onebody Knows',
-    correct: false
-  }
+  { answer: 'Nobody Knows', correct: true },
+  { answer: 'Onebody Knows', correct: false }
 ];
 
 const answers2 = [
-  {
-    answer: 'Nobody Knows',
-    correct: true
-  },
-  {
-    answer: 'Onebody Knows',
-    correct: false
-  },
-  {
-    answer: 'Twobody Knows',
-    correct: true
-  },
-  {
-    answer: 'Threebody Knows',
-    correct: false
-  }
+  { answer: 'Nobody Knows', correct: true },
+  { answer: 'Onebody Knows', correct: false },
+  { answer: 'Twobody Knows', correct: true },
+  { answer: 'Threebody Knows', correct: false }
 ];
 
 const invalidAnswerLength1 = [
-  {
-    answer: 'Nobody Knows',
-    correct: true
-  }
+  { answer: 'Nobody Knows', correct: true }
 ];
 
 const invalidAnswerLength2 = [
-  {
-    answer: 'Nobody Knows',
-    correct: true
-  },
-  {
-    answer: 'Onebody Knows',
-    correct: false
-  },
-  {
-    answer: 'Twobody Knows',
-    correct: false
-  },
-  {
-    answer: 'Threebody Knows',
-    correct: false
-  },
-  {
-    answer: 'Fourbody Knows',
-    correct: false
-  },
-  {
-    answer: 'Fivebody Knows',
-    correct: false
-  },
-  {
-    answer: 'Sixbody Knows',
-    correct: false
-  }
+  { answer: 'Nobody Knows', correct: true },
+  { answer: 'Onebody Knows', correct: false },
+  { answer: 'Twobody Knows', correct: false },
+  { answer: 'Threebody Knows', correct: false },
+  { answer: 'Fourbody Knows', correct: false },
+  { answer: 'Fivebody Knows', correct: false },
+  { answer: 'Sixbody Knows', correct: false }
 ];
 
 const answersInvliadStringLength1 = [
-  {
-    answer: 'Nobody Knows',
-    correct: true
-  },
-  {
-    answer: '',
-    correct: false
-  },
-  {
-    answer: 'Twobody Knows',
-    correct: false
-  },
-  {
-    answer: 'Threebody Knows',
-    correct: false
-  }
+  { answer: 'Nobody Knows', correct: true },
+  { answer: '', correct: false },
+  { answer: 'Twobody Knows', correct: false },
+  { answer: 'Threebody Knows', correct: false }
 ];
 
 const answersInvliadStringLength2 = [
-  {
-    answer: 'Nobody Knows',
-    correct: true
-  },
-  {
-    answer: 'Onebody Knows',
-    correct: false
-  },
-  {
-    answer: 'Twobody Knows',
-    correct: false
-  },
-  {
-    answer: 'Threebody Knowsssssssssssssssss',
-    correct: false
-  }
+  { answer: 'Nobody Knows', correct: true },
+  { answer: 'Onebody Knows', correct: false },
+  { answer: 'Twobody Knows', correct: false },
+  { answer: 'Threebody Knowsssssssssssssssss', correct: false }
 ];
 
 const answersDuplicateAnswers = [
-  {
-    answer: 'Nobody Knows',
-    correct: true
-  },
-  {
-    answer: 'Onebody Knows',
-    correct: false
-  },
-  {
-    answer: 'Nobody Knows',
-    correct: false
-  },
-  {
-    answer: 'Threebody Knows',
-    correct: false
-  }
+  { answer: 'Nobody Knows', correct: true },
+  { answer: 'Onebody Knows', correct: false },
+  { answer: 'Nobody Knows', correct: false },
+  { answer: 'Threebody Knows', correct: false }
 ];
 
 const answersNoCorrect = [
-  {
-    answer: 'Nobody Knows',
-    correct: false
-  },
-  {
-    answer: 'Onebody Knows',
-    correct: false
-  },
-  {
-    answer: 'Twobody Knows',
-    correct: false
-  },
-  {
-    answer: 'Threebody Knows',
-    correct: false
-  }
+  { answer: 'Nobody Knows', correct: false },
+  { answer: 'Onebody Knows', correct: false },
+  { answer: 'Twobody Knows', correct: false },
+  { answer: 'Threebody Knows', correct: false }
 ];
 
+// Question bodies for version 1
 const questionBody = {
   question: questionString,
   duration: 60,
@@ -197,9 +119,88 @@ const questionBodyInvalidPoint2 = {
   answers: answers,
 };
 
-beforeEach(() => {
-  requestClear();
-});
+// Question bodies for version 2
+const questionBodyV2 = {
+  question: questionString,
+  duration: 60,
+  points: 5,
+  answers: answers,
+  thumbnailUrl: validUrl
+};
+
+const questionBody2V2 = {
+  question: questionString,
+  duration: 30,
+  points: 7,
+  answers: answers2,
+  thumbnailUrl: validUrl2
+};
+
+const questionBody3V2 = {
+  question: questionString,
+  duration: 30,
+  points: 7,
+  answers: answers2,
+  thumbnailUrl: validUrl3
+};
+
+const questionBodyNegativeDurationV2 = {
+  question: questionString,
+  duration: -1,
+  points: 5,
+  answers: answers,
+  thumbnailUrl: validUrl3
+};
+
+const questionBodyInvalidPoint1V2 = {
+  question: questionString,
+  duration: 60,
+  points: 0,
+  answers: answers,
+  thumbnailUrl: validUrl
+};
+
+const questionBodyInvalidPoint2V2 = {
+  question: questionString,
+  duration: 60,
+  points: 11,
+  answers: answers,
+  thumbnailUrl: validUrl2
+};
+
+const questionBodyInvFile1V2 = {
+  question: questionString,
+  duration: 60,
+  points: 5,
+  answers: answers,
+  thumbnailUrl: invalidFile1
+};
+
+const questionBodyInvFile2V2 = {
+  question: questionString,
+  duration: 60,
+  points: 5,
+  answers: answers,
+  thumbnailUrl: invalidFile2
+};
+
+const questionBodyInvType1V2 = {
+  question: questionString,
+  duration: 30,
+  points: 7,
+  answers: answers2,
+  thumbnailUrl: invalidType
+};
+
+const questionBodyInvType2V2 = {
+  question: questionString,
+  duration: 30,
+  points: 7,
+  answers: answers2,
+  thumbnailUrl: invalidType2
+};
+
+beforeEach(() => { requestClear(); });
 
 /// /////////////////////////////////////////////////////////////////////////////
 /// /////////////////////////////// VERSION 2 ///////////////////////////////////
@@ -210,7 +211,7 @@ describe('questionCreate', () => {
     test('token is not a valid user', () => {
       // token is not an integer
       expect(() => requestQuestionCreate(
-        invalidUser, quizId, questionBody
+        invalidUser, quizId, questionBodyV2
       )).toThrow(HTTPError[401]);
     });
 
@@ -220,7 +221,7 @@ describe('questionCreate', () => {
       ).token;
 
       expect(() => requestQuestionCreate(
-        token1, quizId, questionBody
+        token1, quizId, questionBodyV2
       )).toThrow(HTTPError[403]);
     });
 
@@ -238,7 +239,7 @@ describe('questionCreate', () => {
       ).quizId;
 
       expect(() => requestQuestionCreate(
-        token1, quizId1, questionBody
+        token1, quizId1, questionBodyV2
       )).toThrow(HTTPError[403]);
     });
   });
@@ -306,26 +307,26 @@ describe('questionCreate', () => {
 
     test('The question duration is not a positive number', () => {
       expect(() => requestQuestionCreate(
-        token1, quizId1, questionBodyNegativeDuration
+        token1, quizId1, questionBodyNegativeDurationV2
       )).toThrow(HTTPError[400]);
     });
 
     test('The sum of the question durations exceeds 3 minutes', () => {
       // question body has a length of 60 seconds
       for (let i = 0; i < 3; i++) {
-        requestQuestionCreate(token1, quizId1, questionBody);
+        requestQuestionCreate(token1, quizId1, questionBodyV2);
       }
 
       // This will tip it up from 180 seconds.
       expect(() => requestQuestionCreate(
-        token1, quizId1, questionBody
+        token1, quizId1, questionBodyV2
       )).toThrow(HTTPError[400]);
     });
 
     test('Sum of the question durations will be 181 seconds', () => {
       // question body has a length of 60 seconds
       for (let i = 0; i < 3; i++) {
-        requestQuestionCreate(token1, quizId1, questionBody);
+        requestQuestionCreate(token1, quizId1, questionBodyV2);
       }
 
       expect(() => requestQuestionCreate(token1, quizId1, {
@@ -341,13 +342,13 @@ describe('questionCreate', () => {
 
     test('The points awarded for the question are less than 1', () => {
       expect(() => requestQuestionCreate(
-        token1, quizId1, questionBodyInvalidPoint1
+        token1, quizId1, questionBodyInvalidPoint1V2
       )).toThrow(HTTPError[400]);
     });
 
     test('The points awarded for the question are greater than 10', () => {
       expect(() => requestQuestionCreate(
-        token1, quizId1, questionBodyInvalidPoint2
+        token1, quizId1, questionBodyInvalidPoint2V2
       )).toThrow(HTTPError[400]);
     });
 
@@ -398,6 +399,44 @@ describe('questionCreate', () => {
         token1, quizId1, question
       )).toThrow(HTTPError[400]);
     });
+
+    // Error 400: The thumbnailUrl is an empty string
+    test('Error 400: The thumbnailUrl is an empty string', () => {
+      const question = {
+        question: questionString,
+        duration: 60,
+        points: 5,
+        answers: answers,
+        thumbnailUrl: ''
+      };
+
+      expect(() => requestQuestionCreate(
+        token1, quizId1, question
+      )).toThrow(HTTPError[400]);
+    });
+
+    // Error 400: The thumbnailUrl is not jpg, jpeg, or png
+    test('Error 400: The thumbnailUrl is not jpg, jpeg, or png', () => {
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBodyInvType1V2
+      )).toThrow(HTTPError[400]);
+
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBodyInvType2V2
+      )).toThrow(HTTPError[400]);
+    });
+
+    // Error 400: The thumbnailUrl does not begin with 'http://' or 'https://'
+    test('Error 400: The thumbnailUrl does not begin with \'http://\' or ' +
+         '\'https://\'', () => {
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBodyInvFile1V2
+      )).toThrow(HTTPError[400]);
+
+      expect(() => requestQuestionCreate(
+        token1, quizId1, questionBodyInvFile2V2
+      )).toThrow(HTTPError[400]);
+    });
   });
 
   describe('VALID Tests', () => {
@@ -411,13 +450,13 @@ describe('questionCreate', () => {
     });
 
     test('return question id', () => {
-      const result = requestQuestionCreate(token1, quizId1, questionBody);
+      const result = requestQuestionCreate(token1, quizId1, questionBodyV2);
       expect(result).toMatchObject({ questionId: expect.any(Number) });
     });
 
     test('return unique question id', () => {
-      const result = requestQuestionCreate(token1, quizId1, questionBody);
-      const result2 = requestQuestionCreate(token1, quizId1, questionBody2);
+      const result = requestQuestionCreate(token1, quizId1, questionBodyV2);
+      const result2 = requestQuestionCreate(token1, quizId1, questionBody2V2);
       expect(result).not.toMatchObject(result2);
     });
 
@@ -425,7 +464,34 @@ describe('questionCreate', () => {
       const questionId = requestQuestionCreate(
         token1,
         quizId1,
-        questionBody
+        questionBodyV2
+      ).questionId;
+
+      const result = requestQuizInfo(token1, quizId1);
+
+      expect(result.questions[0].questionId).toStrictEqual(questionId);
+      expect(result.questions[0].question).toStrictEqual(questionString);
+      expect(result.questions[0].duration).toStrictEqual(60);
+      expect(result.questions[0].points).toStrictEqual(5);
+      expect(result.questions[0].answers.length).toStrictEqual(2);
+    });
+
+    test('return question id', () => {
+      const result = requestQuestionCreate(token1, quizId1, questionBody2V2);
+      expect(result).toMatchObject({ questionId: expect.any(Number) });
+    });
+
+    test('return unique question id', () => {
+      const result = requestQuestionCreate(token1, quizId1, questionBody2V2);
+      const result2 = requestQuestionCreate(token1, quizId1, questionBody3V2);
+      expect(result).not.toMatchObject(result2);
+    });
+
+    test('successfully create the question with correct infos', () => {
+      const questionId = requestQuestionCreate(
+        token1,
+        quizId1,
+        questionBodyV2
       ).questionId;
 
       const result = requestQuizInfo(token1, quizId1);

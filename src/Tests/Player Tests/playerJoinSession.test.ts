@@ -84,7 +84,8 @@ const questionBody = {
     { answer: 'b', correct: false },
     { answer: 'c', correct: false },
     { answer: 'd', correct: false }
-  ]
+  ],
+  thumbnailUrl: 'https://ThisIsSomehowValid.jpeg'
 };
 
 // Defining variables to be used later

@@ -425,7 +425,7 @@ function adminQuizEmptyTrash(token: number, quizId: number[]):
 }
 
 /** adminQuizUpdateImageURL
-  * Updates the quiz's thumbnail URL, assuming the ingURL is valid
+  * Updates the quiz's thumbnail URL, assuming the imgURL is valid
   *
   * @param { number } token - The user's token
   * @param { number } quizId - The quizId for which the thumnail needs changing

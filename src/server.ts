@@ -321,12 +321,6 @@ app.get('/v2/admin/quiz/list', (req: Request, res: Response) => {
   res.json(adminQuizList(token));
 });
 
-// adminQuizTrash
-app.get('/v2/admin/quiz/trash', (req: Request, res: Response) => {
-  const token = parseInt(req.headers.token as string);
-  res.json(adminQuizTrash(token));
-});
-
 // adminQuizEmptyTrash
 app.delete('/v2/admin/quiz/trash/empty', (req: Request, res: Response) => {
   const token = parseInt(req.headers.token as string);
@@ -379,13 +373,6 @@ app.post('/v2/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
 
   res.json(adminQuizRestore(token, quizId));
   backupData();
-});
-
-// adminQuizRestore
-app.post('/v2/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
-  const token = parseInt(req.headers.token as string);
-  const quizId = parseInt(req.params.quizid);
-  res.json(adminQuizRestore(token, quizId));
 });
 
 // ====================================================================
@@ -471,6 +458,9 @@ app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const token = parseInt(req.headers.token as string);
 
+  // So that the same function works for both v1 and v2
+  if (!questionBody.thumbnailUrl) questionBody.thumbnailUrl = 'Invalid';
+
   res.json(adminQuestionCreate(token, quizId, questionBody));
   backupData();
 });
@@ -482,6 +472,9 @@ app.put('/v2/admin/quiz/:quizid/question/:questionid',
     const quizId = parseInt(req.params.quizid);
     const { questionBody } = req.body;
     const token = parseInt(req.headers.token as string);
+
+    // So that the same function works for both v1 and v2
+    if (!questionBody.thumbnailUrl) questionBody.thumbnailUrl = 'Invalid';
 
     res.json(updateQuestion(token, quizId, questionId, questionBody));
     backupData();
