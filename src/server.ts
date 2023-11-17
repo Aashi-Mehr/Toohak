@@ -292,24 +292,24 @@ app.post('/v1/admin/quiz/:quizid/session/start',
 
 app.get('/v1/admin/quiz/:quizid/session/:sessionid',
   (req: Request, res: Response) => {
-  const quizId = parseInt(req.params.quizid);
-  const sessionId = parseInt(req.params.sessionid);
-  const token = parseInt(req.headers.token as string);
+    const quizId = parseInt(req.params.quizid);
+    const sessionId = parseInt(req.params.sessionid);
+    const token = parseInt(req.headers.token as string);
 
-  res.json(quizGetSession(quizId, sessionId, token));
-  backupData();
-});
+    res.json(quizGetSession(quizId, sessionId, token));
+    backupData();
+  });
 
 app.put('/v1/admin/quiz/:quizid/session/:sessionid',
   (req: Request, res: Response) => {
-  const token = parseInt(req.headers.token as string);
-  const quizId = parseInt(req.params.quizid);
-  const sessionId = parseInt(req.params.sessionid);
-  const action = req.body.action;
+    const token = parseInt(req.headers.token as string);
+    const quizId = parseInt(req.params.quizid);
+    const sessionId = parseInt(req.params.sessionid);
+    const action = req.body.action;
 
-  res.json(adminQuizSessionUpdate(quizId, sessionId, token, action));
-  backupData();
-});
+    res.json(adminQuizSessionUpdate(quizId, sessionId, token, action));
+    backupData();
+  });
 
 // ====================================================================
 //  ========================= QUIZ FUNCTIONS =========================

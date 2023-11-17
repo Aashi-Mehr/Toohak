@@ -13,8 +13,6 @@ import {
   noQs400,
   tooMany400,
   ErrorObject,
-  getSession,
-  inval400,
   cantAct400,
   sessionStatus,
   getQuizSession
@@ -133,7 +131,6 @@ export function adminQuizSessionUpdate(quizId: number, sessionId: number,
 
       return { };
     }
-
   } else if (action === 'SKIP_COUNTDOWN') {
     // Action : skip_countdown
 
@@ -204,11 +201,10 @@ export function adminQuizSessionUpdate(quizId: number, sessionId: number,
   * @param { number } quizId - The quizId of the quiz that's being started
   * @param { number } sessionId - The session id of an active session within the quiz
   *
-  * @returns { Record<string, never>  } - If the details given are valid
-  * @returns { ErrorObject } - If the details given are invalid
+  * @returns { sessionStatus } - If the details given are valid
   */
-export function quizGetSession(quizId: number, sessionId: number, token: number):
-sessionStatus {
+export function quizGetSession(quizId: number, sessionId: number,
+  token: number): sessionStatus {
   // Error 401 : Checking if user exists
   const user = getUser(token, getData());
   if (!user) throw HTTPError(401, token401);
@@ -254,7 +250,7 @@ sessionStatus {
 
   return {
     state: session.state,
-    atQuestion: 3,
+    atQuestion: session.atQuestion,
     players: playersInSession,
     metadata: {
       quizId: quiz.quizId,
