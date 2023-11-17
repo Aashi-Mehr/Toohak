@@ -103,6 +103,12 @@ app.get('/echo', (req: Request, res: Response) => {
 
 // KV Data
 app.get('/data', async (req: Request, res: Response) => {
+  await database.hset("data:forum", {
+    users: [],
+    quizzes: [],
+    sessions: [],
+    quizSessions: []
+  });
   const data = await database.hgetall('data:forum');
   res.status(200).json({data: data});
 });
