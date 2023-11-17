@@ -14,17 +14,23 @@
 //
 // clear (parameters: void(); return: empty{})
 // Reset state of the application back to the start
-import { setData } from './dataStore';
+import { getData, setData } from './dataStore';
 
 function clear(): Record<string, never> {
+  // Need to clear the timers
+  for (const session of getData().quizSessions) {
+    for (const timer of session.timers) {
+      clearTimeout(timer);
+    }
+  }
+
+  // Setting the rest of the data to be clear
   setData({
     users: [],
     quizzes: [],
     sessions: [],
     quizSessions: []
   });
-
-  // Need to clear the timers
 
   return { };
 }
