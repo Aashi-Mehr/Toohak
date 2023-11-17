@@ -593,6 +593,27 @@ export function requestQuizSessionStart(token: number, quizId: number,
   return result;
 }
 
+// PUT SESSION UPDATE Define Wrapper Function
+export function requestQuizSessionUpdate(quizId: number, sessionId: number,
+  token: number, action: string): ErrorObject | Record<string, never> {
+  const res = request(
+    'PUT',
+    SERVER_URL + '/v1/admin/quiz/' + quizId + '/session/' + sessionId,
+    {
+      headers: { token: token.toString() },
+      json: { action: action }
+    }
+  );
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
+}
+
 // ====================================================================
 //  ======================= QUESTION FUNCTIONS =======================
 // ====================================================================

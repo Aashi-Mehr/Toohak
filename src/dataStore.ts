@@ -52,6 +52,9 @@ const newPass400 = 'Old Password and New Password match exactly';
 const auto400 = 'autoStartNum is a number greater than 50';
 const tooMany400 = 'A maximum of 10 sessions not in END state currently exist';
 const noQs400 = 'The quiz does not have any questions in it';
+const unactive400 = 'Session Id does not refer to a valid session within this quiz';
+const invalAct400 = 'Action provided in not a valid action';
+const cantAct400 = 'Action cannot be applied in current state';
 
 // Player errors
 const playerId400 = 'Player ID does not exist';
@@ -66,47 +69,47 @@ const invImg400 = 'When fetched, the URL doesn\'t return a valid file or type' +
 // ENUM States
 export enum SessionState {
   // Players can join in this state, and nothing has started
-  LOBBY = 'lobby',
+  LOBBY = 'LOBBY',
 
   // This is the question countdown period. It always exists before a question
   // is open and the frontend makes the request to move to the open state
-  QUESTION_COUNTDOWN = 'question_countdown',
+  QUESTION_COUNTDOWN = 'QUESTION_COUNTDOWN',
 
   // This is when players can see the question and answers, and submit their
   // answers (as many times as they like)
-  QUESTION_OPEN = 'question_open',
+  QUESTION_OPEN = 'QUESTION_OPEN',
 
   // This is when players can still see the question answers, but cannot submit
-  QUESTION_CLOSE = 'question_close',
+  QUESTION_CLOSE = 'QUESTION_CLOSE',
 
   // This is when players can see the correct answer, as well as everyone
   // playings' performance in that question, whilst they typically wait to go to
   // the next countdown
-  ANSWER_SHOW = 'answer_show',
+  ANSWER_SHOW = 'ANSWER_SHOW',
 
   // This is where the final results are displayed for all players and questions
-  FINAL_RESULTS = 'final_results',
+  FINAL_RESULTS = 'FINAL_RESULTS',
 
   // The game is now over and inactive
-  END = 'end'
+  END = 'END'
 }
 
 // ENUM Actions
 export enum Actions {
   // Move onto the countdown for the next question
-  NEXT_QUESTION = 'next_question',
+  NEXT_QUESTION = 'NEXT_QUESTIONS',
 
   // This is how to skip the question countdown period immediately.
-  SKIP_COUNTDOWN = 'skip_countdown',
+  SKIP_COUNTDOWN = 'SKIP_COUNTDOWN',
 
   // Go straight to the next most immediate answers show state
-  GO_TO_ANSWER = 'go_to_answer',
+  GO_TO_ANSWER = 'GO_TO_ANSWER',
 
   // Go straight to the final results state
-  GO_TO_FINAL_RESULTS = 'go_to_final_results',
+  GO_TO_FINAL_RESULTS = 'GO_TO_FINAL_RESULTS',
 
   // Go straight to the END state
-  END = 'end'
+  END = 'END'
 }
 
 // INTERFACES Other
@@ -247,10 +250,7 @@ interface QuizSessionAdd {
   quiz: QuizAdd,
   players: QuizSessionPlayer[],
   messages: Message[],
-  timers: {
-    countdown: ReturnType<typeof setTimeout>[],
-    open: ReturnType<typeof setTimeout>[]
-  }
+  timers: ReturnType<typeof setTimeout>[]
 }
 
 interface PlayerId {
@@ -474,6 +474,12 @@ function getUniqueID(allData: Datastore): number {
   return allIds[randomPos];
 }
 
+// Sleep Sync function
+const sleepSync = (ms: number) => {
+  const StartTime = new Date().getTime();
+  while (new Date().getTime() - StartTime < ms) { /* zzzZZ */ }
+};
+
 export {
   getData,
   setData,
@@ -542,5 +548,9 @@ export {
   message400,
   invImg400,
   playerName400,
-  playerJoin400
+  playerJoin400,
+  sleepSync,
+  unactive400,
+  invalAct400,
+  cantAct400,
 };

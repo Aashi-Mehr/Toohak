@@ -14,7 +14,7 @@ import data from '../data.json';
 
 import { clear } from './other';
 import { getData, setData } from './dataStore';
-import { quizSessionStart } from './sessions';
+import { adminQuizSessionUpdate, quizSessionStart } from './sessions';
 
 import {
   adminAuthLogin,
@@ -282,6 +282,17 @@ app.post('/v1/admin/quiz/:quizid/session/start',
     const autoStart = parseInt(req.body.autoStartNum);
 
     res.json(quizSessionStart(token, quizId, autoStart));
+    backupData();
+  });
+
+app.put('/v1/admin/quiz/:quizid/session/:sessionid',
+  (req: Request, res: Response) => {
+    const token = parseInt(req.headers.token as string);
+    const quizId = parseInt(req.params.quizid);
+    const sessionId = parseInt(req.params.sessionid);
+    const action = req.body.action;
+
+    res.json(adminQuizSessionUpdate(quizId, sessionId, token, action));
     backupData();
   });
 
