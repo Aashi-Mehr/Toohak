@@ -9,7 +9,8 @@ import {
   requestQuestionCreate,
   requestPlayerJoin,
   requestPlayerChat,
-  requestPlayerMessage
+  requestPlayerMessage,
+  requestQuizSessionUpdate
 } from '../testHelper';
 
 import HTTPError from 'http-errors';
@@ -84,7 +85,8 @@ const questionBody = {
     { answer: 'b', correct: false },
     { answer: 'c', correct: false },
     { answer: 'd', correct: false }
-  ]
+  ],
+  thumbnailUrl: 'https://ThisIsSomehowValid.jpeg'
 };
 
 // Defining variables to be used later
@@ -115,14 +117,11 @@ describe('Error Cases', () => {
 
   // Error 400: Session is not in LOBBY state
   test('Error 400: Session is not in LOBBY state', () => {
-    // requestUpdateSessionState(token, quizId, quizSessionId, "NEXT_QUESTION");
+    requestQuizSessionUpdate(quizId, quizSessionId, token, 'NEXT_QUESTION');
 
-    // expect(() => requestPlayerJoin(
-    //   quizSessionId, "Name1"
-    // )).toThrow(HTTPError[400]);
-
-    // Uncomment after requestUpdateSessionState is created
-    expect(1 + 1).toStrictEqual(2);
+    expect(() => requestPlayerJoin(
+      quizSessionId, 'Name1'
+    )).toThrow(HTTPError[400]);
   });
 
   // Error 400: Session is not in LOBBY state

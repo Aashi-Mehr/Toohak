@@ -120,7 +120,8 @@ export function playerJoinSession(sessionId: number, name: string): PlayerId {
   // Adding player to session
   quizSess.players.push({
     name: name,
-    playerId: playerId
+    playerId: playerId,
+    answers: []
   });
 
   return { playerId: playerId };

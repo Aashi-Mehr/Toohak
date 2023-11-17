@@ -2,17 +2,18 @@ import HTTPError from 'http-errors';
 import {
   QuizSessionId,
   SessionState,
-  auto400,
   getData,
   getQuiz,
-  getUniqueID,
   getUser,
-  noQs400,
-  token401,
-  tooMany400,
+  getUniqueID,
   unauth403,
-  getSession,
   unactive400,
+  token401,
+  auto400,
+  noQs400,
+  tooMany400,
+  ErrorObject,
+  getSession,
   inval400,
   cantAct400,
   sessionStatus,
@@ -65,11 +66,135 @@ export function quizSessionStart(token: number, quizId: number,
     atQuestion: 1,
     quiz: quiz,
     players: [],
-    messages: []
+    messages: [],
+    timers: []
   });
 
   // Return sessionId object
   return { sessionId: sessionId };
+}
+
+/** adminQuizSessionUpdate
+  * Update the state of a particular session by sending an action command
+  *
+  * @param { number } token - The token of the user starting the session
+  * @param { number } quizId - The quizId of the quiz that's being started
+  * @param { number } sessionId - The session id of an active session within the quiz
+  * @param { string } action - Action enum to change the state
+  *
+  * @returns { Record<string, never>  } - If the details given are valid
+  * @returns { ErrorObject } - If the details given are invalid
+  */
+export function adminQuizSessionUpdate(quizId: number, sessionId: number,
+  token: number, action: string): ErrorObject | Record<string, never> {
+  action = action.toUpperCase();
+
+  // Error 401 : Checking if user exists
+  const user = getUser(token, getData());
+  if (!user) throw HTTPError(401, token401);
+
+  // Error 403 : Check if quizId is valid
+  const quiz = getQuiz(quizId, getData().quizzes);
+  if (!quiz || quiz.authId !== user.authUserId) {
+    throw HTTPError(403, unauth403);
+  }
+
+  // Loop through the quiz to find valid active session
+  // Error 400 : Invalid or unactive session id
+  const session = getQuizSession(sessionId, getData().quizSessions);
+  if (!session ||
+      session.quiz.quizId !== quizId ||
+      session.state === SessionState.END) {
+    throw HTTPError(400, unactive400);
+  }
+
+  // Update the session state based on the action given
+  if (action === 'END') {
+    // Action : End - Change session state to end
+    session.state = SessionState.END;
+    return { };
+  } else if (action === 'NEXT_QUESTION') {
+    // Action : next_question
+
+    // player must be in lobby, question close or answer show
+    if (session.state === SessionState.LOBBY ||
+        session.state === SessionState.QUESTION_CLOSE ||
+        session.state === SessionState.ANSWER_SHOW) {
+      // change session state to question countdown
+      session.state = SessionState.QUESTION_COUNTDOWN;
+
+      // Set a 3 second timer which will move to question_open
+      const countdownTimer = setTimeout(() => {
+        adminQuizSessionUpdate(quizId, sessionId, token, 'SKIP_COUNTDOWN');
+      }, 3000);
+
+      // Add that to timers
+      session.timers.push(countdownTimer);
+
+      return { };
+    }
+
+  } else if (action === 'SKIP_COUNTDOWN') {
+    // Action : skip_countdown
+
+    // player must be in question countdown
+    if (session.state === SessionState.QUESTION_COUNTDOWN) {
+      // Remove timers
+      while (session.timers.length > 0) {
+        clearTimeout(session.timers[0]);
+        session.timers.splice(0, 1);
+      }
+
+      // Switch state to QUESTION_OPEN
+      session.state = SessionState.QUESTION_OPEN;
+
+      // At question open, a timer to get to question_close starts
+      const duration = quiz.questions[session.atQuestion - 1].duration;
+      const openTimer = setTimeout(() => {
+        session.state = SessionState.QUESTION_CLOSE;
+
+        // Remove timers
+        while (session.timers.length > 0) {
+          clearTimeout(session.timers[0]);
+          session.timers.splice(0, 1);
+        }
+      }, duration * 1000);
+
+      // Add that to timers
+      session.timers.push(openTimer);
+
+      return { };
+    }
+  } else if (action === 'GO_TO_ANSWER') {
+    // Action : go_to_answer
+
+    // Player must be in question_open or question_close
+    if (session.state === SessionState.QUESTION_OPEN ||
+        session.state === SessionState.QUESTION_CLOSE) {
+      // Remove timers, as question no longer needs to close
+      while (session.timers.length > 0) {
+        clearTimeout(session.timers[0]);
+        session.timers.splice(0, 1);
+      }
+
+      // change player state to answer_show
+      session.state = SessionState.ANSWER_SHOW;
+      return { };
+    }
+  } else if (action === 'GO_TO_FINAL_RESULTS') {
+    // Action : go_to_final_results
+
+    // Player must be in question_close or answer_show
+    if (session.state === SessionState.QUESTION_CLOSE ||
+        session.state === SessionState.ANSWER_SHOW) {
+      // change player state to final_results
+      session.state = SessionState.FINAL_RESULTS;
+
+      return { };
+    }
+  }
+
+  throw HTTPError(400, cantAct400);
 }
 
 /** quizGetSession
@@ -96,71 +221,49 @@ sessionStatus {
 
   // Loop through the quiz to find valid active session
   // Error 400 : Invalid or unactive session id
-  // const session = getQuizSession(sessionId, getData().quizSessions);
-  // if (!session || session.quiz.quizId !== quizId || session.state === SessionState.END) {
-  //   throw HTTPError(400, unactive400);
-  // }
   const session = getQuizSession(sessionId, getData().quizSessions);
-  if (!session || !session.quiz || session.quiz.quizId !== quizId || session.state === SessionState.END) {
+  if (!session ||
+      session.quiz.quizId !== quizId ||
+      session.state === SessionState.END) {
     throw HTTPError(400, unactive400);
   }
 
   // get player names in session
   const playersInSession: string[] = [];
-  // Add players to the array
   for (const player of session.players) {
+    // Add players to the array
     playersInSession.push(player.name);
   }
 
   // get questions in the quiz
-  const quizQuest: string[] = [];
-  for (const questionInQuiz of session.quiz.questions) {
-    quizQuest.push(questionInQuiz);
+  const quizQuestions = [];
+  for (const ques of session.quiz.questions) {
+    quizQuestions.push({
+      questionId: ques.questionId,
+      question: ques.question,
+      duration: ques.duration,
+      thumbnailUrl: ques.thumbnailUrl,
+      points: ques.points,
+      answers: ques.answers
+    });
   }
-
-  // const quizAns: string;
-  // for (const questionAnswers of quiz.questions.answers) {
-  //   quizAnswer = questionAnswers;
-  // }
 
   // Calculating the duration of the quiz
   let duration = 0;
-  for (const question of quizQuest) {
-    duration += question.duration;
-  }
+  for (const question of quiz.questions) { duration += question.duration; }
 
   return {
     state: session.state,
     atQuestion: 3,
     players: playersInSession,
     metadata: {
-      quizId: quizId,
+      quizId: quiz.quizId,
       name: quiz.name,
       timeCreated: quiz.timeCreated,
       timeLastEdited: quiz.timeLastEdited,
       description: quiz.description,
       numQuestions: quiz.questions.length,
-      questions: [
-        {
-          questionId: quiz.questions.quiestionId,
-          question: quiz.questions.question,
-          duration: quiz.questions.duration,
-          thumbnailUrl: quiz.questions.thumbnailUrl,
-          points: quiz.questions.points,
-          answers: [
-            {
-              // answerId: quiz.questions.question.answers.answerId,
-              // answer: quiz.questions.question.answers.answer,
-              // colour: quiz.questions.question.answers.colour,
-              // correct: quiz.questions.question.answers.correct
-              answerId: quiz.questions.question.quizAnswer.answerId,
-              answer: quiz.questions.question.quizAnswer.answer,
-              colour: quiz.questions.question.quizAnswer.colour,
-              correct: quiz.questions.question.quizAnswer.correct
-            }
-          ]
-        }
-      ],
+      questions: quizQuestions,
       duration: duration,
       thumbnailUrl: quiz.thumbnailUrl
     }

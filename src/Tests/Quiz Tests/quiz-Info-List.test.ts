@@ -180,9 +180,6 @@ describe('adminQuizInfo Version 1', () => {
   });
 
   test('INVALID User Id: Invalid quizId or quizId not matching', () => {
-    // Register test id: 2 by user id: 1
-    quizId = requestQuizCreate(1, 'first last', 'fist_test').quizId;
-
     // Quiz ID does not refer to a valid quiz
     expect(() => requestQuizInfo(1, 100, true)).toThrow(HTTPError[401]);
 
@@ -261,9 +258,6 @@ describe('adminQuizInfo Version 2', () => {
   });
 
   test('INVALID User Id: Invalid quizId or quizId not matching', () => {
-    // Register test id: 2 by user id: 1
-    quizId = requestQuizCreate(1, 'first last', 'fist_test').quizId;
-
     // Quiz ID does not refer to a valid quiz
     expect(() => requestQuizInfo(1, 100)).toThrow(HTTPError[401]);
 
