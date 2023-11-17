@@ -24,15 +24,12 @@ const SERVER_URL = `${url}:${port}`;
 //  ======================== OTHER FUNCTIONS =========================
 // ====================================================================
 
-// DELETE CLEAR Define wrapper function: Version 1
-export function requestClearV1() {
-  const res = request('DELETE', SERVER_URL + '/v1/clear');
-  return JSON.parse(res.body.toString());
-}
+// DELETE CLEAR Define wrapper function
+export function requestClear(v1?: boolean) {
+  let v = '/v2';
+  if (v1) v = '/v1';
 
-// DELETE CLEAR Define wrapper function: Version 1
-export function requestClear() {
-  const res = request('DELETE', SERVER_URL + '/v2/clear');
+  const res = request('DELETE', SERVER_URL + v + '/clear');
   return JSON.parse(res.body.toString());
 }
 
@@ -42,7 +39,7 @@ export function requestClear() {
 
 // POST REGISTER Define wrapper function
 export function requestRegister(email: string, password: string,
-  nameFirst: string, nameLast: string, v1?:boolean): Token {
+  nameFirst: string, nameLast: string, v1?: boolean): Token {
   let compUrl: string;
   if (v1) compUrl = SERVER_URL + '/v1/admin/auth/register';
   else compUrl = SERVER_URL + '/v2/admin/auth/register';
@@ -69,7 +66,7 @@ export function requestRegister(email: string, password: string,
 }
 
 // POST LOGIN Define wrapper function
-export function requestLogin(email: string, password: string, v1?:boolean):
+export function requestLogin(email: string, password: string, v1?: boolean):
   Token {
   let compUrl: string;
   if (v1) compUrl = SERVER_URL + '/v1/admin/auth/login';
@@ -95,7 +92,7 @@ export function requestLogin(email: string, password: string, v1?:boolean):
 }
 
 // GET DETAILS Define wrapper function
-export function requestDetails(token: number, v1?:boolean): Details {
+export function requestDetails(token: number, v1?: boolean): Details {
   let res;
 
   if (v1) {
@@ -122,7 +119,7 @@ export function requestDetails(token: number, v1?:boolean): Details {
 }
 
 // POST LOGOUT Define wrapper function
-export function requestLogout(token: number, v1?:boolean):
+export function requestLogout(token: number, v1?: boolean):
   ErrorObject | Record<string, never> {
   let res;
 
@@ -242,23 +239,40 @@ export function requestPasswordEdit(token: number, oldPass: string,
 
 // POST QUIZ CREATE Define wrapper function
 export function requestQuizCreate(token: number, name: string,
-  description: any): QuizId {
+  description: string, v1?: boolean): QuizId {
+  let v = '/v2';
+  let headers: any = { token: token.toString() };
+  let json: any = {
+    name: name,
+    description: description
+  };
+
+  if (v1) {
+    v = '/v1';
+    headers = { };
+    json = {
+      token: token,
+      name: name,
+      description: description
+    };
+  }
+
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/quiz',
+    SERVER_URL + v + '/admin/quiz',
     {
-      json: {
-        token: token,
-        name: name,
-        description: description
-      }
+      json: json,
+      headers: headers
     }
   );
 
   const result = JSON.parse(res.body.toString());
 
-  if ('error' in result) return { quizId: -1 };
-  else return result;
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // GET QUIZ INFO Define wrapper function
@@ -319,69 +333,140 @@ export function requestQuizList(token: number | string,
 
 // PUT QUIZ DESCRIPTION UODATE Define Wrapper Function
 export function requestQuizDescriptionUpdate(token: number | string,
-  quizId: number, description: string) {
+  quizId: number, description: string, v1?: boolean): Record<string, never> {
+  let v = '/v2';
+  let headers: any = { token: token.toString() };
+  let json: any = { description: description };
+
+  if (v1) {
+    v = '/v1';
+    headers = { };
+    json = {
+      token: token,
+      description: description
+    };
+  }
+
   const res = request(
     'PUT',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '/description',
+    SERVER_URL + v + '/admin/quiz/' + quizId + '/description',
     {
-      json: {
-        token: token,
-        description: description,
-      }
+      json: json,
+      headers: headers
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // PUT QUIZ NMAE UPDATE Define wrapper function
 export function requestQuizNameUpdate(token: number, quizId: number,
-  name: string) {
+  name: string, v1?: boolean): Record<string, never> {
+  let v = '/v2';
+  let headers: any = { token: token.toString() };
+  let json: any = { name: name };
+
+  if (v1) {
+    v = '/v1';
+    headers = { };
+    json = {
+      token: token,
+      name: name
+    };
+  }
+
   const res = request(
     'PUT',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '/name',
+    SERVER_URL + v + '/admin/quiz/' + quizId + '/name',
     {
-      json: {
-        token: token,
-        name: name,
-      }
+      json: json,
+      headers: headers
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // QUIZ REMOVE Define wrapper function
-export function requestQuizRemove(token: number, quizId: number):
-  ErrorObject | Record<string, never> {
+export function requestQuizRemove(token: number, quizId: number, v1?: boolean):
+  Record<string, never> {
+  let v = '/v2';
+  let headers: any = { token: token.toString() };
+  let qs: any = { };
+
+  if (v1) {
+    v = '/v1';
+    headers = { };
+    qs = { token: token };
+  }
+
   const res = request(
     'DELETE',
-    SERVER_URL + '/v1/admin/quiz/' + quizId,
-    { qs: { token: token } }
+    SERVER_URL + v + '/admin/quiz/' + quizId,
+    {
+      qs: qs,
+      headers: headers
+    }
   );
-  return JSON.parse(res.body.toString());
+
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // POST QUIZ TRANSFER Define wrapper function
 export function requestQuizTransfer(token: number | string, quizId: number,
-  userEmail: string) {
+  userEmail: string, v1?: boolean): Record<string, never> {
+  let v = '/v2';
+  let headers: any = { token: token.toString() };
+  let json: any = { userEmail: userEmail };
+
+  if (v1) {
+    v = '/v1';
+    headers = { };
+    json = {
+      token: token,
+      userEmail: userEmail
+    };
+  }
+
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '/transfer',
+    SERVER_URL + v + '/admin/quiz/' + quizId + '/transfer',
     {
-      json: {
-        token: token,
-        userEmail: userEmail,
-      }
+      headers: headers,
+      json: json
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // GET QUIZ TRASH Define wrapper function
 export function requestQuizTrash(token: number | string, v1?: boolean):
-  QuizList | ErrorObject {
+  QuizList {
   let res;
   if (v1) {
     res = request(
@@ -396,6 +481,7 @@ export function requestQuizTrash(token: number | string, v1?: boolean):
       { headers: { token: token.toString() } }
     );
   }
+
   const result = JSON.parse(res.body.toString());
 
   if (res.statusCode !== 200) {
@@ -407,7 +493,7 @@ export function requestQuizTrash(token: number | string, v1?: boolean):
 
 // POST QUIZ RESTORE Define wrapper function
 export function requestQuizRestore(token: number, quizId: number, v1?: boolean):
-  ErrorObject | Record<string, never> {
+  Record<string, never> {
   let res;
 
   if (v1) {
@@ -533,19 +619,36 @@ export function requestQuizSessionUpdate(quizId: number, sessionId: number,
 // ====================================================================
 
 export function requestQuestionCreate(token: number | string,
-  quizId: number, questionBody: QuestionBody): QuestionId {
+  quizId: number, questionBody: QuestionBody, v1?: boolean): QuestionId {
+  let v = '/v2';
+  let headers: any = { token: token.toString() };
+  let json: any = { questionBody: questionBody };
+
+  if (v1) {
+    v = '/v1';
+    headers = { };
+    json = {
+      token: token,
+      questionBody: questionBody
+    };
+  }
+
   const res = request(
     'POST',
-    SERVER_URL + '/v1/admin/quiz/' + quizId + '/question',
+    SERVER_URL + v + '/admin/quiz/' + quizId + '/question',
     {
-      json: {
-        token: token,
-        questionBody: questionBody,
-      }
+      json: json,
+      headers: headers
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // QUESTION MOVE Define wrapper function
@@ -605,30 +708,68 @@ export function requestQuesDup(token: number, quizid: number,
 
 // QUESTION Update Define wrapper function
 export function requestQuesUpdate(token: number, quizId: number, quesId: number,
-  questionBody: QuestionBody): ErrorObject | Record<string, never> {
+  questionBody: QuestionBody, v1?: boolean):
+  ErrorObject | Record<string, never> {
+  let v = '/v2';
+  let headers: any = { token: token.toString() };
+  let json: any = { questionBody: questionBody };
+
+  if (v1) {
+    v = '/v1';
+    headers = { };
+    json = {
+      token: token,
+      questionBody: questionBody
+    };
+  }
+
   const res = request(
     'PUT',
-    `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}`,
+    `${SERVER_URL}${v}/admin/quiz/${quizId}/question/${quesId}`,
     {
-      json: {
-        token: token,
-        questionBody: questionBody
-      }
+      json: json,
+      headers: headers
     }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // QUESTION Update Define wrapper function
 export function requestQuesDelete(token: number, quizId: number,
-  quesId: number): ErrorObject | Record<string, never> {
+  quesId: number, v1?: boolean): ErrorObject | Record<string, never> {
+  let v = '/v2';
+  let qs: any = { };
+  let headers:any = { token: token.toString() };
+
+  if (v1) {
+    v = '/v1';
+    qs = { token: token };
+    headers = { };
+  }
+
   const res = request(
     'DELETE',
-    `${SERVER_URL}/v1/admin/quiz/${quizId}/question/${quesId}?token=${token}`
+    `${SERVER_URL}${v}/admin/quiz/${quizId}/question/${quesId}`,
+    {
+      qs: qs,
+      headers: headers
+    }
   );
 
-  return JSON.parse(res.body.toString());
+  const result = JSON.parse(res.body.toString());
+
+  if (res.statusCode !== 200) {
+    throw HTTPError(res.statusCode, result?.error || result || 'NO MESSAGE');
+  }
+
+  return result;
 }
 
 // ====================================================================

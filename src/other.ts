@@ -24,6 +24,8 @@ function clear(): Record<string, never> {
     quizSessions: []
   });
 
+  // Need to clear the timers
+
   return { };
 }
 

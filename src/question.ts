@@ -20,7 +20,8 @@ import {
   ansDup400,
   ansInc400,
   quesID400,
-  quesPos400
+  quesPos400,
+  invImg400
 } from './dataStore';
 
 import HTTPError from 'http-errors';
@@ -73,6 +74,21 @@ function validQuestionBody(questionBody: QuestionBody):
     if (firstInstance !== i) return { error: ansDup400 };
   }
 
+  // Image url format is incorrect
+  if (questionBody.thumbnailUrl) {
+    // thumbnailUrl will not be empty if it is v2, as the server will set it to
+    // 'Invalid' so that this function works for both v1 and v2 calls
+
+    // Should start with 'https://'/'http://' and end with 'jpg'/'jpeg'/'png'
+    if ((!questionBody.thumbnailUrl.startsWith('https://') &&
+        !questionBody.thumbnailUrl.startsWith('http://')) ||
+        (!questionBody.thumbnailUrl.endsWith('png') &&
+        !questionBody.thumbnailUrl.endsWith('jpg') &&
+        !questionBody.thumbnailUrl.endsWith('jpeg'))) {
+      return { error: invImg400 };
+    }
+  }
+
   // This will mean that no errors occur
   return { error: '' };
 }
@@ -88,30 +104,26 @@ function validQuestionBody(questionBody: QuestionBody):
   * @returns { ErrorObject } - If the token or the inputs is invalid
   */
 export function adminQuestionCreate(token: number, quizId: number,
-  questionBody: QuestionBody, thumbnailUrl?: string): QuestionId | ErrorObject {
+  questionBody: QuestionBody): QuestionId | ErrorObject {
   const data = getData();
 
   // Checking if the user exists
   const user = getUser(token, data);
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Checking if user owns the quiz
   const quiz = getQuiz(quizId, data.quizzes);
-  if (!quiz) return { error: unauth403 };
-  if (quiz.authId !== user.authUserId) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
+  if (quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
 
   // Checking the question body is valid
   const valid = validQuestionBody(questionBody);
-  if (valid.error) { return valid; }
+  if (valid.error) throw HTTPError(400, valid.error);
 
   // Ensuring the duration is valid
   let durationSum = questionBody.duration;
   for (const ques of quiz.questions) durationSum += ques.duration;
-  if (durationSum > 180) return { error: quizDur400 };
-
-  /// //////////////////////////////////////////////////////////////////////////
-  /// ///// ERROR CHECKING THUMBNAIL ///////////////////////////////////////////
-  /// //////////////////////////////////////////////////////////////////////////
+  if (durationSum > 180) throw HTTPError(400, quizDur400);
 
   // Creating answers
   const answers: Answer[] = [];
@@ -136,7 +148,7 @@ export function adminQuestionCreate(token: number, quizId: number,
     duration: questionBody.duration,
     points: questionBody.points,
     answers: answers,
-    thumbnailUrl: thumbnailUrl
+    thumbnailUrl: questionBody.thumbnailUrl
   };
 
   // Updating the time editted
@@ -218,37 +230,38 @@ export function updateQuestion(token: number, quizId: number, quesId: number,
   // Error Checking
   // Check if the user is valid
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Check if the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Checking that the user owns the quiz
-  if (quiz.authId !== user.authUserId) return { error: unauth403 };
+  if (quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
 
   // Check if the question exists within the quiz
   let question: Question;
   for (const ques of quiz.questions) {
     if (ques.questionId === quesId) question = ques;
   }
-  if (!question) return { error: quesID400 };
+  if (!question) throw HTTPError(400, quesID400);
 
   const valid = validQuestionBody(questionBody);
-  if (valid.error) return valid;
+  if (valid.error) throw HTTPError(400, valid.error);
 
   // Sum of the question durations in the quiz exceeds 3 minutes
   let durationSum = questionBody.duration;
   for (const ques of quiz.questions) {
     if (ques.questionId !== quesId) durationSum += ques.duration;
   }
-  if (durationSum > 180) return { error: quizDur400 };
+  if (durationSum > 180) throw HTTPError(400, quizDur400);
 
   // No errors occur, so update the question
   question.question = questionBody.question;
   question.duration = questionBody.duration;
   question.points = questionBody.points;
   question.answers = questionBody.answers;
+  question.thumbnailUrl = questionBody.thumbnailUrl;
 
   // Update the last edited time for the quiz
   quiz.timeLastEdited = Math.floor(Date.now() / 1000);
@@ -271,14 +284,14 @@ export function deleteQuestion(token: number, quizId: number, quesId: number):
   // Error Checking
   // Check if the user is valid
   const user = getUser(token, getData());
-  if (!user) return { error: token401 };
+  if (!user) throw HTTPError(401, token401);
 
   // Check if the quiz exists
   const quiz = getQuiz(quizId, getData().quizzes);
-  if (!quiz) return { error: unauth403 };
+  if (!quiz) throw HTTPError(403, unauth403);
 
   // Checking that the user owns the quiz
-  if (quiz.authId !== user.authUserId) return { error: unauth403 };
+  if (quiz.authId !== user.authUserId) throw HTTPError(403, unauth403);
 
   // Check if the question exists within the quiz
   for (const ques of quiz.questions) {
@@ -288,7 +301,7 @@ export function deleteQuestion(token: number, quizId: number, quesId: number):
     }
   }
 
-  return { error: quesID400 };
+  throw HTTPError(400, quesID400);
 }
 
 /** adminQuesDup
@@ -321,12 +334,14 @@ export function adminQuestionDuplicate(token: number, quesId: number,
   }
   if (!currQues) throw HTTPError(400, quesID400);
 
+  // Checking duration remains valid after duplication
   let durationSum = currQues.duration;
   for (const ques of quiz.questions) {
     durationSum += ques.duration;
   }
   if (durationSum > 180) throw HTTPError(400, quizDur400);
 
+  // Adding the new question to the list of questions
   const newId = getUniqueID(getData());
   quiz.questions.push({
     questionId: newId,
